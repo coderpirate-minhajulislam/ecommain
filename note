@@ -1,0 +1,206 @@
+for create branch
+git branch dev
+git checkout dev
+git push -u origin dev
+
+git checkout main
+
+for deletete branch
+git branch -d dev
+git push origin --delete dev
+
+
+for merge branch
+git checkout main
+git merge dev
+git push origin main
+
+
+primehaatbd
+@Minhaz_1332!S
+
+.\deploy-build.bat
+
+
+php artisan tinker --execute="Schema::table('banners', function($t) { $t->string('position', 20)->default('hero')->after('is_active'); });"
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('banners', function(\Illuminate\Database\Schema\Blueprint `$table) { `$table->string('position', 20)->default('hero')->after('is_active'); });"
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('banners', function(\Illuminate\Database\Schema\Blueprint \$table) { \$table->string('position', 20)->default('hero')->after('is_active'); });"
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('landing_pages', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->string('template', 10)->default('v1')->after('hero_video'); });"
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('landing_pages', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->json('review_images')->nullable()->after('hero_video'); });"
+
+
+
+
+
+
+
+php artisan tinker --execute='Schema::table("landing_pages", function ($t) { if (!Schema::hasColumn("landing_pages", "checkout_title")) $t->string("checkout_title")->nullable()->after("checkout_banner_text"); if (!Schema::hasColumn("landing_pages", "review_images_title")) $t->string("review_images_title")->nullable()->after("checkout_title"); if (!Schema::hasColumn("landing_pages", "review_images")) $t->json("review_images")->nullable()->after("hero_video"); if (!Schema::hasColumn("landing_pages", "template")) $t->string("template", 10)->default("v1")->after("review_images"); }); echo "Done";'
+
+
+php artisan tinker --execute='Schema::table("products", function ($t) { if (!Schema::hasColumn("products", "extra_category_ids")) $t->json("extra_category_ids")->nullable()->after("sub_category_id"); if (!Schema::hasColumn("products", "extra_sub_category_ids")) $t->json("extra_sub_category_ids")->nullable()->after("extra_category_ids"); }); echo "Done";'
+
+
+
+# ORDERS TABLE
+php artisan tinker --execute='Schema::table("orders", function ($t) { $t->index("status"); $t->index("phone"); $t->index("created_at"); $t->index(["status", "created_at"]); $t->index("steadfast_consignment_id"); $t->index("payment_method"); }); echo "Done orders";'
+
+# PRODUCTS TABLE
+php artisan tinker --execute='Schema::table("products", function ($t) { $t->index(["in_stock", "is_featured"]); $t->index(["in_stock", "is_new_arrival"]); $t->index(["in_stock", "offer_timer"]); $t->index("created_at"); $t->index("price"); }); echo "Done products";'
+
+# BANNERS TABLE
+php artisan tinker --execute='Schema::table("banners", function ($t) { $t->index(["is_active", "position", "sort_order"]); }); echo "Done banners";'
+
+# CONTACT MESSAGES TABLE
+php artisan tinker --execute='Schema::table("contact_messages", function ($t) { $t->index("is_read"); }); echo "Done contact_messages";'
+
+# COUPONS TABLE
+php artisan tinker --execute='Schema::table("coupons", function ($t) { $t->index(["is_active", "is_global"]); }); echo "Done coupons";'
+
+# PAYMENT METHODS TABLE
+php artisan tinker --execute='Schema::table("payment_methods", function ($t) { $t->index(["is_active", "sort_order"]); }); echo "Done payment_methods";'
+
+# USERS TABLE
+php artisan tinker --execute='Schema::table("users", function ($t) { $t->index("role"); }); echo "Done users";'
+
+# REVIEWS TABLE (composite)
+php artisan tinker --execute='Schema::table("reviews", function ($t) { $t->index(["product_id", "is_approved"]); }); echo "Done reviews";'
+
+php artisan tinker --execute="Schema::table('orders', function(\$t) { \$t->string('district')->nullable()->after('phone'); });"
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('orders', function(Illuminate\Database\Schema\Blueprint `$table) { `$table->text('note')->nullable()->after('discount'); });"
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('orders', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->text('note')->nullable()->after('discount'); });"
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('products', function(Illuminate\Database\Schema\Blueprint `$table) { `$table->string('size_label')->nullable()->after('allowed_payment_methods'); `$table->string('color_label')->nullable()->after('size_label'); });"
+
+
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('products', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->string('size_label')->nullable()->after('allowed_payment_methods'); \$table->string('color_label')->nullable()->after('size_label'); });"
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('products', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->string('size_label')->nullable(); \$table->string('color_label')->nullable(); });
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('products', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->string('size_label')->nullable(); \$table->string('color_label')->nullable(); });"
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('product_variants', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->boolean('free_shipping')->nullable()->default(null)->after('in_stock'); \$table->json('shipping_zones')->nullable()->default(null)->after('free_shipping'); });"
+
+# Windows PowerShell fix (use raw SQL to avoid namespace parse errors):
+php artisan tinker --execute="DB::statement('ALTER TABLE product_variants ADD COLUMN free_shipping TINYINT(1) NULL DEFAULT NULL AFTER in_stock, ADD COLUMN shipping_zones JSON NULL DEFAULT NULL AFTER free_shipping'); echo 'Done';"
+
+
+
+
+Edit your Nginx config to increase the client_max_body_size directive:
+
+Add or update inside the http block:
+
+Or, if you prefer to set it per-site, edit your site config:
+
+Add it inside the server or location block:
+
+Then reload Nginx:
+
+If you're also using PHP-FPM, update /etc/php/8.x/fpm/php.ini:
+
+Then restart PHP-FPM:
+
+root@main:/etc/nginx/sites-available# cd /etc/php/8.4/fpm/php.ini
+-bash: cd: /etc/php/8.4/fpm/php.ini: Not a directory
+root@main:/etc/nginx/sites-available#
+
+You need to use a text editor, not cd — it's a file, not a directory:
+
+Then find and update these values:
+
+sudo nano /etc/nginx/sites-available/your-site.conf
+server {
+    client_max_body_size 100M;
+    ...
+}
+Save and restart PHP-FPM:
+sudo nano /etc/php/8.4/fpm/php.ini
+upload_max_filesize = 100M
+post_max_size = 100M
+sudo systemctl restart php8.4-fpm
+
+
+
+php artisan tinker --execute="DB::statement('ALTER TABLE reviews DROP COLUMN title');"
+
+php artisan tinker --execute="DB::statement('ALTER TABLE orders ADD COLUMN order_source VARCHAR(50) NULL AFTER note;'); echo 'done';"
+
+
+
+
+146.190.88.32
+
+
+
+grep "Meta CAPI" /var/www/html/specialorganicshop/storage/logs/laravel.log
+
+
+
+php artisan tinker --execute="Illuminate\Support\Facades\Schema::table('product_variants', function(Illuminate\Database\Schema\Blueprint \$table) { \$table->boolean('free_shipping')->nullable()->default(null)->after('in_stock'); \$table->json('shipping_zones')->nullable()->default(null)->after('free_shipping'); });"
+
+
+php artisan tinker --execute="DB::statement('ALTER TABLE product_variants ADD COLUMN free_shipping TINYINT(1) NULL DEFAULT NULL AFTER in_stock, ADD COLUMN shipping_zones JSON NULL DEFAULT NULL AFTER free_shipping'); echo 'Done';"
+
+
+php artisan tinker --execute="DB::statement('ALTER TABLE product_variants ADD COLUMN free_shipping TINYINT(1) NULL DEFAULT NULL AFTER in_stock, ADD COLUMN shipping_zones JSON NULL DEFAULT NULL AFTER free_shipping'); echo 'Done';"
+
+php artisan tinker --execute="DB::statement(\"ALTER TABLE orders MODIFY COLUMN status ENUM('pending','confirmed','processing','shipped','delivered','cancelled','returned','hold','pre-order') NOT NULL DEFAULT 'pending'\"); echo 'Done';"
+
+
+
+
+php artisan tinker --execute="DB::statement('ALTER TABLE orders ADD COLUMN utm_source VARCHAR(100) NULL AFTER gclid, ADD COLUMN utm_medium VARCHAR(100) NULL AFTER utm_source, ADD COLUMN utm_campaign VARCHAR(255) NULL AFTER utm_medium, ADD COLUMN utm_content VARCHAR(255) NULL AFTER utm_campaign, ADD COLUMN utm_term VARCHAR(255) NULL AFTER utm_content'); echo 'Done';"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Install Bengali fonts
+sudo apt install -y fonts-beng
+
+# Find the font file
+find /usr/share/fonts -name "*.ttf" | grep -i "beng\|lohit" | head -5
+
+# Create fonts directory and copy font
+mkdir -p /var/www/html/specialorganicshop/storage/fonts
+cp /usr/share/fonts/truetype/lohit-bengali/Lohit-Bengali.ttf /var/www/html/specialorganicshop/storage/fonts/
+
+# Set permissions
+chown www-data:www-data /var/www/html/specialorganicshop/storage/fonts/Lohit-Bengali.ttf
+
+
+
+cd /var/www/html/specialorganicshop
+php artisan view:clear
+
+ls -la /var/www/html/specialorganicshop/storage/fonts/
+
+
+# Alternative - download Kalpurush (popular BD font)
+sudo apt install -y wget
+wget -O /var/www/html/specialorganicshop/storage/fonts/kalpurush.ttf \
+  "https://github.com/hablullah/go-data-bengali/raw/master/font/Kalpurush.ttf"

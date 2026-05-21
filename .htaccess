@@ -1,0 +1,83 @@
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
+
+    RewriteEngine On
+
+    # Force HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # ─── SECURITY: Block access to sensitive folders/files ───
+    RewriteRule ^app(/.*)?$ - [F,L]
+    RewriteRule ^bootstrap(/.*)?$ - [F,L]
+    RewriteRule ^config(/.*)?$ - [F,L]
+    RewriteRule ^database(/.*)?$ - [F,L]
+    RewriteRule ^resources(/.*)?$ - [F,L]
+    RewriteRule ^routes(/.*)?$ - [F,L]
+    RewriteRule ^storage/framework(/.*)?$ - [F,L]
+    RewriteRule ^storage/logs(/.*)?$ - [F,L]
+    RewriteRule ^tests(/.*)?$ - [F,L]
+    RewriteRule ^vendor(/.*)?$ - [F,L]
+    RewriteRule ^node_modules(/.*)?$ - [F,L]
+    RewriteRule ^\.env$ - [F,L]
+    RewriteRule ^\.env\..*$ - [F,L]
+    RewriteRule ^artisan$ - [F,L]
+    RewriteRule ^composer\.(json|lock)$ - [F,L]
+    RewriteRule ^package\.(json|lock)$ - [F,L]
+    RewriteRule ^phpunit\.xml$ - [F,L]
+    RewriteRule ^tsconfig\.json$ - [F,L]
+    RewriteRule ^vite\.config\.ts$ - [F,L]
+    RewriteRule ^pint\.json$ - [F,L]
+
+    # Allow public storage files (uploads/images)
+    RewriteRule ^storage/app/public/(.*)$ storage/app/public/$1 [L]
+
+    # ─── Serve static files from public/ folder ───
+    # build/ assets (JS, CSS)
+    RewriteCond %{REQUEST_URI} ^/build/
+    RewriteRule ^build/(.*)$ public/build/$1 [L]
+
+    # favicon, robots, sw.js, etc.
+    RewriteCond %{DOCUMENT_ROOT}/public/%{REQUEST_URI} -f
+    RewriteRule ^(.+\.(ico|svg|png|jpg|jpeg|gif|webp|css|js|txt|woff|woff2|ttf|eot|map|json))$ public/$1 [L]
+
+    # uploads folder
+    RewriteRule ^uploads/(.*)$ public/uploads/$1 [L]
+
+    # storage symlink
+    RewriteRule ^storage/(.*)$ public/storage/$1 [L]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-XSRF-Token Header
+    RewriteCond %{HTTP:x-xsrf-token} .
+    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
+
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ public/index.php [L]
+</IfModule>
+
+# Block access to hidden files (.env, .git, etc.)
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# PHP Settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 20M
+    php_value post_max_size 25M
+    php_value max_execution_time 600
+    php_value memory_limit 256M
+</IfModule>

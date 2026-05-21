@@ -1,0 +1,131 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: '@Minhaz_1332!SS'
+          MYSQL_DATABASE: specialorganicshop
+          MYSQL_USER: specialorganicshop
+          MYSQL_PASSWORD: '@Minhaz_1332!SS'
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -h localhost -u specialorganicshop -p@Minhaz_1332!SS" --health-interval=10s --health-timeout=5s --health-retries=5
+
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, dom, filter, gd, iconv, json, mbstring, pdo, redis
+
+      - name: Copy Environment File
+        run: cp .env.example .env
+
+      - name: Configure Database for CI
+        run: |
+          sed -i 's/APP_NAME=Laravel/APP_NAME="specialorganicshop"/' .env
+          sed -i 's/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/' .env
+          sed -i "s/# DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/" .env
+          sed -i "s/# DB_PORT=3306/DB_PORT=3306/" .env
+          sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=specialorganicshop/" .env
+          sed -i "s/# DB_USERNAME=root/DB_USERNAME=specialorganicshop/" .env
+          sed -i "s/# DB_PASSWORD=/DB_PASSWORD=@Minhaz_1332!SS/" .env
+          sed -i 's/CACHE_STORE=database/CACHE_STORE=redis/' .env
+          sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=redis/' .env
+          sed -i 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=redis/' .env
+
+      - name: Install Composer Dependencies
+        run: composer install --optimize-autoloader --no-progress --no-interaction --prefer-dist
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h127.0.0.1 -uspecialorganicshop -p'@Minhaz_1332!SS' --silent; do
+            echo 'Waiting for MySQL...'
+            sleep 2
+          done
+          echo 'MySQL is ready!'
+
+      - name: Setup Database for Build
+        run: php artisan migrate --force
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '25'
+
+      - name: Install NPM Dependencies
+        run: npm install
+
+      - name: Generate Wayfinder Types
+        run: php artisan wayfinder:generate --with-form
+
+      - name: Build NPM Assets
+        run: npm run build
+
+      # - name: Remove Old Build Files on Server
+      #   uses: appleboy/ssh-action@v1.2.5
+      #   with:
+      #     host: ${{ secrets.VPS_HOST }}
+      #     username: ${{ secrets.VPS_USER }}
+      #     password: ${{ secrets.VPS_PASSWORD }}
+      #     script: |
+      #       rm -rf /var/www/html/specialorganicshop/public/build
+      #       rm -rf /var/www/html/specialorganicshop/bootstrap/cache/*.php
+      #       rm -rf /var/www/html/specialorganicshop/database/migrations/*.php
+
+
+      - name: Synchronize Files To Server
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: '.'
+          target: '/var/www/html/specialorganicshop/'
+
+      - name: Run Remote/Artisan Commands
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /var/www/html/specialorganicshop
+            sudo chown -R www-data:www-data /var/www/html/specialorganicshop
+            sudo chmod -R 775 /var/www/html/specialorganicshop/storage
+            sudo chmod -R 775 /var/www/html/specialorganicshop/bootstrap/cache
+
+            php artisan migrate --force
+
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan cache:clear
+            php artisan event:clear
+
+            php artisan optimize
+
+# php artisan migrate:fresh --seed --force
+
+# test
