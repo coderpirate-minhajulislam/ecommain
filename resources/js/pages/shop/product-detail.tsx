@@ -135,6 +135,7 @@ export default function ProductDetail() {
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
     const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
+    const [isThumbnailOverride, setIsThumbnailOverride] = useState(false);
     const [videoOpen, setVideoOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<'details' | 'policy' | 'reviews'>('details');
     const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({ days: 0, hours: 0, minutes: 0, seconds: 0, expired: false });
@@ -169,12 +170,11 @@ export default function ProductDetail() {
     const activeInStock = selectedVariant ? selectedVariant.in_stock : product?.in_stock;
     const productImages = product?.images?.map((img) => img.image_path) ?? [];
     const hasVariantImage = Boolean(selectedVariant?.image_path);
-    const imagePaths = hasVariantImage
-        ? [selectedVariant!.image_path!]
-        : productImages;
-    const displayedImagePath = hasVariantImage
+    const imagePaths = productImages;
+    const currentGalleryImagePath = imagePaths[selectedImage] ?? null;
+    const displayedImagePath = hasVariantImage && !isThumbnailOverride
         ? selectedVariant!.image_path!
-        : imagePaths[selectedImage] ?? null;
+        : currentGalleryImagePath ?? selectedVariant?.image_path ?? null;
 
     // Variant shipping: if null → inherit from product; if true → free; if false → use variant zones
     const activeFreeShipping = selectedVariant && selectedVariant.free_shipping !== null
@@ -184,12 +184,18 @@ export default function ProductDetail() {
         ? selectedVariant.shipping_zones
         : (product?.shipping_zones ?? []);
 
+    function handleGalleryThumbSelect(index: number) {
+        setSelectedImage(index);
+        setIsThumbnailOverride(true);
+    }
+
     function imgPrev() {
         if (imagePaths.length <= 1) {
             return;
         }
 
         setSelectedImage((i) => (i - 1 + imagePaths.length) % imagePaths.length);
+        setIsThumbnailOverride(true);
     }
 
     function imgNext() {
@@ -198,6 +204,7 @@ export default function ProductDetail() {
         }
 
         setSelectedImage((i) => (i + 1) % imagePaths.length);
+        setIsThumbnailOverride(true);
     }
 
     function onImgTouchStart(e: React.TouchEvent) {
@@ -323,8 +330,11 @@ export default function ProductDetail() {
     useEffect(() => {
         if (!product?.images?.length) {
             setSelectedImage(0);
+            setIsThumbnailOverride(false);
             return;
         }
+
+        setIsThumbnailOverride(false);
 
         if (selectedVariant?.image_path) {
             const variantImageIndex = product.images.findIndex((img) => img.image_path === selectedVariant.image_path);
@@ -395,7 +405,7 @@ export default function ProductDetail() {
                                         {product.images.map((img, i) => (
                                             <button
                                                 key={img.id}
-                                                onClick={() => setSelectedImage(i)}
+                                                onClick={() => handleGalleryThumbSelect(i)}
                                                 className={`shrink-0 overflow-hidden rounded-md border-2 transition-all sm:h-18 sm:w-18 lg:h-20 lg:w-20 ${selectedImage === i ? 'border-primary ring-1 ring-primary/50' : 'border-muted-foreground/20 hover:border-primary/50'}`}
                                             >
                                                 <img src={`/${img.image_path}`} alt="" className="h-full w-full object-cover" />
@@ -506,7 +516,7 @@ export default function ProductDetail() {
                                                 {imagePaths.map((_, i) => (
                                                     <button
                                                         key={i}
-                                                        onClick={() => setSelectedImage(i)}
+                                                        onClick={() => handleGalleryThumbSelect(i)}
                                                         className={`h-1.5 rounded-full transition-all ${i === selectedImage ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
                                                         aria-label={`Go to image ${i + 1}`}
                                                     />
@@ -520,7 +530,7 @@ export default function ProductDetail() {
                                         {product.images.map((img, i) => (
                                             <button
                                                 key={img.id}
-                                                onClick={() => setSelectedImage(i)}
+                                                onClick={() => handleGalleryThumbSelect(i)}
                                                 className={`shrink-0 overflow-hidden rounded-md border-2 transition-all h-14 w-14 ${selectedImage === i ? 'border-primary ring-1 ring-primary/50' : 'border-muted-foreground/20 hover:border-primary/50'}`}
                                             >
                                                 <img src={`/${img.image_path}`} alt="" className="h-full w-full object-cover" />
