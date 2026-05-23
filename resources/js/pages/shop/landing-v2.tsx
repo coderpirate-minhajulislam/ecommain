@@ -414,6 +414,24 @@ export default function LandingPageV2() {
     const paidAmount = selectedPaymentMethod?.requires_payment_details && data.payment_amount ? Math.min(parseFloat(data.payment_amount) || 0, total) : 0;
     const dueAmount = Math.max(0, total - paidAmount);
 
+    const filteredZones = useMemo(() => {
+        const district = data.district.trim().toLowerCase();
+        if (!district) return allSelectedZones;
+        if (district === 'dhaka') {
+            return allSelectedZones.filter((zone) => zone.toLowerCase().includes('inside'));
+        }
+        return allSelectedZones.filter((zone) => zone.toLowerCase().includes('outside'));
+    }, [allSelectedZones, data.district]);
+
+    useEffect(() => {
+        if (filteredZones.length > 0) {
+            if (!filteredZones.includes(deliveryZone)) setDeliveryZone(filteredZones[0]);
+            return;
+        }
+        setDeliveryZone('Default');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filteredZones, deliveryZone]);
+
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
     const [districtSearch, setDistrictSearch] = useState('');
     const [districtOpen, setDistrictOpen] = useState(false);
@@ -1180,11 +1198,11 @@ export default function LandingPageV2() {
                                             )
                                         )}
 
-                                        {allSelectedZones.length > 0 && (
+                                        {filteredZones.length > 0 && (
                                             <div className="mb-3">
                                                 <p className="mb-2 text-xs font-medium text-gray-400">Delivery Area</p>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {allSelectedZones.map((zone) => (
+                                                    {filteredZones.map((zone) => (
                                                         <button key={zone} type="button" onClick={() => setDeliveryZone(zone)} className={`rounded-md border px-2 py-1.5 text-xs font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary text-white' : 'border-gray-200 text-gray-500 hover:border-primary/50'}`}>{zone}</button>
                                                     ))}
                                                 </div>

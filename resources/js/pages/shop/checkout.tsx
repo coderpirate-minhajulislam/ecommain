@@ -101,16 +101,6 @@ export default function CheckoutPage() {
         return [...productZoneSet];
     }, [items, serverZones]);
 
-    // Set default delivery zone
-    if (!deliveryZone) {
-        if (allZones.length > 0) {
-            setDeliveryZone(allZones[0]);
-        } else if (items.length > 0) {
-            // All products have free shipping, set a default zone
-            setDeliveryZone('Default');
-        }
-    }
-
     const { data, setData, post, processing, errors, transform } = useForm({
         first_name: '',
         phone: '',
@@ -137,6 +127,30 @@ export default function CheckoutPage() {
         ? Math.min(parseFloat(data.payment_amount) || 0, total)
         : 0;
     const dueAmount = Math.max(0, total - paidAmount);
+
+    const filteredZones = useMemo(() => {
+        const district = data.district.trim().toLowerCase();
+        if (!district) {
+            return allZones;
+        }
+        if (district === 'dhaka') {
+            return allZones.filter((zone) => zone.toLowerCase().includes('inside'));
+        }
+        return allZones.filter((zone) => zone.toLowerCase().includes('outside'));
+    }, [allZones, data.district]);
+
+    useEffect(() => {
+        if (filteredZones.length > 0) {
+            if (!filteredZones.includes(deliveryZone)) {
+                setDeliveryZone(filteredZones[0]);
+            }
+            return;
+        }
+
+        if (items.length > 0) {
+            setDeliveryZone('Default');
+        }
+    }, [filteredZones, deliveryZone, items.length]);
 
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
     const [districtSearch, setDistrictSearch] = useState('');
@@ -485,11 +499,11 @@ export default function CheckoutPage() {
                         {/* Form */}
                         <div className="space-y-6 lg:col-span-2">
                             {/* Delivery Zone */}
-                            {allZones.length > 0 && (
+                            {filteredZones.length > 0 && (
                                 <Card className="p-4">
                                     <h2 className="mb-3 text-base font-semibold">{labels?.deliveryArea ?? 'Delivery Area'}</h2>
                                     <div className="flex flex-wrap gap-3">
-                                        {allZones.map((zone) => (
+                                        {filteredZones.map((zone) => (
                                             <button
                                                 key={zone}
                                                 type="button"

@@ -225,19 +225,6 @@ export default function LandingPage() {
         return [...zoneSet];
     }, [selectedItems, product.id, product.free_shipping, product.shipping_zones, extraProducts, serverZones, selectedVariant]);
 
-    // Auto-select first zone when available zones change; reset if current zone is no longer available
-    useEffect(() => {
-        if (allSelectedZones.length > 0) {
-            if (!allSelectedZones.includes(deliveryZone)) {
-                setDeliveryZone(allSelectedZones[0]);
-            }
-        } else {
-            // All products have free shipping — set a default zone so validation passes
-            setDeliveryZone('Default');
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [allSelectedZones]);
-
     // Countdown timer
     useEffect(() => {
         if (!landingPage.countdown_enabled || !landingPage.countdown_end_time) {
@@ -540,6 +527,32 @@ export default function LandingPage() {
         ? Math.min(parseFloat(data.payment_amount) || 0, total)
         : 0;
     const dueAmount = Math.max(0, total - paidAmount);
+
+    const filteredZones = useMemo(() => {
+        const district = data.district.trim().toLowerCase();
+
+        if (!district) {
+            return allSelectedZones;
+        }
+
+        if (district === 'dhaka') {
+            return allSelectedZones.filter((zone) => zone.toLowerCase().includes('inside'));
+        }
+
+        return allSelectedZones.filter((zone) => zone.toLowerCase().includes('outside'));
+    }, [allSelectedZones, data.district]);
+
+    useEffect(() => {
+        if (filteredZones.length > 0) {
+            if (!filteredZones.includes(deliveryZone)) {
+                setDeliveryZone(filteredZones[0]);
+            }
+            return;
+        }
+
+        setDeliveryZone('Default');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filteredZones, deliveryZone]);
 
     const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
     const [districtSearch, setDistrictSearch] = useState('');
@@ -1679,23 +1692,23 @@ export default function LandingPage() {
                                         )}
 
                                         {/* Delivery Zone Selector */}
-                                        {allSelectedZones.length > 0 && (
-                                            <div className="mb-3">
-                                                <p className="mb-2 text-xs font-medium text-muted-foreground">Delivery Area</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {allSelectedZones.map((zone) => (
-                                                        <button
-                                                            key={zone}
-                                                            type="button"
-                                                            onClick={() => setDeliveryZone(zone)}
-                                                            className={`rounded-md border px-2 py-1.5 text-xs font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
-                                                        >
-                                                            {zone}
-                                                        </button>
-                                                    ))}
+                                            {filteredZones.length > 0 && (
+                                                <div className="mb-3">
+                                                    <p className="mb-2 text-xs font-medium text-muted-foreground">Delivery Area</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {filteredZones.map((zone) => (
+                                                            <button
+                                                                key={zone}
+                                                                type="button"
+                                                                onClick={() => setDeliveryZone(zone)}
+                                                                className={`rounded-md border px-2 py-1.5 text-xs font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
+                                                            >
+                                                                {zone}
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
 
                                         <div className="space-y-2 text-sm">
                                             {hasMultipleProducts && selectedItems.filter((i) => i.selected).map((i) => {
