@@ -10,7 +10,12 @@ export function ShopFooter({ className = '' }: { className?: string }) {
     const { canNativeInstall, isInstalled, isInAppBrowser, isIOS, promptInstall, openInBrowser } = usePwaInstall();
     const [showIOSGuide, setShowIOSGuide] = useState(false);
 
-    const showInstallButton = !isInstalled && (canNativeInstall || isInAppBrowser);
+    const showInstallButton = !isInstalled && (canNativeInstall || isInAppBrowser || isIOS);
+    const installButtonLabel = canNativeInstall
+        ? 'Install on your device'
+        : isIOS
+            ? 'Tap to see how to install'
+            : 'Open in browser to install';
 
     return (
         <footer className={`border-t border-border bg-muted/30 ${className}`}>
@@ -56,12 +61,10 @@ export function ShopFooter({ className = '' }: { className?: string }) {
                             onClick={() => {
                                 if (canNativeInstall) {
                                     promptInstall();
+                                } else if (isIOS) {
+                                    setShowIOSGuide(true);
                                 } else if (isInAppBrowser) {
-                                    if (isIOS) {
-                                        setShowIOSGuide(true);
-                                    } else {
-                                        openInBrowser();
-                                    }
+                                    openInBrowser();
                                 }
                             }}
                             className="inline-flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/10 px-5 py-3 text-sm font-medium text-primary shadow-sm transition hover:bg-primary/20 active:scale-95"
@@ -74,16 +77,13 @@ export function ShopFooter({ className = '' }: { className?: string }) {
                             </span>
                             <span className="flex flex-col items-start leading-tight">
                                 <span className="text-xs text-muted-foreground">
-                                    {isInAppBrowser && !canNativeInstall
-                                        ? (isIOS ? 'Tap to see how to install' : 'Open in browser to install')
-                                        : 'Install on your device'
-                                    }
+                                    {installButtonLabel}
                                 </span>
                                 <span className="font-semibold">Get App</span>
                             </span>
                         </button>
 
-                        {/* iOS in-app browser instructions overlay */}
+                        {/* iOS instructions overlay */}
                         {showIOSGuide && (
                             <div className="relative mt-2 w-full max-w-xs rounded-xl border border-primary/30 bg-background p-4 text-sm shadow-lg">
                                 <button
