@@ -345,7 +345,7 @@ export default function ProductDetail() {
         if (selectedImage >= product.images.length) {
             setSelectedImage(0);
         }
-    }, [product?.images, selectedImage, selectedVariant?.image_path]);
+    }, [product?.images, selectedVariantId, selectedVariant?.image_path]);
 
     if (!product) {
         return (
