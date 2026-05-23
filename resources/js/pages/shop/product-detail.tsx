@@ -167,9 +167,11 @@ export default function ProductDetail() {
     const activePrice = selectedVariant ? selectedVariant.price : product?.price;
     const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product?.original_price;
     const activeInStock = selectedVariant ? selectedVariant.in_stock : product?.in_stock;
-    const activeMainImage = selectedVariant?.image_path
-        ? '/' + selectedVariant.image_path
-        : (product?.images?.[selectedImage]?.image_path ? '/' + product.images[selectedImage].image_path : null);
+    const productImages = product?.images?.map((img) => img.image_path) ?? [];
+    const imagePaths = productImages.length > 0
+        ? productImages
+        : (selectedVariant?.image_path ? [selectedVariant.image_path] : []);
+    const displayedImagePath = imagePaths[selectedImage] ?? selectedVariant?.image_path ?? null;
 
     // Variant shipping: if null → inherit from product; if true → free; if false → use variant zones
     const activeFreeShipping = selectedVariant && selectedVariant.free_shipping !== null
@@ -178,10 +180,6 @@ export default function ProductDetail() {
     const activeShippingZones = selectedVariant && selectedVariant.free_shipping === false && selectedVariant.shipping_zones?.length
         ? selectedVariant.shipping_zones
         : (product?.shipping_zones ?? []);
-
-    const imagePaths: string[] = selectedVariant?.image_path
-        ? [selectedVariant.image_path]
-        : (product?.images?.map((img) => img.image_path) ?? []);
 
     function imgPrev() {
         if (imagePaths.length <= 1) {
@@ -320,8 +318,23 @@ export default function ProductDetail() {
     }, [product?.id]);
 
     useEffect(() => {
-        setSelectedImage(0);
-    }, [selectedVariantId]);
+        if (!product?.images?.length) {
+            return;
+        }
+
+        const variantImageIndex = selectedVariant?.image_path
+            ? product.images.findIndex((img) => img.image_path === selectedVariant.image_path)
+            : -1;
+
+        if (selectedVariant?.image_path && variantImageIndex >= 0) {
+            setSelectedImage(variantImageIndex);
+            return;
+        }
+
+        if (selectedImage >= product.images.length) {
+            setSelectedImage(0);
+        }
+    }, [product?.images, selectedImage, selectedVariant?.image_path]);
 
     if (!product) {
         return (
@@ -403,14 +416,14 @@ export default function ProductDetail() {
                                     {imagePaths.length === 0 && (
                                         <span className="flex h-full w-full items-center justify-center text-8xl">📦</span>
                                     )}
-                                    {imagePaths.map((path, i) => (
+                                    {displayedImagePath && (
                                         <img
-                                            key={i}
-                                            src={`/${path}`}
+                                            key={displayedImagePath}
+                                            src={`/${displayedImagePath}`}
                                             alt={product.name}
-                                            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${i === selectedImage ? 'z-10 opacity-100' : 'z-0 opacity-0'}`}
+                                            className="absolute inset-0 h-full w-full object-cover"
                                         />
-                                    ))}
+                                    )}
                                     {product.youtube_video && (
                                         <button
                                             onClick={() => setVideoOpen(true)}
@@ -455,14 +468,14 @@ export default function ProductDetail() {
                                     {imagePaths.length === 0 && (
                                         <span className="flex h-full w-full items-center justify-center text-8xl">📦</span>
                                     )}
-                                    {imagePaths.map((path, i) => (
+                                    {displayedImagePath && (
                                         <img
-                                            key={i}
-                                            src={`/${path}`}
+                                            key={displayedImagePath}
+                                            src={`/${displayedImagePath}`}
                                             alt={product.name}
-                                            className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ${i === selectedImage ? 'z-10 opacity-100' : 'z-0 opacity-0'}`}
+                                            className="absolute inset-0 h-full w-full object-cover"
                                         />
-                                    ))}
+                                    )}
                                     {product.youtube_video && (
                                         <button
                                             onClick={() => setVideoOpen(true)}
