@@ -44,6 +44,7 @@ import { Separator } from '@/components/ui/separator';
 import { buildItem, gtmViewItem, gtmAddToCart, gtmBeginCheckout, gtmAddShippingInfo, gtmAddPaymentInfo } from '@/lib/gtm';
 import { pixelViewContent, pixelAddToCart, pixelInitiateCheckout, pixelAddPaymentInfo, buildContent } from '@/lib/meta-pixel';
 import { tiktokViewContent, tiktokAddToCart, tiktokInitiateCheckout, tiktokAddPaymentInfo, tiktokPlaceAnOrder, tiktokCompletePayment, buildTikTokContent } from '@/lib/tiktok-pixel';
+import { buildDistrictOptions, filterShippingZoneNamesForDistrict } from '@/lib/shipping-zone-class';
 import type { Product } from '@/types/global';
 import { bangladeshDistricts } from '@/data/bangladesh-districts';
 
@@ -164,7 +165,7 @@ function getYouTubeEmbedUrl(url: string | null): string | null {
 }
 
 export default function LandingPage() {
-    const { product, landingPage, paymentMethods: serverMethods, extraProducts = [], gtmId, gtmSsUrl, metaPixelId, pixelExternalId, tiktokPixelId, freeShippingAmount = 0, freeShippingEnabled = true, siteBranding, labels, hasGlobalCoupons, couponProductIds, isBlocked, shippingZones: serverZones = [], viewEventId } = usePage<{ product: Product; landingPage: LandingPageData; paymentMethods: PaymentMethodOption[]; extraProducts: ExtraProduct[]; gtmId?: string; gtmSsUrl?: string; metaPixelId?: string; pixelExternalId?: string; tiktokPixelId?: string; freeShippingAmount: number; freeShippingEnabled: boolean; siteBranding?: { title?: string; phone?: string; whatsapp?: string }; labels?: Record<string, string>; hasGlobalCoupons?: boolean; couponProductIds?: number[]; isBlocked?: boolean; shippingZones?: string[]; viewEventId?: string }>().props;
+    const { product, landingPage, paymentMethods: serverMethods, extraProducts = [], gtmId, gtmSsUrl, metaPixelId, pixelExternalId, tiktokPixelId, freeShippingAmount = 0, freeShippingEnabled = true, siteBranding, labels, hasGlobalCoupons, couponProductIds, isBlocked, shippingZones: serverZones = [], shippingZoneClasses = [], viewEventId } = usePage<{ product: Product; landingPage: LandingPageData; paymentMethods: PaymentMethodOption[]; extraProducts: ExtraProduct[]; gtmId?: string; gtmSsUrl?: string; metaPixelId?: string; pixelExternalId?: string; tiktokPixelId?: string; freeShippingAmount: number; freeShippingEnabled: boolean; siteBranding?: { title?: string; phone?: string; whatsapp?: string }; labels?: Record<string, string>; hasGlobalCoupons?: boolean; couponProductIds?: number[]; isBlocked?: boolean; shippingZones?: string[]; shippingZoneClasses?: { name: string; districts?: string[] | null }[]; viewEventId?: string }>().props;
 
     const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
     const [extraVariants, setExtraVariants] = useState<Record<number, number | null>>({});
@@ -529,18 +530,12 @@ export default function LandingPage() {
     const dueAmount = Math.max(0, total - paidAmount);
 
     const filteredZones = useMemo(() => {
-        const district = data.district.trim().toLowerCase();
+        return filterShippingZoneNamesForDistrict(data.district, allSelectedZones, shippingZoneClasses);
+    }, [allSelectedZones, data.district, shippingZoneClasses]);
 
-        if (!district) {
-            return allSelectedZones;
-        }
-
-        if (district === 'dhaka') {
-            return allSelectedZones.filter((zone) => zone.toLowerCase().includes('inside'));
-        }
-
-        return allSelectedZones.filter((zone) => zone.toLowerCase().includes('outside'));
-    }, [allSelectedZones, data.district]);
+    const districtOptions = useMemo(() => {
+        return buildDistrictOptions(bangladeshDistricts, shippingZoneClasses);
+    }, [shippingZoneClasses]);
 
     useEffect(() => {
         if (filteredZones.length > 0) {
@@ -1278,7 +1273,7 @@ export default function LandingPage() {
                                                         autoComplete="off"
                                                     />
                                                     {districtOpen && (() => {
-                                                        const filtered = bangladeshDistricts.filter((d) =>
+                                                        const filtered = districtOptions.filter((d) =>
                                                             d.toLowerCase().includes(districtSearch.toLowerCase())
                                                         );
                                                         return filtered.length > 0 ? (

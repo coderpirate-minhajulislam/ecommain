@@ -15,6 +15,7 @@ import { useCart, clearCart, updateCartQuantity, removeFromCart, refreshCartZone
 import { buildItem, gtmBeginCheckout, gtmAddShippingInfo, gtmAddPaymentInfo, gtmRemoveFromCart } from '@/lib/gtm';
 import { pixelInitiateCheckout, pixelAddPaymentInfo, buildContent } from '@/lib/meta-pixel';
 import { tiktokInitiateCheckout, tiktokAddPaymentInfo, buildTikTokContent } from '@/lib/tiktok-pixel';
+import { buildDistrictOptions, filterShippingZoneNamesForDistrict } from '@/lib/shipping-zone-class';
 import { bangladeshDistricts } from '@/data/bangladesh-districts';
 
 function formatPrice(amount: number): string {
@@ -56,7 +57,7 @@ type CheckoutLabels = {
 
 export default function CheckoutPage() {
     useFlashToast();
-    const { paymentMethods: serverMethods, freeShippingAmount, freeShippingEnabled, labels, hasGlobalCoupons, couponProductIds, shippingZones: serverZones = [], metaPixelId, pixelExternalId } = usePage<{ paymentMethods: PaymentMethodOption[]; freeShippingAmount: number; freeShippingEnabled: boolean; labels?: CheckoutLabels; hasGlobalCoupons?: boolean; couponProductIds?: number[]; shippingZones?: string[]; metaPixelId?: string; pixelExternalId?: string }>().props;
+    const { paymentMethods: serverMethods, freeShippingAmount, freeShippingEnabled, labels, hasGlobalCoupons, couponProductIds, shippingZones: serverZones = [], shippingZoneClasses = [], metaPixelId, pixelExternalId } = usePage<{ paymentMethods: PaymentMethodOption[]; freeShippingAmount: number; freeShippingEnabled: boolean; labels?: CheckoutLabels; hasGlobalCoupons?: boolean; couponProductIds?: number[]; shippingZones?: string[]; shippingZoneClasses?: { name: string; districts?: string[] | null }[]; metaPixelId?: string; pixelExternalId?: string }>().props;
     const [deliveryZone, setDeliveryZone] = useState('');
     const { items, subtotal, shipping } = useCart(deliveryZone, freeShippingAmount, freeShippingEnabled);
 
@@ -129,15 +130,12 @@ export default function CheckoutPage() {
     const dueAmount = Math.max(0, total - paidAmount);
 
     const filteredZones = useMemo(() => {
-        const district = data.district.trim().toLowerCase();
-        if (!district) {
-            return allZones;
-        }
-        if (district === 'dhaka') {
-            return allZones.filter((zone) => zone.toLowerCase().includes('inside'));
-        }
-        return allZones.filter((zone) => zone.toLowerCase().includes('outside'));
-    }, [allZones, data.district]);
+        return filterShippingZoneNamesForDistrict(data.district, allZones, shippingZoneClasses);
+    }, [allZones, data.district, shippingZoneClasses]);
+
+    const districtOptions = useMemo(() => {
+        return buildDistrictOptions(bangladeshDistricts, shippingZoneClasses);
+    }, [shippingZoneClasses]);
 
     useEffect(() => {
         if (filteredZones.length > 0) {
@@ -592,7 +590,7 @@ export default function CheckoutPage() {
                                                 autoComplete="off"
                                             />
                                             {districtOpen && (() => {
-                                                const filtered = bangladeshDistricts.filter((d) =>
+                                                const filtered = districtOptions.filter((d) =>
                                                     d.toLowerCase().includes(districtSearch.toLowerCase())
                                                 );
                                                 return filtered.length > 0 ? (

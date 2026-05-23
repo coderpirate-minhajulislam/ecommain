@@ -392,6 +392,10 @@ class ShopController extends Controller
             'freeShippingEnabled' => (bool) Setting::get('free_shipping_enabled', true),
             'freeShippingAmount'  => (int) Setting::get('free_shipping_amount', 0),
             'shippingZones'       => Cache::remember('shop.shipping_zones', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray()),
+            'shippingZoneClasses' => Cache::remember('shop.shipping_zone_classes', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->get(['name', 'districts'])->map(fn ($zone) => [
+                'name' => $zone->name,
+                'districts' => $zone->districts ?? [],
+            ])->toArray()),
             'labels'              => $this->checkoutLabels(),
         ]);
     }
@@ -408,6 +412,10 @@ class ShopController extends Controller
             'freeShippingAmount'  => (int) Setting::get('free_shipping_amount', 0),
             'paymentMethods'      => $paymentMethods,
             'shippingZones'       => Cache::remember('shop.shipping_zones', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray()),
+            'shippingZoneClasses' => Cache::remember('shop.shipping_zone_classes', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->get(['name', 'districts'])->map(fn ($zone) => [
+                'name' => $zone->name,
+                'districts' => $zone->districts ?? [],
+            ])->toArray()),
             'labels'              => $this->checkoutLabels(),
             'hasGlobalCoupons'    => Cache::remember('shop.has_global_coupons', 600, fn () => Coupon::where('is_active', true)->where('is_global', true)->exists()),
             'couponProductIds'    => Cache::remember('shop.coupon_product_ids', 600, fn () => Coupon::where('is_active', true)->where('is_global', false)->with('products:id')->get()->flatMap(fn ($c) => $c->products->pluck('id'))->unique()->values()->toArray()),
@@ -477,6 +485,10 @@ class ShopController extends Controller
             'isBlocked'           => BlockedIp::isBlocked($request->ip()),
             'labels'              => $this->checkoutLabels(),
             'shippingZones'       => Cache::remember('shop.shipping_zones', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray()),
+            'shippingZoneClasses' => Cache::remember('shop.shipping_zone_classes', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->get(['name', 'districts'])->map(fn ($zone) => [
+                'name' => $zone->name,
+                'districts' => $zone->districts ?? [],
+            ])->toArray()),
             'paymentMethods' => Cache::remember('shop.payment_methods', 3600, function () {
                 return PaymentMethod::where('is_active', true)->orderBy('sort_order')->get(['name', 'slug', 'description', 'account_number', 'logo', 'icon', 'account_label', 'instructions_text', 'payment_number_label', 'payment_amount_label', 'requires_payment_details'])->toArray();
             }),

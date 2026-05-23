@@ -16,6 +16,7 @@ import { useFlashToast } from '@/hooks/use-flash-toast';
 type ShippingZone = {
     id: number;
     name: string;
+    districts: string[];
     sort_order: number;
     created_at: string;
 };
@@ -74,6 +75,7 @@ export default function ShippingZonesIndex() {
                                 <tr className="border-b border-sidebar-border/70 text-left dark:border-sidebar-border">
                                     <th className="px-4 py-3 font-medium text-muted-foreground">#</th>
                                     <th className="px-4 py-3 font-medium text-muted-foreground">Zone Name</th>
+                                    <th className="px-4 py-3 font-medium text-muted-foreground">Districts</th>
                                     <th className="px-4 py-3 font-medium text-muted-foreground">Sort Order</th>
                                     <th className="px-4 py-3 font-medium text-muted-foreground text-right">Actions</th>
                                 </tr>
@@ -86,6 +88,7 @@ export default function ShippingZonesIndex() {
                                     >
                                         <td className="px-4 py-3 text-muted-foreground">{index + 1}</td>
                                         <td className="px-4 py-3 font-medium">{zone.name}</td>
+                                        <td className="px-4 py-3 text-muted-foreground">{zone.districts?.length ? zone.districts.join(', ') : 'All districts'}</td>
                                         <td className="px-4 py-3 text-muted-foreground">{zone.sort_order}</td>
                                         <td className="px-4 py-3 text-right">
                                             <div className="inline-flex items-center gap-1">
