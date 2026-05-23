@@ -168,10 +168,13 @@ export default function ProductDetail() {
     const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product?.original_price;
     const activeInStock = selectedVariant ? selectedVariant.in_stock : product?.in_stock;
     const productImages = product?.images?.map((img) => img.image_path) ?? [];
-    const imagePaths = productImages.length > 0
-        ? productImages
-        : (selectedVariant?.image_path ? [selectedVariant.image_path] : []);
-    const displayedImagePath = imagePaths[selectedImage] ?? selectedVariant?.image_path ?? null;
+    const hasVariantImage = Boolean(selectedVariant?.image_path);
+    const imagePaths = hasVariantImage
+        ? [selectedVariant!.image_path!]
+        : productImages;
+    const displayedImagePath = hasVariantImage
+        ? selectedVariant!.image_path!
+        : imagePaths[selectedImage] ?? null;
 
     // Variant shipping: if null → inherit from product; if true → free; if false → use variant zones
     const activeFreeShipping = selectedVariant && selectedVariant.free_shipping !== null
@@ -319,15 +322,13 @@ export default function ProductDetail() {
 
     useEffect(() => {
         if (!product?.images?.length) {
+            setSelectedImage(0);
             return;
         }
 
-        const variantImageIndex = selectedVariant?.image_path
-            ? product.images.findIndex((img) => img.image_path === selectedVariant.image_path)
-            : -1;
-
-        if (selectedVariant?.image_path && variantImageIndex >= 0) {
-            setSelectedImage(variantImageIndex);
+        if (selectedVariant?.image_path) {
+            const variantImageIndex = product.images.findIndex((img) => img.image_path === selectedVariant.image_path);
+            setSelectedImage(variantImageIndex >= 0 ? variantImageIndex : 0);
             return;
         }
 
