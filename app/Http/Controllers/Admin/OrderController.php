@@ -10,6 +10,7 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Setting;
+use App\Models\ShippingZone;
 use App\Services\CarrybeeService;
 use App\Services\CourierSyncService;
 use App\Services\PathaoService;
@@ -208,6 +209,9 @@ class OrderController extends Controller
         return Inertia::render('admin/orders/create', [
             'products' => Product::with('variants', 'images')->where('in_stock', true)->orderBy('name')->get(),
             'emailEnabled' => (bool) Setting::get('checkout_email_enabled', false),
+            'shippingZones' => Cache::remember('shop.shipping_zones', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray()),
+            'freeShippingAmount' => (float) Setting::get('free_shipping_amount', 0),
+            'freeShippingEnabled' => (bool) Setting::get('free_shipping_enabled', true),
         ]);
     }
 
@@ -218,6 +222,7 @@ class OrderController extends Controller
             'phone' => 'required|string|max:50',
             'email' => 'nullable|email|max:255',
             'address' => 'required|string|max:500',
+            'delivery_zone' => 'nullable|string|max:100',
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled,hold,pre-order',
             'order_source' => 'nullable|in:direct,fb,tiktok,google_ads,admin',
             'items' => 'required|array|min:1',
@@ -227,6 +232,8 @@ class OrderController extends Controller
         ]);
 
         $subtotal = 0;
+        $deliveryZone = $validated['delivery_zone'] ?? null;
+        $maxShipping = 0;
         $orderItems = [];
 
         foreach ($validated['items'] as $item) {
@@ -237,6 +244,23 @@ class OrderController extends Controller
             $quantity = $item['quantity'];
             $lineTotal = $price * $quantity;
             $subtotal += $lineTotal;
+
+            $effectiveFreeShipping = ($variant && $variant->free_shipping !== null)
+                ? (bool) $variant->free_shipping
+                : (bool) $product->free_shipping;
+
+            $effectiveZones = ($variant && $variant->free_shipping === false)
+                ? ($variant->shipping_zones ?? [])
+                : (($variant && $variant->free_shipping === true) ? [] : ($product->shipping_zones ?? []));
+
+            if (!$effectiveFreeShipping && $deliveryZone) {
+                $matched = collect($effectiveZones)->firstWhere('zone', $deliveryZone);
+                $charge = $matched ? (float) $matched['charge'] : 0;
+
+                if ($charge > $maxShipping) {
+                    $maxShipping = $charge;
+                }
+            }
 
             $variantLabel = null;
             if ($variant) {
@@ -257,7 +281,11 @@ class OrderController extends Controller
             ];
         }
 
-        $shipping = $subtotal > 50 ? 0 : 5.99;
+        $freeShippingEnabled = (bool) Setting::get('free_shipping_enabled', true);
+        $freeShippingAmount = (float) Setting::get('free_shipping_amount', 0);
+        $shipping = ($freeShippingEnabled && $freeShippingAmount > 0 && $subtotal >= $freeShippingAmount)
+            ? 0
+            : $maxShipping;
         $total = $subtotal + $shipping;
 
         $order = Order::create([
@@ -272,6 +300,7 @@ class OrderController extends Controller
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?? null,
             'address' => $validated['address'],
+            'delivery_zone' => $deliveryZone,
         ]);
 
         foreach ($orderItems as $item) {

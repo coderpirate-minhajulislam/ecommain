@@ -1,5 +1,11 @@
 import { Head, useForm } from '@inertiajs/react';
+import { useEffect, useMemo } from 'react';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+
+type ShippingZoneCharge = {
+    zone: string;
+    charge: number | string;
+};
 
 type Variant = {
     id: number;
@@ -7,6 +13,8 @@ type Variant = {
     color: string | null;
     price: string;
     in_stock: boolean;
+    free_shipping?: boolean | null;
+    shipping_zones?: ShippingZoneCharge[] | null;
 };
 
 type ProductImage = {
@@ -19,6 +27,8 @@ type Product = {
     name: string;
     price: string;
     in_stock: boolean;
+    free_shipping?: boolean | null;
+    shipping_zones?: ShippingZoneCharge[] | null;
     variants: Variant[];
     images: ProductImage[];
 };
@@ -32,6 +42,9 @@ type OrderItemRow = {
 type Props = {
     products: Product[];
     emailEnabled: boolean;
+    shippingZones?: string[];
+    freeShippingAmount?: number;
+    freeShippingEnabled?: boolean;
 };
 
 const statuses = ['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'hold', 'pre-order'];
@@ -52,12 +65,39 @@ function formatPrice(price: string | null): string {
     return `$${parseFloat(price).toFixed(2)}`;
 }
 
-export default function CreateOrder({ products, emailEnabled }: Props) {
+function resolveEffectiveZones(product: Product | undefined, variant: Variant | undefined): ShippingZoneCharge[] {
+    if (!product) {
+        return [];
+    }
+
+    if (variant && variant.free_shipping === false) {
+        return variant.shipping_zones ?? [];
+    }
+
+    if (variant && variant.free_shipping === true) {
+        return [];
+    }
+
+    if (product.free_shipping === true) {
+        return [];
+    }
+
+    return product.shipping_zones ?? [];
+}
+
+export default function CreateOrder({
+    products,
+    emailEnabled,
+    shippingZones = [],
+    freeShippingAmount = 0,
+    freeShippingEnabled = true,
+}: Props) {
     const { data, setData, post, processing, errors } = useForm({
         first_name: '',
         phone: '',
         email: '',
         address: '',
+        delivery_zone: shippingZones[0] ?? '',
         status: 'pending',
         order_source: 'admin',
         items: [{ product_id: '', variant_id: '', quantity: '1' }] as OrderItemRow[],
@@ -110,11 +150,71 @@ export default function CreateOrder({ products, emailEnabled }: Props) {
         return parseFloat(product.price);
     };
 
+    const availableZones = useMemo(() => {
+        const zoneSet = new Set<string>();
+
+        data.items.forEach((item) => {
+            const product = getProduct(item.product_id);
+            const variant = item.variant_id ? product?.variants.find((v) => v.id === Number(item.variant_id)) : undefined;
+
+            resolveEffectiveZones(product, variant).forEach((zone) => {
+                zoneSet.add(zone.zone);
+            });
+        });
+
+        return Array.from(zoneSet);
+    }, [data.items, products]);
+
+    const deliveryZoneOptions = availableZones.length > 0 ? availableZones : shippingZones;
+
+    useEffect(() => {
+        if (deliveryZoneOptions.length === 0) {
+            if (data.delivery_zone) {
+                setData('delivery_zone', '');
+            }
+
+            return;
+        }
+
+        if (!data.delivery_zone || !deliveryZoneOptions.includes(data.delivery_zone)) {
+            setData('delivery_zone', deliveryZoneOptions[0]);
+        }
+    }, [data.delivery_zone, deliveryZoneOptions, setData]);
+
     const subtotal = data.items.reduce((sum, item) => {
         return sum + getItemPrice(item) * (parseInt(item.quantity) || 0);
     }, 0);
 
-    const shipping = subtotal > 50 ? 0 : 5.99;
+    const shipping = useMemo(() => {
+        if (freeShippingEnabled && freeShippingAmount > 0 && subtotal >= freeShippingAmount) {
+            return 0;
+        }
+
+        if (!data.delivery_zone) {
+            return 0;
+        }
+
+        let maxCharge = 0;
+
+        data.items.forEach((item) => {
+            const product = getProduct(item.product_id);
+            const variant = item.variant_id ? product?.variants.find((v) => v.id === Number(item.variant_id)) : undefined;
+            const effectiveZones = resolveEffectiveZones(product, variant);
+
+            if (!effectiveZones.length) {
+                return;
+            }
+
+            const matched = effectiveZones.find((zone) => zone.zone === data.delivery_zone);
+
+            if (matched) {
+                maxCharge = Math.max(maxCharge, Number(matched.charge || 0));
+            }
+        });
+
+        return maxCharge;
+    }, [data.delivery_zone, data.items, freeShippingAmount, freeShippingEnabled, subtotal]);
+
     const total = subtotal + shipping;
 
     function handleSubmit(e: React.FormEvent) {
@@ -328,6 +428,30 @@ export default function CreateOrder({ products, emailEnabled }: Props) {
                                         </option>
                                     ))}
                                 </select>
+                            </div>
+
+                            <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
+                                <h3 className="mb-3 text-sm font-semibold">Delivery Zone</h3>
+                                {deliveryZoneOptions.length > 0 ? (
+                                    <>
+                                        <select
+                                            value={data.delivery_zone}
+                                            onChange={(e) => setData('delivery_zone', e.target.value)}
+                                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                                        >
+                                            {deliveryZoneOptions.map((zone) => (
+                                                <option key={zone} value={zone}>
+                                                    {zone}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <p className="mt-2 text-xs text-muted-foreground">
+                                            Shipping is calculated from the selected zone and each item’s shipping rules.
+                                        </p>
+                                    </>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">No shipping zones are available for the selected items.</p>
+                                )}
                             </div>
 
                             <div className="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
