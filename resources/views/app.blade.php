@@ -96,8 +96,15 @@
             }
         </style>
 
+        @php
+            $seoMetaTags = json_decode(\App\Models\Setting::get('seo_meta_tags', '[]'), true) ?: [];
+        @endphp
+
         <x-inertia::head>
             <title>{{ $siteTitle && $siteSubtitle ? $siteTitle . ' - ' . $siteSubtitle : ($siteTitle ?: 'Shop') }}</title>
+            @foreach ($seoMetaTags as $seoMetaTag)
+                {!! $seoMetaTag !!}
+            @endforeach
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

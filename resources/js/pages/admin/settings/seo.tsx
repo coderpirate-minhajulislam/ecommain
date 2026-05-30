@@ -1,5 +1,5 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { Globe, Search, Upload, X } from 'lucide-react';
+import { Globe, Plus, Search, Trash2, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,12 +14,13 @@ type Props = {
     siteMetaKeywords: string;
     ogImage: string;
     robotsTxt: string;
+    seoMetaTags: string[];
 };
 
 export default function SeoSettings() {
     useFlashToast();
 
-    const { siteMetaTitle, siteMetaDescription, siteMetaKeywords, ogImage, robotsTxt } =
+    const { siteMetaTitle, siteMetaDescription, siteMetaKeywords, ogImage, robotsTxt, seoMetaTags } =
         usePage<Props>().props;
 
     const { data, setData, post, processing, errors } = useForm<{
@@ -28,12 +29,14 @@ export default function SeoSettings() {
         site_meta_keywords: string;
         robots_txt: string;
         og_image: File | null;
+        meta_tags: string[];
     }>({
         site_meta_title: siteMetaTitle ?? '',
         site_meta_description: siteMetaDescription ?? '',
         site_meta_keywords: siteMetaKeywords ?? '',
         robots_txt: robotsTxt ?? "User-agent: *\nAllow: /",
         og_image: null,
+        meta_tags: seoMetaTags ?? [],
     });
 
     const fileRef = useRef<HTMLInputElement>(null);
@@ -41,7 +44,9 @@ export default function SeoSettings() {
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0] ?? null;
+
         setData('og_image', file);
+
         if (file) {
             setPreview(URL.createObjectURL(file));
         } else {
@@ -52,7 +57,10 @@ export default function SeoSettings() {
     function clearOgImage() {
         setData('og_image', null);
         setPreview(null);
-        if (fileRef.current) fileRef.current.value = '';
+
+        if (fileRef.current) {
+            fileRef.current.value = '';
+        }
     }
 
     function handleSubmit(e: React.FormEvent) {
@@ -150,6 +158,59 @@ export default function SeoSettings() {
                                         <p className="text-xs text-muted-foreground">
                                             Comma-separated keywords. Less important for modern SEO but still useful.
                                         </p>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <div className="flex items-center justify-between gap-4">
+                                            <Label>Additional Meta Tags</Label>
+                                            <button
+                                                type="button"
+                                                className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-white transition hover:bg-primary/90"
+                                                onClick={() => setData('meta_tags', [...data.meta_tags, ''])}
+                                            >
+                                                <Plus className="h-4 w-4" />
+                                                Add Tag
+                                            </button>
+                                        </div>
+                                        <p className="text-xs text-muted-foreground">
+                                            Add any site-wide &lt;meta&gt; tags such as Google site verification, search console domain verification, or other verification tags. Enter the full tag markup.
+                                        </p>
+                                        <div className="space-y-3">
+                                            {data.meta_tags.map((tag, index) => (
+                                                <div key={index} className="rounded-lg border border-border bg-surface p-3">
+                                                    <div className="mb-2 flex items-center justify-between gap-3">
+                                                        <p className="text-sm font-medium">Meta Tag {index + 1}</p>
+                                                        <button
+                                                            type="button"
+                                                            className="inline-flex items-center gap-2 text-sm text-destructive hover:text-destructive/80"
+                                                            onClick={() => {
+                                                                const nextTags = [...data.meta_tags];
+                                                                nextTags.splice(index, 1);
+                                                                setData('meta_tags', nextTags);
+                                                            }}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                            Remove
+                                                        </button>
+                                                    </div>
+                                                    <Textarea
+                                                        id={`meta_tags[${index}]`}
+                                                        placeholder='<meta name="google-site-verification" content="..." />'
+                                                        value={tag}
+                                                        onChange={(e) => {
+                                                            const nextTags = [...data.meta_tags];
+                                                            nextTags[index] = e.target.value;
+                                                            setData('meta_tags', nextTags);
+                                                        }}
+                                                        rows={3}
+                                                        className="font-mono text-xs"
+                                                    />
+                                                    {errors[`meta_tags.${index}`] && (
+                                                        <p className="mt-1 text-sm text-destructive">{errors[`meta_tags.${index}`]}</p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
 
                                     {/* OG Image */}

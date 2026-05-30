@@ -56,6 +56,7 @@ class AppServiceProvider extends ServiceProvider
             'cardBuyNowEnabled'    => fn () => (bool) Setting::get('card_buy_now_enabled', true),
             'cartPageEnabled'      => fn () => (bool) Setting::get('cart_page_enabled', true),
             'productCardLayout'    => fn () => Setting::get('product_card_layout', '1'),
+            'seoMetaTags' => fn () => json_decode(Setting::get('seo_meta_tags', '[]'), true) ?: [],
             'searchProducts'     => fn () => Cache::remember('shop.products.all', 900, function () {
                 return Product::query()
                     ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping')

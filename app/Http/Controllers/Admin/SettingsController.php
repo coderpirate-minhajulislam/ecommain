@@ -1003,6 +1003,7 @@ class SettingsController extends Controller
             'siteMetaKeywords'    => Setting::get('seo_meta_keywords', ''),
             'ogImage'             => Setting::get('seo_og_image', ''),
             'robotsTxt'           => Setting::get('seo_robots_txt', "User-agent: *\nAllow: /"),
+            'seoMetaTags'         => json_decode(Setting::get('seo_meta_tags', '[]'), true) ?: [],
         ]);
     }
 
@@ -1014,12 +1015,15 @@ class SettingsController extends Controller
             'site_meta_keywords'    => ['nullable', 'string', 'max:500'],
             'robots_txt'            => ['nullable', 'string', 'max:2000'],
             'og_image'              => ['nullable', 'image', 'max:10240'],
+            'meta_tags'             => ['nullable', 'array', 'max:50'],
+            'meta_tags.*'           => ['required', 'string', 'max:1000'],
         ]);
 
         Setting::set('seo_meta_title',       $request->input('site_meta_title') ?? '');
         Setting::set('seo_meta_description', $request->input('site_meta_description') ?? '');
         Setting::set('seo_meta_keywords',    $request->input('site_meta_keywords') ?? '');
         Setting::set('seo_robots_txt',       $request->input('robots_txt') ?? "User-agent: *\nAllow: /");
+        Setting::set('seo_meta_tags',        json_encode($request->input('meta_tags', [])));
 
         // Write robots.txt to the public directory so it is served as a static file
         File::put(public_path('robots.txt'), $request->input('robots_txt') ?? "User-agent: *\nAllow: /");
