@@ -109,6 +109,7 @@ class BannerController extends Controller
         $banner->delete();
         Cache::forget('shop.banners');
         Cache::forget('shop.mid_banners');
+        Cache::forget('shop.popup_banners');
 
         return redirect()->route('admin.banners.index')->with('success', 'Banner deleted successfully.');
     }
