@@ -15,6 +15,7 @@ class Banner extends Model
         'sort_order',
         'is_active',
         'position',
+        'popup_timer',
     ];
 
     protected function casts(): array
@@ -22,6 +23,7 @@ class Banner extends Model
         return [
             'is_active' => 'boolean',
             'sort_order' => 'integer',
+            'popup_timer' => 'integer',
         ];
     }
 }

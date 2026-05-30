@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->string('position', 20)->default('hero');
+            $table->integer('popup_timer')->nullable()->default(5);
             $table->timestamps();
 
             $table->index(['is_active', 'position', 'sort_order']);

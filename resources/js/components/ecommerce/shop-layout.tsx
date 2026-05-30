@@ -9,6 +9,7 @@ import { GtmScript } from '@/components/ecommerce/gtm-script';
 import { GtmSsScript } from '@/components/ecommerce/gtm-ss-script';
 import { MetaPixelScript } from '@/components/ecommerce/meta-pixel-script';
 import { TikTokPixelScript } from '@/components/ecommerce/tiktok-pixel-script';
+import PopupBanner from './popup-banner';
 
 function ScrollToTopButton() {
     const [visible, setVisible] = useState(false);
@@ -131,6 +132,7 @@ export function ShopLayout({ children }: { children: ReactNode }) {
             <FloatingSupportButton siteBranding={siteBranding} />
             <MobileBottomMenu />
             <ScrollToTopButton />
+            <PopupBanner />
 
         </div>
     );

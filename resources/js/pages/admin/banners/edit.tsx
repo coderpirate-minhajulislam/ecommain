@@ -31,6 +31,7 @@ export default function EditBanner() {
         sort_order: String(banner.sort_order),
         is_active: banner.is_active,
         position: banner.position || 'hero',
+        popup_timer: String(banner.popup_timer ?? 5),
         image: null as File | null,
     });
 
@@ -145,8 +146,15 @@ export default function EditBanner() {
                             <select id="position" value={data.position} onChange={(e) => setData('position', e.target.value)} className={inputClass}>
                                 <option value="hero">Hero (Top)</option>
                                 <option value="mid">Mid (After Featured)</option>
+                                <option value="popup">Popup (Modal)</option>
                             </select>
                             {errors.position && <p className="text-sm text-destructive">{errors.position}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <label htmlFor="popup_timer" className={labelClass}>Popup Timer (seconds)</label>
+                            <input id="popup_timer" type="number" min="1" max="60" value={data.popup_timer} onChange={(e) => setData('popup_timer', e.target.value)} className={inputClass} />
+                           
+                            {errors.popup_timer && <p className="text-sm text-destructive">{errors.popup_timer}</p>}
                         </div>
                         <div className="flex items-center gap-3 pb-2">
                             <button

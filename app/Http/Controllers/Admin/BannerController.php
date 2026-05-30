@@ -35,7 +35,8 @@ class BannerController extends Controller
             'button_link' => ['nullable', 'string', 'max:500'],
             'sort_order'  => ['nullable', 'integer', 'min:0'],
             'is_active'   => ['boolean'],
-            'position'    => ['nullable', 'string', 'in:hero,mid'],
+            'position'    => ['nullable', 'string', 'in:hero,mid,popup'],
+            'popup_timer' => ['nullable', 'integer', 'min:1', 'max:60'],
             'image'       => ['required', 'image', 'max:10240'],
         ]);
 
@@ -47,11 +48,13 @@ class BannerController extends Controller
                 'image_path' => $imagePath,
                 'sort_order' => $validated['sort_order'] ?? 0,
                 'position'   => $validated['position'] ?? 'hero',
+                'popup_timer' => $validated['popup_timer'] ?? 5,
             ],
         ));
 
         Cache::forget('shop.banners');
         Cache::forget('shop.mid_banners');
+        Cache::forget('shop.popup_banners');
 
         return redirect()->route('admin.banners.index')->with('success', 'Banner created successfully.');
     }
@@ -70,13 +73,15 @@ class BannerController extends Controller
             'button_link' => ['nullable', 'string', 'max:500'],
             'sort_order'  => ['nullable', 'integer', 'min:0'],
             'is_active'   => ['boolean'],
-            'position'    => ['nullable', 'string', 'in:hero,mid'],
+            'position'    => ['nullable', 'string', 'in:hero,mid,popup'],
+            'popup_timer' => ['nullable', 'integer', 'min:1', 'max:60'],
             'image'       => ['nullable', 'image', 'max:10240'],
         ]);
 
         $data = collect($validated)->except(['image'])->toArray();
         $data['sort_order'] = $data['sort_order'] ?? 0;
         $data['position'] = $data['position'] ?? $banner->position;
+        $data['popup_timer'] = $data['popup_timer'] ?? $banner->popup_timer ?? 5;
 
         if ($request->hasFile('image')) {
             $old = public_path($banner->image_path);
@@ -89,6 +94,7 @@ class BannerController extends Controller
         $banner->update($data);
         Cache::forget('shop.banners');
         Cache::forget('shop.mid_banners');
+        Cache::forget('shop.popup_banners');
 
         return redirect()->route('admin.banners.index')->with('success', 'Banner updated successfully.');
     }

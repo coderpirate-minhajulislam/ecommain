@@ -204,3 +204,12 @@ ls -la /var/www/html/specialorganicshop/storage/fonts/
 sudo apt install -y wget
 wget -O /var/www/html/specialorganicshop/storage/fonts/kalpurush.ttf \
   "https://github.com/hablullah/go-data-bengali/raw/master/font/Kalpurush.ttf"
+
+
+
+
+
+
+
+
+php artisan tinker --execute="DB::statement('ALTER TABLE banners ADD COLUMN popup_timer INT NULL DEFAULT 5 AFTER position'); echo 'Done';"

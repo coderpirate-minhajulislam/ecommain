@@ -91,6 +91,10 @@ class ShopController extends Controller
             return Banner::where('is_active', true)->where('position', 'mid')->orderBy('sort_order')->orderBy('id')->get(['id', 'title', 'subtitle', 'button_text', 'button_link', 'image_path'])->toArray();
         });
 
+        $popupBanners = Cache::remember('shop.popup_banners', 3600, function () {
+            return Banner::where('is_active', true)->where('position', 'popup')->orderBy('sort_order')->orderBy('id')->get(['id', 'title', 'subtitle', 'button_text', 'button_link', 'image_path', 'popup_timer'])->toArray();
+        });
+
         $featuredProducts = Cache::remember('shop.products.featured', 900, function () {
             return Product::with('category:id,name', 'images', 'variants')
                 ->where('in_stock', true)
@@ -154,6 +158,7 @@ class ShopController extends Controller
             'seoKeywords'        => Setting::get('seo_meta_keywords', ''),
             'seoOgImage'         => Setting::get('seo_og_image') ? url(Setting::get('seo_og_image')) : '',
             'homeLayout'         => Setting::get('home_layout', '1'),
+            'popupBanners'       => $popupBanners,
         ]);
     }
 
