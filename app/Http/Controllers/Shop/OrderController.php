@@ -50,7 +50,9 @@ class OrderController extends Controller
                     'Authorization: Bearer ' . $bdApiKey,
                 ]);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
                 $response = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -79,7 +81,9 @@ class OrderController extends Controller
                         }
                     }
                 }
-            } catch (\Throwable) {}
+            } catch (\Throwable $e) {
+                \Log::warning('BD Courier API error for phone ' . $phone . ': ' . $e->getMessage());
+            }
         }
 
         // --- Order Ratio Check API ---
@@ -100,7 +104,9 @@ class OrderController extends Controller
                     'X-Domain: ' . $orcDomain,
                 ]);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
                 $response = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -132,7 +138,9 @@ class OrderController extends Controller
                         }
                     }
                 }
-            } catch (\Throwable) {}
+            } catch (\Throwable $e) {
+                \Log::warning('Order Ratio Check API error for phone ' . $phone . ': ' . $e->getMessage());
+            }
         }
 
         // If neither API is configured, allow all

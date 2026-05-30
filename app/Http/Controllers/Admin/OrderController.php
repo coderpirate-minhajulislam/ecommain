@@ -426,17 +426,25 @@ class OrderController extends Controller
                 'Authorization: Bearer ' . $bdApiKey,
             ]);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
             curl_close($ch);
 
-            if (!$curlError && $httpCode === 200) {
+            if ($curlError) {
+                \Log::warning('BD Courier API error for order ' . $id . ': ' . $curlError);
+            } elseif ($httpCode !== 200) {
+                \Log::warning('BD Courier API returned HTTP ' . $httpCode . ' for order ' . $id . ': ' . substr($response, 0, 200));
+            } elseif ($response) {
                 $json = json_decode($response, true);
                 if (($json['status'] ?? '') === 'success') {
                     $results['bdcourier'] = $json;
+                } else {
+                    \Log::warning('BD Courier API invalid response for order ' . $id . ': ' . substr($response, 0, 200));
                 }
             }
         }
@@ -444,7 +452,7 @@ class OrderController extends Controller
         // --- Order Ratio Check ---
         $orcApiKey = Setting::get('orderratiocheck_api_key', '');
         $orcDomain = Setting::get('orderratiocheck_domain', '');
-        if ($orcApiKey) {
+        if ($orcApiKey && $orcDomain) {
             $ch = curl_init('https://app.growever.bd/api/courier-check');
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['phone' => $phone]));
@@ -454,19 +462,29 @@ class OrderController extends Controller
                 'X-Domain: ' . $orcDomain,
             ]);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
 
             $response = curl_exec($ch);
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $curlError = curl_error($ch);
             curl_close($ch);
 
-            if (!$curlError && $httpCode === 200) {
+            if ($curlError) {
+                \Log::warning('Order Ratio Check API error for order ' . $id . ': ' . $curlError);
+            } elseif ($httpCode !== 200) {
+                \Log::warning('Order Ratio Check API returned HTTP ' . $httpCode . ' for order ' . $id . ': ' . substr($response, 0, 200));
+            } elseif ($response) {
                 $json = json_decode($response, true);
                 if (($json['status'] ?? '') === 'success') {
                     $results['orderratiocheck'] = $json;
+                } else {
+                    \Log::warning('Order Ratio Check API invalid response for order ' . $id . ': ' . substr($response, 0, 200));
                 }
             }
+        } elseif ($orcApiKey && !$orcDomain) {
+            \Log::warning('Order Ratio Check domain is not configured for order ' . $id);
         }
 
         if (empty($results)) {
