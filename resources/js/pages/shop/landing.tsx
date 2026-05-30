@@ -522,6 +522,20 @@ export default function LandingPage() {
         utm_term:     (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_term')     || sessionStorage.getItem('utm_term')     || ''; })(),
     });
 
+    // Update form data with sessionStorage values after they're populated (handles mobile device delays)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+            keys.forEach((key) => {
+                const value = sessionStorage.getItem(key) || '';
+                if (value || data[key] === '') {
+                    setData(key, value);
+                }
+            });
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
+
     // Calculate paid amount and due based on payment method
     const selectedPaymentMethod = serverMethods.find((m) => m.slug === data.payment_method);
     const paidAmount = selectedPaymentMethod?.requires_payment_details && data.payment_amount
@@ -760,6 +774,13 @@ export default function LandingPage() {
         e.preventDefault();
         const activeSelected = selectedItems.filter((i) => i.selected);
 
+        // Ensure UTM parameters are read fresh from sessionStorage at submit time
+        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+        const freshUtmData: Record<string, string> = {};
+        keys.forEach((key) => {
+            freshUtmData[key] = sessionStorage.getItem(key) || data[key] || '';
+        });
+
         if (hasMultipleProducts) {
             transform((formData) => ({
                 ...formData,
@@ -773,6 +794,7 @@ export default function LandingPage() {
                 payment_phone: formData.payment_phone,
                 payment_amount: formData.payment_amount,
                 coupon_code: appliedCoupon || undefined,
+                ...freshUtmData,
             }));
         } else {
             transform((formData) => ({
@@ -784,6 +806,7 @@ export default function LandingPage() {
                 payment_phone: formData.payment_phone,
                 payment_amount: formData.payment_amount,
                 coupon_code: appliedCoupon || undefined,
+                ...freshUtmData,
             }));
         }
 

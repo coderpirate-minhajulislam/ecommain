@@ -74,6 +74,16 @@ export default function CheckoutPage() {
             .catch(() => {/* silent fail */});
     }, []);
 
+    // Capture UTM parameters from URL and store in sessionStorage
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+        keys.forEach((key) => {
+            const val = params.get(key);
+            if (val) sessionStorage.setItem(key, val);
+        });
+    }, []);
+
     const [couponCode, setCouponCode] = useState('');
     const [couponDiscount, setCouponDiscount] = useState(0);
     const [appliedCoupon, setAppliedCoupon] = useState('');
@@ -121,6 +131,20 @@ export default function CheckoutPage() {
         utm_content:  typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_content')  ?? '') : '',
         utm_term:     typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_term')     ?? '') : '',
     });
+
+    // Update form data with sessionStorage values after they're populated (handles mobile device delays)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+            keys.forEach((key) => {
+                const value = sessionStorage.getItem(key) || '';
+                if (value || data[key] === '') {
+                    setData(key, value);
+                }
+            });
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
 
     // Calculate paid amount and due based on payment method
     const selectedPaymentMethod = serverMethods.find((m) => m.slug === data.payment_method);
@@ -442,6 +466,14 @@ export default function CheckoutPage() {
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
+
+        // Ensure UTM parameters are read fresh from sessionStorage at submit time
+        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+        const freshUtmData: Record<string, string> = {};
+        keys.forEach((key) => {
+            freshUtmData[key] = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem(key) || data[key] || '') : (data[key] || '');
+        });
+
         transform((formData) => ({
             ...formData,
             items: items.map((i) => ({
@@ -451,6 +483,7 @@ export default function CheckoutPage() {
             })),
             delivery_zone: deliveryZone,
             coupon_code: appliedCoupon || undefined,
+            ...freshUtmData,
         }));
         post('/checkout', {
             forceFormData: true,

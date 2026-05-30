@@ -411,6 +411,20 @@ export default function LandingPageV2() {
         utm_term:     (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_term')     || sessionStorage.getItem('utm_term')     || ''; })(),
     });
 
+    // Update form data with sessionStorage values after they're populated (handles mobile device delays)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+            keys.forEach((key) => {
+                const value = sessionStorage.getItem(key) || '';
+                if (value || data[key] === '') {
+                    setData(key, value);
+                }
+            });
+        }, 100);
+        return () => clearTimeout(timer);
+    }, []);
+
     const selectedPaymentMethod = serverMethods.find((m) => m.slug === data.payment_method);
     const paidAmount = selectedPaymentMethod?.requires_payment_details && data.payment_amount ? Math.min(parseFloat(data.payment_amount) || 0, total) : 0;
     const dueAmount = Math.max(0, total - paidAmount);
@@ -576,10 +590,35 @@ export default function LandingPageV2() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         const activeSelected = selectedItems.filter((i) => i.selected);
+
+        // Ensure UTM parameters are read fresh from sessionStorage at submit time
+        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
+        const freshUtmData: Record<string, string> = {};
+        keys.forEach((key) => {
+            freshUtmData[key] = sessionStorage.getItem(key) || data[key] || '';
+        });
+
         if (hasMultipleProducts) {
-            transform((formData) => ({ ...formData, items: activeSelected.map((i) => ({ product_id: i.product_id, quantity: i.quantity, variant_id: i.product_id === product.id ? selectedVariantId : (extraVariants[i.product_id] ?? null) })), delivery_zone: deliveryZone, coupon_code: appliedCoupon || undefined }));
+            transform((formData) => ({
+                ...formData,
+                items: activeSelected.map((i) => ({
+                    product_id: i.product_id,
+                    quantity: i.quantity,
+                    variant_id: i.product_id === product.id ? selectedVariantId : (extraVariants[i.product_id] ?? null)
+                })),
+                delivery_zone: deliveryZone,
+                coupon_code: appliedCoupon || undefined,
+                ...freshUtmData,
+            }));
         } else {
-            transform((formData) => ({ ...formData, variant_id: selectedVariantId, quantity: primaryQty, delivery_zone: deliveryZone, coupon_code: appliedCoupon || undefined }));
+            transform((formData) => ({
+                ...formData,
+                variant_id: selectedVariantId,
+                quantity: primaryQty,
+                delivery_zone: deliveryZone,
+                coupon_code: appliedCoupon || undefined,
+                ...freshUtmData,
+            }));
         }
         post(`/lp/${landingPage.slug}`, { forceFormData: true });
     }
