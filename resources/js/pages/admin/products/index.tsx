@@ -24,11 +24,12 @@ type Product = {
     price: string;
     original_price: string | null;
     in_stock: boolean;
+    stock_quantity: number | null;
     created_at: string;
     category: Category | null;
     sub_category: { id: number; name: string } | null;
     images: { id: number; image_path: string; sort_order: number }[];
-    variants: { id: number; size: string | null; color: string | null; price: string }[];
+    variants: { id: number; size: string | null; color: string | null; price: string; stock_quantity: number | null }[];
 };
 
 type PaginatedProducts = {
@@ -214,9 +215,9 @@ export default function ProductsIndex() {
                                         )}
                                     </td>
                                     <td className="whitespace-nowrap px-2 py-3 sm:px-4">
-                                        {product.in_stock ? (
+                                        {product.in_stock && product.stock_quantity !== 0 ? (
                                             <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                                                In Stock
+                                                {product.stock_quantity ? `In Stock (${product.stock_quantity})` : 'In Stock'}
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">

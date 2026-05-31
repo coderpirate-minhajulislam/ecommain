@@ -112,6 +112,7 @@ type ExtraProductVariant = {
     price: string;
     original_price: string | null;
     in_stock: boolean;
+    stock_quantity: number | null;
 };
 
 type ExtraProduct = {
@@ -120,6 +121,7 @@ type ExtraProduct = {
     price: string;
     original_price: string | null;
     in_stock: boolean;
+    stock_quantity: number | null;
     free_shipping: boolean;
     shipping_zones: { zone: string; charge: number }[];
     allowed_payment_methods: string[];
@@ -177,6 +179,8 @@ export default function LandingPageV2() {
     const shippingZones = useMemo(() => product.shipping_zones || [], [product.shipping_zones]);
 
     const selectedVariant = variants.find((v) => v.id === selectedVariantId) ?? null;
+    const activeStockQuantity = selectedVariant ? selectedVariant.stock_quantity : product?.stock_quantity;
+    const isOutOfStock = !activeInStock || activeStockQuantity === 0;
 
     const allSelectedZones = useMemo(() => {
         const zoneSet = new Set<string>();
@@ -1161,6 +1165,17 @@ export default function LandingPageV2() {
                                                 </div>
                                             )}
 
+                                            {/* Stock Status Badge */}
+                                            <div className="mt-3 border-t border-gray-100 pt-3">
+                                                {isOutOfStock ? (
+                                                    <span className="text-red-600 text-sm font-medium">Out of Stock</span>
+                                                ) : activeStockQuantity ? (
+                                                    <span className="text-green-600 text-sm font-medium">In Stock ({activeStockQuantity} available)</span>
+                                                ) : (
+                                                    <span className="text-blue-600 text-sm font-medium">In Stock (Unlimited)</span>
+                                                )}
+                                            </div>
+
                                             {/* Quantity */}
                                             <div className="mt-3 flex items-center gap-3 border-t border-gray-100 pt-3">
                                                 <span className="text-xs font-medium text-gray-400">Qty:</span>
@@ -1207,6 +1222,25 @@ export default function LandingPageV2() {
                                                         );
                                                     })()}
                                                     {ep.variants.length > 0 && isSelected && (extraVariants[ep.id] ?? null) === null && <p className="mt-2 text-xs font-medium text-red-500">Please select a variant.</p>}
+                                                    {(() => {
+                                                        const epSelectedId = extraVariants[ep.id] ?? null;
+                                                        const epSelectedVariant = epSelectedId ? ep.variants.find((v) => v.id === epSelectedId) : null;
+                                                        const epActiveInStock = epSelectedVariant ? epSelectedVariant.in_stock : ep.in_stock;
+                                                        const epActiveStockQuantity = epSelectedVariant ? epSelectedVariant.stock_quantity : ep.stock_quantity;
+                                                        const epIsOutOfStock = !epActiveInStock || epActiveStockQuantity === 0;
+
+                                                        return (
+                                                            <div className="mt-3 border-t border-gray-100 pt-3">
+                                                                {epIsOutOfStock ? (
+                                                                    <span className="text-red-600 text-sm font-medium">Out of Stock</span>
+                                                                ) : epActiveStockQuantity ? (
+                                                                    <span className="text-green-600 text-sm font-medium">In Stock ({epActiveStockQuantity} available)</span>
+                                                                ) : (
+                                                                    <span className="text-blue-600 text-sm font-medium">In Stock (Unlimited)</span>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })()}
                                                     <div className="mt-3 flex items-center gap-3 border-t border-gray-100 pt-3">
                                                         <span className="text-xs font-medium text-gray-400">Qty:</span>
                                                         <div className="flex items-center rounded-md border border-gray-200">

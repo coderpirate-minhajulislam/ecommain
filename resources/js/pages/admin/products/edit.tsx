@@ -1,6 +1,6 @@
 import { Head, useForm, Link, usePage } from '@inertiajs/react';
 import { ArrowLeft, Plus, Trash2, Upload, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 type Category = { id: number; name: string };
 type SubCategory = { id: number; category_id: number; name: string };
@@ -65,7 +65,7 @@ export default function EditProduct() {
         offer_timer: product.offer_timer?.substring(0, 16) || '',
         is_featured: product.is_featured || false,
         is_new_arrival: product.is_new_arrival || false,
-        stock_quantity: product.stock_quantity ? String(product.stock_quantity) : '',
+        stock_quantity: product.stock_quantity !== null ? String(product.stock_quantity) : '',
         images: [] as File[],
         remove_images: [] as number[],
         in_stock: product.in_stock,
@@ -82,7 +82,7 @@ export default function EditProduct() {
             price: v.price,
             original_price: v.original_price || '',
             in_stock: v.in_stock,
-            stock_quantity: v.stock_quantity ? String(v.stock_quantity) : '',
+            stock_quantity: v.stock_quantity !== null ? String(v.stock_quantity) : '',
             free_shipping: v.free_shipping ?? null,
             shipping_zones: (v.shipping_zones || []).map((z) => ({ zone: z.zone, charge: String(z.charge) })),
         })) as VariantRow[],
@@ -106,6 +106,13 @@ export default function EditProduct() {
         () => (data.category_id ? subCategories.filter((sc) => sc.category_id === Number(data.category_id)) : []),
         [data.category_id, subCategories],
     );
+
+    // Auto-uncheck in_stock when stock_quantity is 0 on page load or when it changes
+    useEffect(() => {
+        if (data.stock_quantity === '0') {
+            setData('in_stock', false);
+        }
+    }, [data.stock_quantity, setData]);
 
     function addVariant() {
         setData('variants', [...data.variants, { size: '', color: '', price: '', original_price: '', in_stock: true, stock_quantity: '', free_shipping: null, shipping_zones: [] }]);
@@ -487,7 +494,13 @@ export default function EditProduct() {
                                         type="number"
                                         min="0"
                                         value={data.stock_quantity}
-                                        onChange={(e) => setData('stock_quantity', e.target.value)}
+                                        onChange={(e) => {
+                                            setData('stock_quantity', e.target.value);
+                                            // Auto-uncheck in_stock when quantity becomes 0
+                                            if (e.target.value === '0') {
+                                                setData('in_stock', false);
+                                            }
+                                        }}
                                         placeholder="∞"
                                         title="Leave empty for unlimited stock"
                                         className="w-16 rounded-sm border border-input bg-background px-1.5 py-0.5 text-sm font-medium text-center focus:outline-none focus:ring-1 focus:ring-primary"
@@ -735,7 +748,13 @@ export default function EditProduct() {
                                             min="0"
                                             placeholder="Unlimited"
                                             value={variant.stock_quantity}
-                                            onChange={(e) => updateVariant(i, 'stock_quantity', e.target.value)}
+                                            onChange={(e) => {
+                                                updateVariant(i, 'stock_quantity', e.target.value);
+                                                // Auto-uncheck in_stock when quantity becomes 0
+                                                if (e.target.value === '0') {
+                                                    updateVariant(i, 'in_stock', false);
+                                                }
+                                            }}
                                             className="flex-1 rounded-md border border-input bg-background px-2 py-1.5 text-sm"
                                         />
                                         {variant.stock_quantity && (
