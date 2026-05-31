@@ -89,6 +89,18 @@ const sourceLabels: Record<string, string> = {
     admin: 'Admin',
 };
 
+const courierStatusColors: Record<string, string> = {
+    pending: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400',
+    picked_up: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    in_transit: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400',
+    out_for_delivery: 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400',
+    delivered: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    failed: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+    unknown: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400',
+    returned: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+};
+
 function formatPrice(price: string | null): string {
     if (!price) {
         return '';
@@ -348,11 +360,17 @@ export default function OrdersIndex() {
                                                 if (!courierInfo) {
                                                     return <span className="text-xs text-muted-foreground/50">—</span>;
                                                 }
+                                                const statusKey = courierInfo.status?.toLowerCase().replace(/\s+/g, '_') || 'unknown';
+                                                const statusColor = courierStatusColors[statusKey] || courierStatusColors['unknown'];
                                                 return (
-                                                    <div className="flex flex-col gap-0.5">
-                                                        <span className="text-xs font-medium text-foreground">{courierInfo.courier}</span>
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 w-fit">
+                                                            {courierInfo.courier}
+                                                        </span>
                                                         {courierInfo.status && (
-                                                            <span className="text-xs text-muted-foreground capitalize">{courierInfo.status}</span>
+                                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize w-fit ${statusColor}`}>
+                                                                {courierInfo.status}
+                                                            </span>
                                                         )}
                                                     </div>
                                                 );
