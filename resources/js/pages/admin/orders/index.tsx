@@ -33,6 +33,14 @@ type Order = {
     first_name: string;
     created_at: string;
     items: OrderItem[];
+    pathao_consignment_id: string | null;
+    pathao_order_status: string | null;
+    steadfast_consignment_id: string | null;
+    steadfast_status: string | null;
+    redx_tracking_id: string | null;
+    redx_status: string | null;
+    carrybee_consignment_id: string | null;
+    carrybee_status: string | null;
 };
 
 type PaginatedOrders = {
@@ -95,6 +103,22 @@ function formatDateTime(dateStr: string) {
         date: d.toLocaleDateString(),
         time: d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
     };
+}
+
+function getCourierStatus(order: Order) {
+    if (order.pathao_consignment_id) {
+        return { courier: 'Pathao', status: order.pathao_order_status };
+    }
+    if (order.steadfast_consignment_id) {
+        return { courier: 'Steadfast', status: order.steadfast_status };
+    }
+    if (order.redx_tracking_id) {
+        return { courier: 'RedX', status: order.redx_status };
+    }
+    if (order.carrybee_consignment_id) {
+        return { courier: 'Carrybee', status: order.carrybee_status };
+    }
+    return null;
 }
 
 export default function OrdersIndex() {
@@ -285,6 +309,7 @@ export default function OrdersIndex() {
                                 <th className="whitespace-nowrap px-2 py-3 text-left font-medium sm:px-4">Items</th>
                                 <th className="whitespace-nowrap px-2 py-3 text-left font-medium sm:px-4">Total</th>
                                 <th className="whitespace-nowrap px-2 py-3 text-left font-medium sm:px-4">Status</th>
+                                <th className="whitespace-nowrap px-2 py-3 text-left font-medium sm:px-4">Courier</th>
                                 <th className="whitespace-nowrap px-2 py-3 text-left font-medium sm:px-4">Source</th>
                                 <th className="whitespace-nowrap px-2 py-3 text-left font-medium sm:px-4">Date</th>
                                 <th className="sticky right-0 whitespace-nowrap bg-muted/50 px-2 py-3 text-right font-medium sm:px-4">Actions</th>
@@ -316,6 +341,22 @@ export default function OrdersIndex() {
                                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium capitalize ${statusColors[order.status] || ''}`}>
                                                 {order.status}
                                             </span>
+                                        </td>
+                                        <td className="whitespace-nowrap px-2 py-3 sm:px-4">
+                                            {(() => {
+                                                const courierInfo = getCourierStatus(order);
+                                                if (!courierInfo) {
+                                                    return <span className="text-xs text-muted-foreground/50">—</span>;
+                                                }
+                                                return (
+                                                    <div className="flex flex-col gap-0.5">
+                                                        <span className="text-xs font-medium text-foreground">{courierInfo.courier}</span>
+                                                        {courierInfo.status && (
+                                                            <span className="text-xs text-muted-foreground capitalize">{courierInfo.status}</span>
+                                                        )}
+                                                    </div>
+                                                );
+                                            })()}
                                         </td>
                                         <td className="whitespace-nowrap px-2 py-3 sm:px-4">
                                             {order.order_source ? (
@@ -357,7 +398,7 @@ export default function OrdersIndex() {
                             })}
                             {orders.data.length === 0 && (
                                 <tr>
-                                    <td colSpan={8} className="px-4 py-8 text-center text-muted-foreground">
+                                    <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
                                         No orders found.
                                     </td>
                                 </tr>
