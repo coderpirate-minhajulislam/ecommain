@@ -168,6 +168,8 @@ export default function ProductDetail() {
     const activePrice = selectedVariant ? selectedVariant.price : product?.price;
     const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product?.original_price;
     const activeInStock = selectedVariant ? selectedVariant.in_stock : product?.in_stock;
+    const activeStockQuantity = selectedVariant ? selectedVariant.stock_quantity : product?.stock_quantity;
+    const isOutOfStock = !activeInStock || activeStockQuantity === 0;
     const productImages = product?.images?.map((img) => img.image_path) ?? [];
     const hasVariantImage = Boolean(selectedVariant?.image_path);
     const imagePaths = productImages;
@@ -591,6 +593,17 @@ export default function ProductDetail() {
                             {product.short_description && (
                                 <p className="whitespace-pre-wrap text-sm sm:text-base md:text-lg leading-relaxed text-muted-foreground w-full">{product.short_description}</p>
                             )}
+
+                            {/* Stock Status Badge */}
+                            <div className="mt-3 sm:mt-4 flex items-center gap-2">
+                                {isOutOfStock ? (
+                                    <Badge className="bg-red-500 text-white hover:bg-red-600">❌ Out of Stock</Badge>
+                                ) : activeStockQuantity ? (
+                                    <Badge className="bg-green-500 text-white hover:bg-green-600">✅ In Stock ({activeStockQuantity} available)</Badge>
+                                ) : (
+                                    <Badge className="bg-blue-500 text-white hover:bg-blue-600">✅ In Stock (Unlimited)</Badge>
+                                )}
+                            </div>
                         </div>
 
                         {/* Divider */}
@@ -685,11 +698,18 @@ export default function ProductDetail() {
                                         variant="ghost"
                                         size="icon"
                                         className="h-8 w-8 sm:h-9 sm:w-9 text-primary hover:bg-primary/10 hover:text-primary"
-                                        onClick={() => setQuantity(quantity + 1)}
+                                        onClick={() => {
+                                            const maxQty = activeStockQuantity || 999;
+                                            setQuantity(Math.min(quantity + 1, maxQty));
+                                        }}
+                                        disabled={activeStockQuantity !== null && quantity >= activeStockQuantity}
                                     >
                                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                 </div>
+                                {activeStockQuantity && quantity > activeStockQuantity && (
+                                    <p className="text-xs text-destructive">Max {activeStockQuantity} available</p>
+                                )}
                             </div>
 
                             {/* Action Buttons — row 1: cart icon + buy now */}
@@ -699,8 +719,8 @@ export default function ProductDetail() {
                                     size="lg"
                                     variant="outline"
                                     className="h-12 flex-1 gap-2 px-6 text-base font-semibold border-primary text-primary hover:bg-primary/15 hover:text-primary transition-colors cursor-pointer"
-                                    disabled={!activeInStock}
-                                    title={activeInStock ? 'Add to Cart' : 'Out of Stock'}
+                                    disabled={isOutOfStock}
+                                    title={isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                                     onClick={() => {
                                         if (variants.length > 0 && !selectedVariantId) {
                                             toast.error('Please select a variation first');
@@ -761,7 +781,7 @@ export default function ProductDetail() {
                                     size="lg"
                                     variant="default"
                                     className={`h-12 flex-1 px-6 font-semibold text-base active:scale-[0.98] transition-all cursor-pointer${buyNowShake ? ' animate-btn-shake' : ''}`}
-                                    disabled={!activeInStock}
+                                    disabled={isOutOfStock}
                                     onClick={() => {
                                         if (variants.length > 0 && !selectedVariantId) {
                                             toast.error('Please select a variation first');

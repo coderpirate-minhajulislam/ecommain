@@ -6,7 +6,7 @@ type Category = { id: number; name: string };
 type SubCategory = { id: number; category_id: number; name: string };
 type GlobalShippingZone = { id: number; name: string };
 type PaymentMethodOption = { id: number; name: string; slug: string };
-type VariantRow = { size: string; color: string; price: string; original_price: string; in_stock: boolean; free_shipping: boolean | null; shipping_zones: { zone: string; charge: string }[] };
+type VariantRow = { size: string; color: string; price: string; original_price: string; in_stock: boolean; stock_quantity: string; free_shipping: boolean | null; shipping_zones: { zone: string; charge: string }[] };
 
 type Props = {
     categories: Category[];
@@ -32,6 +32,7 @@ export default function CreateProduct({ categories, subCategories, shippingZones
         is_new_arrival: false,
         images: [] as File[],
         in_stock: true,
+        stock_quantity: '',
         free_shipping: false,
         shipping_zones: [] as { zone: string; charge: string }[],
         allowed_payment_methods: [] as string[],
@@ -54,7 +55,7 @@ export default function CreateProduct({ categories, subCategories, shippingZones
     );
 
     function addVariant() {
-        setData('variants', [...data.variants, { size: '', color: '', price: '', original_price: '', in_stock: true, free_shipping: null, shipping_zones: [] }]);
+        setData('variants', [...data.variants, { size: '', color: '', price: '', original_price: '', in_stock: true, stock_quantity: '', free_shipping: null, shipping_zones: [] }]);
         setData('variant_images', [...data.variant_images, null]);
         setVariantImagePreviews((prev) => [...prev, null]);
     }
@@ -490,44 +491,66 @@ export default function CreateProduct({ categories, subCategories, shippingZones
                             {errors.allowed_payment_methods && <p className="text-sm text-destructive">{errors.allowed_payment_methods}</p>}
                         </div>
 
-                        <div className="flex items-center gap-4 pt-2 sm:col-span-2">
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="in_stock"
-                                    type="checkbox"
-                                    checked={data.in_stock}
-                                    onChange={(e) => setData('in_stock', e.target.checked)}
-                                    className="h-4 w-4 rounded border-input"
-                                />
-                                <label htmlFor="in_stock" className="text-sm font-medium">
-                                    In Stock
-                                </label>
+                        <div className="flex items-center gap-6 pt-2 sm:col-span-2 flex-wrap">
+                            {/* In Stock & Stock Quantity */}
+                            <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="in_stock"
+                                        type="checkbox"
+                                        checked={data.in_stock}
+                                        onChange={(e) => setData('in_stock', e.target.checked)}
+                                        className="h-4 w-4 rounded border-input cursor-pointer"
+                                    />
+                                    <label htmlFor="in_stock" className="text-sm font-medium cursor-pointer">
+                                        In Stock
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/40 rounded-md border border-border">
+                                    <label htmlFor="stock_quantity" className="text-xs font-medium text-muted-foreground whitespace-nowrap">
+                                        Qty:
+                                    </label>
+                                    <input
+                                        id="stock_quantity"
+                                        type="number"
+                                        min="0"
+                                        value={data.stock_quantity}
+                                        onChange={(e) => setData('stock_quantity', e.target.value)}
+                                        placeholder="∞"
+                                        title="Leave empty for unlimited stock"
+                                        className="w-16 rounded-sm border border-input bg-background px-1.5 py-0.5 text-sm font-medium text-center focus:outline-none focus:ring-1 focus:ring-primary"
+                                    />
+                                </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="is_featured"
-                                    type="checkbox"
-                                    checked={data.is_featured}
-                                    onChange={(e) => setData('is_featured', e.target.checked)}
-                                    className="h-4 w-4 rounded border-input"
-                                />
-                                <label htmlFor="is_featured" className="text-sm font-medium">
-                                    Featured Product
-                                </label>
-                            </div>
+                            {/* Featured & New Arrival */}
+                            <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="is_featured"
+                                        type="checkbox"
+                                        checked={data.is_featured}
+                                        onChange={(e) => setData('is_featured', e.target.checked)}
+                                        className="h-4 w-4 rounded border-input cursor-pointer"
+                                    />
+                                    <label htmlFor="is_featured" className="text-sm font-medium cursor-pointer">
+                                        Featured Product
+                                    </label>
+                                </div>
 
-                            <div className="flex items-center gap-2">
-                                <input
-                                    id="is_new_arrival"
-                                    type="checkbox"
-                                    checked={data.is_new_arrival}
-                                    onChange={(e) => setData('is_new_arrival', e.target.checked)}
-                                    className="h-4 w-4 rounded border-input"
-                                />
-                                <label htmlFor="is_new_arrival" className="text-sm font-medium">
-                                    New Arrival
-                                </label>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        id="is_new_arrival"
+                                        type="checkbox"
+                                        checked={data.is_new_arrival}
+                                        onChange={(e) => setData('is_new_arrival', e.target.checked)}
+                                        className="h-4 w-4 rounded border-input cursor-pointer"
+                                    />
+                                    <label htmlFor="is_new_arrival" className="text-sm font-medium cursor-pointer">
+                                        New Arrival
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -626,6 +649,17 @@ export default function CreateProduct({ categories, subCategories, shippingZones
                                         className="h-3.5 w-3.5 rounded border-input"
                                     />
                                     <span className="text-[11px]">In Stock</span>
+                                </div>
+                                <div className="w-24 space-y-1">
+                                    <label className="text-[11px] text-muted-foreground">Stock Qty</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        placeholder="Unlimited"
+                                        value={variant.stock_quantity}
+                                        onChange={(e) => updateVariant(i, 'stock_quantity', e.target.value)}
+                                        className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm"
+                                    />
                                 </div>
                                 {/* Variant Shipping */}
                                 <div className="w-full mt-1 space-y-1.5 border-t border-dashed border-input pt-2">

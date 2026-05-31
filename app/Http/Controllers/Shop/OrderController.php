@@ -255,9 +255,38 @@ class OrderController extends Controller
         foreach ($validated['items'] as $item) {
             $product = Product::findOrFail($item['product_id']);
             $variant = $item['variant_id'] ? ProductVariant::findOrFail($item['variant_id']) : null;
+            $quantity = $item['quantity'];
+
+            // Check stock availability for variant or product
+            if ($variant) {
+                // If variant is out of stock
+                if (!$variant->in_stock || $variant->stock_quantity === 0) {
+                    return back()->withErrors([
+                        'stock' => "The product variant '{$product->name}' is currently out of stock."
+                    ]);
+                }
+                // If variant has limited stock and requested quantity exceeds available stock
+                if ($variant->stock_quantity !== null && $quantity > $variant->stock_quantity) {
+                    return back()->withErrors([
+                        'stock' => "Only {$variant->stock_quantity} unit(s) of '{$product->name}' available in stock."
+                    ]);
+                }
+            } else {
+                // If product is out of stock
+                if (!$product->in_stock || $product->stock_quantity === 0) {
+                    return back()->withErrors([
+                        'stock' => "The product '{$product->name}' is currently out of stock."
+                    ]);
+                }
+                // If product has limited stock and requested quantity exceeds available stock
+                if ($product->stock_quantity !== null && $quantity > $product->stock_quantity) {
+                    return back()->withErrors([
+                        'stock' => "Only {$product->stock_quantity} unit(s) of '{$product->name}' available in stock."
+                    ]);
+                }
+            }
 
             $price = $variant ? (float) $variant->price : (float) $product->price;
-            $quantity = $item['quantity'];
             $lineTotal = $price * $quantity;
             $subtotal += $lineTotal;
 

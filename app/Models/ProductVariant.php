@@ -14,6 +14,7 @@ class ProductVariant extends Model
         'price',
         'original_price',
         'in_stock',
+        'stock_quantity',
         'free_shipping',
         'shipping_zones',
         'image_path',
@@ -25,6 +26,7 @@ class ProductVariant extends Model
             'price' => 'decimal:2',
             'original_price' => 'decimal:2',
             'in_stock' => 'boolean',
+            'stock_quantity' => 'integer',
             'free_shipping' => 'boolean',
             'shipping_zones' => 'array',
         ];
