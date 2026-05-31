@@ -599,9 +599,9 @@ export default function ProductDetail() {
                                 {isOutOfStock ? (
                                     <span className="text-red-600 text-sm font-medium">Out of Stock</span>
                                 ) : activeStockQuantity ? (
-                                    <span className="text-green-600 text-sm font-medium">In Stock ({activeStockQuantity} available)</span>
+                                    <span className="text-green-600 text-sm font-medium">In Stock ({activeStockQuantity} Available)</span>
                                 ) : (
-                                    <span className="text-blue-600 text-sm font-medium">In Stock (Unlimited)</span>
+                                    <span className="text-blue-600 text-sm font-medium">In Stock (Available)</span>
                                 )}
                             </div>
                         </div>
@@ -690,6 +690,7 @@ export default function ProductDetail() {
                                         size="icon"
                                         className="h-8 w-8 sm:h-9 sm:w-9 text-primary hover:bg-primary/10 hover:text-primary"
                                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                        disabled={isOutOfStock}
                                     >
                                         <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
@@ -702,13 +703,13 @@ export default function ProductDetail() {
                                             const maxQty = activeStockQuantity || 999;
                                             setQuantity(Math.min(quantity + 1, maxQty));
                                         }}
-                                        disabled={activeStockQuantity !== null && quantity >= activeStockQuantity}
+                                        disabled={isOutOfStock || (activeStockQuantity !== null && quantity >= activeStockQuantity)}
                                     >
                                         <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                                     </Button>
                                 </div>
-                                {activeStockQuantity && quantity > activeStockQuantity && (
-                                    <p className="text-xs text-destructive">Max {activeStockQuantity} available</p>
+                                {!isOutOfStock && activeStockQuantity && quantity > activeStockQuantity && (
+                                    <p className="text-xs text-destructive">Max {activeStockQuantity} Available</p>
                                 )}
                             </div>
 

@@ -518,9 +518,14 @@ export default function CreateProduct({ categories, subCategories, shippingZones
                                         value={data.stock_quantity}
                                         onChange={(e) => setData('stock_quantity', e.target.value)}
                                         placeholder="∞"
-                                        title="Leave empty for unlimited stock"
+                                        title="Leave empty for available stock"
                                         className="w-16 rounded-sm border border-input bg-background px-1.5 py-0.5 text-sm font-medium text-center focus:outline-none focus:ring-1 focus:ring-primary"
                                     />
+                                    {(data.stock_quantity || data.stock_quantity === 0) && (
+                                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                            ({data.stock_quantity} available)
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
@@ -652,14 +657,21 @@ export default function CreateProduct({ categories, subCategories, shippingZones
                                 </div>
                                 <div className="w-24 space-y-1">
                                     <label className="text-[11px] text-muted-foreground">Stock Qty</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        placeholder="Unlimited"
-                                        value={variant.stock_quantity}
-                                        onChange={(e) => updateVariant(i, 'stock_quantity', e.target.value)}
-                                        className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm"
-                                    />
+                                    <div className="flex items-center gap-1.5">
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            placeholder="Leave blank for available stock"
+                                            value={variant.stock_quantity}
+                                            onChange={(e) => updateVariant(i, 'stock_quantity', e.target.value)}
+                                            className="w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm"
+                                        />
+                                        {(variant.stock_quantity || variant.stock_quantity === 0) && (
+                                            <span className="text-[10px] text-green-600 dark:text-green-400 font-medium whitespace-nowrap">
+                                                ({variant.stock_quantity})
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
                                 {/* Variant Shipping */}
                                 <div className="w-full mt-1 space-y-1.5 border-t border-dashed border-input pt-2">

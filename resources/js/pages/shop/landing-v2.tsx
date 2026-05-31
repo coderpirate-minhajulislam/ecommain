@@ -1169,7 +1169,7 @@ export default function LandingPageV2() {
                                                 {isOutOfStock ? (
                                                     <span className="text-red-600 text-sm font-medium">Out of Stock</span>
                                                 ) : activeStockQuantity ? (
-                                                    <span className="text-green-600 text-sm font-medium">In Stock ({activeStockQuantity} available)</span>
+                                                    <span className="text-green-600 text-sm font-medium">In Stock ({activeStockQuantity} Available)</span>
                                                 ) : (
                                                     <span className="text-blue-600 text-sm font-medium">In Stock (Unlimited)</span>
                                                 )}
@@ -1233,9 +1233,9 @@ export default function LandingPageV2() {
                                                                 {epIsOutOfStock ? (
                                                                     <span className="text-red-600 text-sm font-medium">Out of Stock</span>
                                                                 ) : epActiveStockQuantity ? (
-                                                                    <span className="text-green-600 text-sm font-medium">In Stock ({epActiveStockQuantity} available)</span>
+                                                                    <span className="text-green-600 text-sm font-medium">In Stock ({epActiveStockQuantity} Available)</span>
                                                                 ) : (
-                                                                    <span className="text-blue-600 text-sm font-medium">In Stock (Unlimited)</span>
+                                                                    <span className="text-blue-600 text-sm font-medium">In Stock (Available)</span>
                                                                 )}
                                                             </div>
                                                         );

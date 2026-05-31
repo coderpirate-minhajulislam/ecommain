@@ -502,10 +502,10 @@ export default function EditProduct() {
                                             }
                                         }}
                                         placeholder="∞"
-                                        title="Leave empty for unlimited stock"
+                                        title="Leave empty for available stock"
                                         className="w-16 rounded-sm border border-input bg-background px-1.5 py-0.5 text-sm font-medium text-center focus:outline-none focus:ring-1 focus:ring-primary"
                                     />
-                                    {data.stock_quantity && (
+                                    {(data.stock_quantity || data.stock_quantity === 0) && (
                                         <span className="text-xs text-green-600 dark:text-green-400 font-medium">
                                             ({data.stock_quantity} available)
                                         </span>
@@ -746,7 +746,7 @@ export default function EditProduct() {
                                         <input
                                             type="number"
                                             min="0"
-                                            placeholder="Unlimited"
+                                            placeholder="Leave blank for available stock"
                                             value={variant.stock_quantity}
                                             onChange={(e) => {
                                                 updateVariant(i, 'stock_quantity', e.target.value);
@@ -757,7 +757,7 @@ export default function EditProduct() {
                                             }}
                                             className="flex-1 rounded-md border border-input bg-background px-2 py-1.5 text-sm"
                                         />
-                                        {variant.stock_quantity && (
+                                        {(variant.stock_quantity || variant.stock_quantity === 0) && (
                                             <span className="text-[10px] text-green-600 dark:text-green-400 font-medium whitespace-nowrap">
                                                 ({variant.stock_quantity})
                                             </span>
