@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';
 import * as Icons from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { GtmScript } from '@/components/ecommerce/gtm-script';
 import { GtmSsScript } from '@/components/ecommerce/gtm-ss-script';
 import { MetaPixelScript } from '@/components/ecommerce/meta-pixel-script';
@@ -454,6 +455,7 @@ export default function LandingPageV2() {
     const [districtOpen, setDistrictOpen] = useState(false);
     const districtRef = useRef<HTMLDivElement>(null);
     const [phoneRestricted, setPhoneRestricted] = useState(false);
+    const [phoneCheckLoading, setPhoneCheckLoading] = useState(false);
     const [checkedPhone, setCheckedPhone] = useState('');
     const phoneCheckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -473,7 +475,8 @@ export default function LandingPageV2() {
 
     useEffect(() => {
         if (phoneCheckRef.current) clearTimeout(phoneCheckRef.current);
-        if (checkedPhone.length !== 11) { setPhoneRestricted(false); return; }
+        if (checkedPhone.length !== 11) { setPhoneRestricted(false); setPhoneCheckLoading(false); return; }
+        setPhoneCheckLoading(true);
         phoneCheckRef.current = setTimeout(async () => {
             try {
                 const res = await fetch('/checkout/check-phone', {
@@ -483,11 +486,12 @@ export default function LandingPageV2() {
                 });
                 const json = await res.json();
                 setPhoneRestricted(!!json.restricted);
+                setPhoneCheckLoading(false);
                 if (json.restricted) {
                     const detailMethod = serverMethods.find((m) => m.requires_payment_details);
                     if (detailMethod) setData('payment_method', detailMethod.slug);
                 }
-            } catch { setPhoneRestricted(false); }
+            } catch { setPhoneRestricted(false); setPhoneCheckLoading(false); }
         }, 500);
         return () => { if (phoneCheckRef.current) clearTimeout(phoneCheckRef.current); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -593,6 +597,12 @@ export default function LandingPageV2() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         const activeSelected = selectedItems.filter((i) => i.selected);
+
+        // Check if COD is selected when restricted
+        if (phoneRestricted && data.payment_method === 'cod') {
+            toast.error('Cash on Delivery is not available for your phone number. Please select an alternative payment method.');
+            return;
+        }
 
         // Ensure UTM parameters are read fresh from sessionStorage at submit time
         const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
@@ -983,6 +993,7 @@ export default function LandingPageV2() {
                                             <div>
                                                 <Label htmlFor="phone">{labels?.phoneNumber ?? 'Phone Number'} *</Label>
                                                 <Input id="phone" type="tel" value={data.phone} onChange={(e) => handlePhoneChange(e.target.value)} placeholder="01XXXXXXXXX" className="mt-1" maxLength={11} inputMode="numeric" />
+                                                {phoneCheckLoading && <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">ℹ Verifying your phone number for Cash on Delivery eligibility...</p>}
                                                 {data.phone && !data.phone.startsWith('01') && <p className="mt-1 text-xs text-red-500">Phone number must start with 01 (e.g., 01XXXXXXXXX). Do not enter +88 or 88.</p>}
                                                 {data.phone && data.phone.startsWith('01') && data.phone.length !== 11 && <p className="mt-1 text-xs text-red-500">Phone number must be exactly 11 digits.</p>}
                                                 {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
@@ -1324,9 +1335,9 @@ export default function LandingPageV2() {
 
                                     {missingVariant && <p className="text-center text-xs text-red-500">Please select a variant (size/color) for all selected products before ordering.</p>}
 
-                                    <Button type="submit" size="lg" disabled={processing || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant} className="w-full text-base font-bold shadow-lg">
+                                    <Button type="submit" size="lg" disabled={processing || phoneCheckLoading || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant} className="w-full text-base font-bold shadow-lg">
                                         <Lock className="mr-2 h-4 w-4" />
-                                        {processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
+                                        {phoneCheckLoading ? 'Verifying Phone...' : processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
                                     </Button>
 
                                     <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400">

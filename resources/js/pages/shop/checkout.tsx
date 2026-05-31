@@ -179,6 +179,7 @@ export default function CheckoutPage() {
     const [districtOpen, setDistrictOpen] = useState(false);
     const districtRef = useRef<HTMLDivElement>(null);
     const [phoneRestricted, setPhoneRestricted] = useState(false);
+    const [phoneCheckLoading, setPhoneCheckLoading] = useState(false);
     const [checkedPhone, setCheckedPhone] = useState('');
     const phoneCheckRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -205,8 +206,11 @@ export default function CheckoutPage() {
         if (phoneCheckRef.current) clearTimeout(phoneCheckRef.current);
         if (checkedPhone.length !== 11) {
             setPhoneRestricted(false);
+            setPhoneCheckLoading(false);
             return;
         }
+        // Set loading immediately when phone is complete
+        setPhoneCheckLoading(true);
         phoneCheckRef.current = setTimeout(async () => {
             try {
                 const res = await fetch('/checkout/check-phone', {
@@ -220,6 +224,7 @@ export default function CheckoutPage() {
                 });
                 const json = await res.json();
                 setPhoneRestricted(!!json.restricted);
+                setPhoneCheckLoading(false);
                 if (json.restricted) {
                     // Auto-select first payment method that requires details
                     const detailMethod = serverMethods.find((m) => m.requires_payment_details);
@@ -229,6 +234,7 @@ export default function CheckoutPage() {
                 }
             } catch {
                 setPhoneRestricted(false);
+                setPhoneCheckLoading(false);
             }
         }, 500);
         return () => { if (phoneCheckRef.current) clearTimeout(phoneCheckRef.current); };
@@ -467,6 +473,12 @@ export default function CheckoutPage() {
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
+        // Check if COD is selected when restricted
+        if (phoneRestricted && data.payment_method === 'cod') {
+            toast.error('Cash on Delivery is not available for your phone number. Please select an alternative payment method.');
+            return;
+        }
+
         // Ensure UTM parameters are read fresh from sessionStorage at submit time
         const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
         const freshUtmData: Record<string, string> = {};
@@ -585,6 +597,9 @@ export default function CheckoutPage() {
                                             maxLength={11}
                                             inputMode="numeric"
                                         />
+                                        {phoneCheckLoading && (
+                                            <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">ℹ Verifying your phone number for Cash on Delivery eligibility...</p>
+                                        )}
                                         {data.phone && !data.phone.startsWith('01') && (
                                             <p className="mt-1 text-xs text-destructive">Phone number must start with 01 (e.g., 01XXXXXXXXX). Do not enter +88 or 88.</p>
                                         )}
@@ -948,9 +963,9 @@ export default function CheckoutPage() {
                                 )}
                             </div>
 
-                            <Button type="submit" className="mt-4 w-full text-sm sm:text-base" size="lg" disabled={processing}>
+                            <Button type="submit" className="mt-4 w-full text-sm sm:text-base" size="lg" disabled={processing || phoneCheckLoading}>
                                 <Lock className="mr-1.5 h-4 w-4 shrink-0" />
-                                <span className="truncate">{processing ? 'Placing Order...' : `${labels?.placeOrder ?? 'Place Order'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}</span>
+                                <span className="truncate">{phoneCheckLoading ? 'Verifying Phone...' : processing ? 'Placing Order...' : `${labels?.placeOrder ?? 'Place Order'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}</span>
                             </Button>
                         </Card>
                     </div>
