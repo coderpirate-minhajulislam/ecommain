@@ -1337,7 +1337,7 @@ export default function LandingPageV2() {
 
                                     <Button type="submit" size="lg" disabled={processing || phoneCheckLoading || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant} className="w-full text-base font-bold shadow-lg">
                                         <Lock className="mr-2 h-4 w-4" />
-                                        {phoneCheckLoading ? 'Verifying Phone...' : processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
+                                        {phoneCheckLoading ? 'Verifying Phone...Please Wait' : processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
                                     </Button>
 
                                     <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[11px] text-gray-400">

@@ -965,7 +965,7 @@ export default function CheckoutPage() {
 
                             <Button type="submit" className="mt-4 w-full text-sm sm:text-base" size="lg" disabled={processing || phoneCheckLoading}>
                                 <Lock className="mr-1.5 h-4 w-4 shrink-0" />
-                                <span className="truncate">{phoneCheckLoading ? 'Verifying Phone...' : processing ? 'Placing Order...' : `${labels?.placeOrder ?? 'Place Order'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}</span>
+                                <span className="truncate">{phoneCheckLoading ? 'Verifying Phone...Please Wait' : processing ? 'Placing Order...' : `${labels?.placeOrder ?? 'Place Order'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}</span>
                             </Button>
                         </Card>
                     </div>
