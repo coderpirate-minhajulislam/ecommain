@@ -18,7 +18,7 @@ jobs:
           MYSQL_PASSWORD: '@Minhaz_1332!E'
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost -u europeancosmeticsbd  -p@Minhaz_1332!E" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: --health-cmd="mysqladmin ping -h localhost -ueuropeancosmeticsbd -p@Minhaz_1332!E" --health-interval=10s --health-timeout=5s --health-retries=5
 
       redis:
         image: redis:latest
@@ -41,12 +41,12 @@ jobs:
 
       - name: Configure Database for CI
         run: |
-          sed -i 's/APP_NAME=Laravel/APP_NAME="europeancosmeticsbd "/' .env
+          sed -i 's/APP_NAME=Laravel/APP_NAME="europeancosmeticsbd"/' .env
           sed -i 's/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/' .env
           sed -i "s/# DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/" .env
           sed -i "s/# DB_PORT=3306/DB_PORT=3306/" .env
-          sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=europeancosmeticsbd /" .env
-          sed -i "s/# DB_USERNAME=root/DB_USERNAME=europeancosmeticsbd /" .env
+          sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=europeancosmeticsbd/" .env
+          sed -i "s/# DB_USERNAME=root/DB_USERNAME=europeancosmeticsbd/" .env
           sed -i "s/# DB_PASSWORD=/DB_PASSWORD=@Minhaz_1332!E/" .env
           sed -i 's/CACHE_STORE=database/CACHE_STORE=redis/' .env
           sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=redis/' .env
@@ -60,7 +60,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h127.0.0.1 -ueuropeancosmeticsbd  -p'@Minhaz_1332!E' --silent; do
+          until mysqladmin ping -h127.0.0.1 -ueuropeancosmeticsbd -p'@Minhaz_1332!E' --silent; do
             echo 'Waiting for MySQL...'
             sleep 2
           done
@@ -90,9 +90,9 @@ jobs:
       #     username: ${{ secrets.VPS_USER }}
       #     password: ${{ secrets.VPS_PASSWORD }}
       #     script: |
-      #       rm -rf /var/www/html/europeancosmeticsbd /public/build
-      #       rm -rf /var/www/html/europeancosmeticsbd /bootstrap/cache/*.php
-      #       rm -rf /var/www/html/europeancosmeticsbd /database/migrations/*.php
+      #       rm -rf /var/www/html/europeancosmeticsbd/public/build
+      #       rm -rf /var/www/html/europeancosmeticsbd/bootstrap/cache/*.php
+      #       rm -rf /var/www/html/europeancosmeticsbd/database/migrations/*.php
 
 
       - name: Synchronize Files To Server
@@ -102,7 +102,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           source: '.'
-          target: '/var/www/html/europeancosmeticsbd /'
+          target: '/var/www/html/europeancosmeticsbd/'
 
       - name: Run Remote/Artisan Commands
         uses: appleboy/ssh-action@v1.2.5
@@ -112,9 +112,9 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/html/europeancosmeticsbd
-            sudo chown -R www-data:www-data /var/www/html/europeancosmeticsbd
-            sudo chmod -R 775 /var/www/html/europeancosmeticsbd /storage
-            sudo chmod -R 775 /var/www/html/europeancosmeticsbd /bootstrap/cache
+            sudo chown -R www-data:www-data/var/www/html/europeancosmeticsbd
+            sudo chmod -R 775 /var/www/html/europeancosmeticsbd/storage
+            sudo chmod -R 775 /var/www/html/europeancosmeticsbd/bootstrap/cache
 
             php artisan migrate --force
 
