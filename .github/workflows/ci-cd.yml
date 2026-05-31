@@ -18,7 +18,7 @@ jobs:
           MYSQL_PASSWORD: '@Minhaz_1332!E'
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost -ueuropeancosmeticsbd -p@Minhaz_1332!E" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: --health-cmd="mysqladmin ping -h localhost -u europeancosmeticsbd -p@Minhaz_1332!E" --health-interval=10s --health-timeout=5s --health-retries=5
 
       redis:
         image: redis:latest
@@ -112,7 +112,7 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/html/europeancosmeticsbd
-            sudo chown -R www-data:www-data/var/www/html/europeancosmeticsbd
+            sudo chown -R www-data:www-data /var/www/html/europeancosmeticsbd
             sudo chmod -R 775 /var/www/html/europeancosmeticsbd/storage
             sudo chmod -R 775 /var/www/html/europeancosmeticsbd/bootstrap/cache
 
