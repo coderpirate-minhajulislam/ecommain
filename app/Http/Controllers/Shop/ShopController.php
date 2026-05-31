@@ -35,6 +35,15 @@ class ShopController extends Controller
 
     private function checkoutLabels(): array
     {
+        // Get COD restricted message from either Order Ratio Check or BD Courier, prioritize whichever is configured
+        $codRestrictedMessage = Setting::get('orderratiocheck_cod_restricted_message');
+        if (!$codRestrictedMessage) {
+            $codRestrictedMessage = Setting::get('bdcourier_cod_restricted_message');
+        }
+        if (!$codRestrictedMessage) {
+            $codRestrictedMessage = 'Based on your phone number history, Cash on Delivery is not available. Please select a payment method below.';
+        }
+
         return [
             'addToCart'            => Setting::get('label_add_to_cart',           'Add to Cart'),
             'buyNow'               => Setting::get('label_buy_now',                'Buy Now'),
@@ -69,7 +78,7 @@ class ShopController extends Controller
             'reviewBody'           => Setting::get('label_review_body',            'Your Review (Minimum 10 characters)'),
             'reviewSubmit'         => Setting::get('label_review_submit',          'Submit Review'),
             'customerReviews'      => Setting::get('label_customer_reviews',       'Customer Reviews'),
-            'codRestrictedMessage' => Setting::get('bdcourier_cod_restricted_message', 'Based on your phone number history, Cash on Delivery is not available. Please select a payment method below.'),
+            'codRestrictedMessage' => $codRestrictedMessage,
         ];
     }
 
