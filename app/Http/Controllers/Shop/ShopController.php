@@ -99,7 +99,7 @@ class ShopController extends Controller
             return Product::with('category:id,name', 'images', 'variants')
                 ->where('in_stock', true)
                 ->where('is_featured', true)
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping')
                 ->latest()
                 ->limit(20)
                 ->get()->toArray();
@@ -110,7 +110,7 @@ class ShopController extends Controller
                 ->where('in_stock', true)
                 ->whereNotNull('offer_timer')
                 ->where('offer_timer', '>', now())
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping', 'offer_timer')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping', 'offer_timer')
                 ->limit(20)
                 ->get()->toArray();
         });
@@ -120,7 +120,7 @@ class ShopController extends Controller
                 ->where('in_stock', true)
                 ->whereNotNull('offer_timer')
                 ->where('offer_timer', '>', now())
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping', 'offer_timer')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping', 'offer_timer')
                 ->limit(4)
                 ->get()->toArray();
         });
@@ -129,7 +129,7 @@ class ShopController extends Controller
             return Product::with('category:id,name', 'images', 'variants')
                 ->where('in_stock', true)
                 ->where('is_new_arrival', true)
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping')
                 ->latest()
                 ->limit(20)
                 ->get()->toArray();
@@ -137,7 +137,7 @@ class ShopController extends Controller
 
         $allProducts = Cache::remember('shop.products.all', 900, function () {
             return Product::with('category:id,name', 'images', 'variants')
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping', 'offer_timer')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping', 'offer_timer')
                 ->orderBy('name')
                 ->limit(100)
                 ->get()->toArray();
@@ -178,7 +178,7 @@ class ShopController extends Controller
         }
 
         $query = Product::with('category:id,name', 'images', 'variants')
-            ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'sub_category_id', 'free_shipping', 'offer_timer')
+            ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'sub_category_id', 'free_shipping', 'offer_timer')
             ->when($search, fn ($q) => $q->where('name', 'like', "%{$search}%"))
             ->when($filter === 'new-arrivals', fn ($q) => $q->where('is_new_arrival', true))
             ->when($filter === 'featured', fn ($q) => $q->where('is_featured', true))
@@ -229,7 +229,7 @@ class ShopController extends Controller
                     $q->where('sub_category_id', $subCategory->id)
                       ->orWhereJsonContains('extra_sub_category_ids', $subCategory->id);
                 })
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'sub_category_id', 'free_shipping', 'offer_timer')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'sub_category_id', 'free_shipping', 'offer_timer')
                 ->when($sort === 'price-low',  fn ($q) => $q->orderBy('price'))
                 ->when($sort === 'price-high', fn ($q) => $q->orderByDesc('price'))
                 ->when($sort !== 'price-low' && $sort !== 'price-high', fn ($q) => $q->orderByDesc('created_at'));
@@ -262,7 +262,7 @@ class ShopController extends Controller
                     $q->where('category_id', $category->id)
                       ->orWhereJsonContains('extra_category_ids', $category->id);
                 })
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'sub_category_id', 'free_shipping', 'offer_timer')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'sub_category_id', 'free_shipping', 'offer_timer')
                 ->when($sort === 'price-low',  fn ($q) => $q->orderBy('price'))
                 ->when($sort === 'price-high', fn ($q) => $q->orderByDesc('price'))
                 ->when($sort !== 'price-low' && $sort !== 'price-high', fn ($q) => $q->orderByDesc('created_at'));
@@ -301,7 +301,7 @@ class ShopController extends Controller
                       ->orWhereJsonContains('extra_category_ids', (int) $product->category_id);
                 })
                 ->where('id', '!=', $product->id)
-                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping')
+                ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping')
                 ->limit(20)
                 ->get()->toArray();
         });

@@ -417,6 +417,17 @@ class OrderController extends Controller
             $order->items()->create($item);
         }
 
+        // Reduce stock quantity for products/variants
+        foreach ($order->items as $item) {
+            if ($item->product_variant_id) {
+                // Reduce stock from variant
+                ProductVariant::where('id', $item->product_variant_id)->decrement('stock_quantity', $item->quantity);
+            } else {
+                // Reduce stock from product
+                Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
+            }
+        }
+
         Cache::forget('admin.dashboard.stats');
         Cache::forget('admin.dashboard.recent_orders');
         Cache::forget('admin.dashboard.orders_by_status');
@@ -709,6 +720,17 @@ class OrderController extends Controller
             $order->items()->create($itemData);
         }
 
+        // Reduce stock quantity for products/variants
+        foreach ($order->items as $item) {
+            if ($item->product_variant_id) {
+                // Reduce stock from variant
+                ProductVariant::where('id', $item->product_variant_id)->decrement('stock_quantity', $item->quantity);
+            } else {
+                // Reduce stock from product
+                Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
+            }
+        }
+
         Cache::forget('admin.dashboard.stats');
         Cache::forget('admin.dashboard.recent_orders');
         Cache::forget('admin.dashboard.orders_by_status');
@@ -789,7 +811,7 @@ class OrderController extends Controller
                     ->whereIn('category_id', $orderedCategoryIds)
                     ->whereNotIn('id', $orderedProductIds)
                     ->where('in_stock', true)
-                    ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'category_id', 'free_shipping', 'offer_timer')
+                    ->select('id', 'name', 'slug', 'price', 'original_price', 'in_stock', 'stock_quantity', 'category_id', 'free_shipping', 'offer_timer')
                     ->limit(8)
                     ->get()
                     ->toArray();

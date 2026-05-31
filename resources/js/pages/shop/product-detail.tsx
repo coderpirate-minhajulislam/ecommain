@@ -597,11 +597,11 @@ export default function ProductDetail() {
                             {/* Stock Status Badge */}
                             <div className="mt-3 sm:mt-4 flex items-center gap-2">
                                 {isOutOfStock ? (
-                                    <Badge className="bg-red-500 text-white hover:bg-red-600">❌ Out of Stock</Badge>
+                                    <span className="text-red-600 text-sm font-medium">Out of Stock</span>
                                 ) : activeStockQuantity ? (
-                                    <Badge className="bg-green-500 text-white hover:bg-green-600">✅ In Stock ({activeStockQuantity} available)</Badge>
+                                    <span className="text-green-600 text-sm font-medium">In Stock ({activeStockQuantity} available)</span>
                                 ) : (
-                                    <Badge className="bg-blue-500 text-white hover:bg-blue-600">✅ In Stock (Unlimited)</Badge>
+                                    <span className="text-blue-600 text-sm font-medium">In Stock (Unlimited)</span>
                                 )}
                             </div>
                         </div>

@@ -336,6 +336,17 @@ class OrderController extends Controller
             $order->items()->create($item);
         }
 
+        // Reduce stock quantity for products/variants
+        foreach ($order->items as $item) {
+            if ($item->product_variant_id) {
+                // Reduce stock from variant
+                ProductVariant::where('id', $item->product_variant_id)->decrement('stock_quantity', $item->quantity);
+            } else {
+                // Reduce stock from product
+                Product::where('id', $item->product_id)->decrement('stock_quantity', $item->quantity);
+            }
+        }
+
         $this->clearDashboardCache();
 
         return redirect()->route('admin.orders.index')->with('success', 'Order created successfully.');
