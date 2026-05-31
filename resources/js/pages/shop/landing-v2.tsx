@@ -179,6 +179,9 @@ export default function LandingPageV2() {
     const shippingZones = useMemo(() => product.shipping_zones || [], [product.shipping_zones]);
 
     const selectedVariant = variants.find((v) => v.id === selectedVariantId) ?? null;
+    const activePrice = selectedVariant ? selectedVariant.price : product.price;
+    const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product.original_price;
+    const activeInStock = selectedVariant ? selectedVariant.in_stock : product.in_stock;
     const activeStockQuantity = selectedVariant ? selectedVariant.stock_quantity : product?.stock_quantity;
     const isOutOfStock = !activeInStock || activeStockQuantity === 0;
 
@@ -240,10 +243,6 @@ export default function LandingPageV2() {
         const interval = setInterval(calc, 1000);
         return () => clearInterval(interval);
     }, [landingPage.countdown_enabled, landingPage.countdown_end_time]);
-
-    const activePrice = selectedVariant ? selectedVariant.price : product.price;
-    const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product.original_price;
-    const activeInStock = selectedVariant ? selectedVariant.in_stock : product.in_stock;
 
     function getItemPrice(productId: number): number {
         if (productId === product.id) return parseFloat(activePrice);
@@ -1325,7 +1324,7 @@ export default function LandingPageV2() {
 
                                     {missingVariant && <p className="text-center text-xs text-red-500">Please select a variant (size/color) for all selected products before ordering.</p>}
 
-                                    <Button type="submit" size="lg" disabled={processing || !activeInStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant} className="w-full text-base font-bold shadow-lg">
+                                    <Button type="submit" size="lg" disabled={processing || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant} className="w-full text-base font-bold shadow-lg">
                                         <Lock className="mr-2 h-4 w-4" />
                                         {processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
                                     </Button>

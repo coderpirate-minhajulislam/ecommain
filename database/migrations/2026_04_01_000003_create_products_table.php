@@ -25,6 +25,7 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_new_arrival')->default(false);
             $table->boolean('in_stock')->default(true);
+            $table->unsignedInteger('stock_quantity')->nullable();
             $table->boolean('free_shipping')->default(false);
             $table->json('shipping_zones')->nullable();
             $table->json('allowed_payment_methods')->nullable();
@@ -56,6 +57,7 @@ return new class extends Migration
             $table->decimal('price', 10, 2);
             $table->decimal('original_price', 10, 2)->nullable();
             $table->boolean('in_stock')->default(true);
+            $table->unsignedInteger('stock_quantity')->nullable();
             $table->boolean('free_shipping')->nullable()->default(null); // null = inherit from product, true = free, false = use variant zones
             $table->json('shipping_zones')->nullable()->default(null);
             $table->string('image_path')->nullable();

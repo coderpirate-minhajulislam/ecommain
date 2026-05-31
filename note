@@ -164,7 +164,7 @@ php artisan tinker --execute="DB::statement('ALTER TABLE orders ADD COLUMN utm_s
 
 
 
-
+php artisan tinker --execute="DB::statement('ALTER TABLE products ADD COLUMN stock_quantity INT UNSIGNED NULL AFTER in_stock'); DB::statement('ALTER TABLE product_variants ADD COLUMN stock_quantity INT UNSIGNED NULL AFTER in_stock'); echo 'Done';"
 
 
 

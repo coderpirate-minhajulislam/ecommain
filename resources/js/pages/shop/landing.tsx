@@ -190,6 +190,9 @@ export default function LandingPage() {
     const shippingZones = useMemo(() => product.shipping_zones || [], [product.shipping_zones]);
 
     const selectedVariant = variants.find((v) => v.id === selectedVariantId) ?? null;
+    const activePrice = selectedVariant ? selectedVariant.price : product.price;
+    const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product.original_price;
+    const activeInStock = selectedVariant ? selectedVariant.in_stock : product.in_stock;
     const activeStockQuantity = selectedVariant ? selectedVariant.stock_quantity : product?.stock_quantity;
     const isOutOfStock = !activeInStock || activeStockQuantity === 0;
 
@@ -260,10 +263,6 @@ export default function LandingPage() {
 
         return () => clearInterval(interval);
     }, [landingPage.countdown_enabled, landingPage.countdown_end_time]);
-
-    const activePrice = selectedVariant ? selectedVariant.price : product.price;
-    const activeOriginalPrice = selectedVariant ? selectedVariant.original_price : product.original_price;
-    const activeInStock = selectedVariant ? selectedVariant.in_stock : product.in_stock;
 
     // Calculate total across all selected items
     function getItemPrice(productId: number): number {
@@ -1870,7 +1869,7 @@ export default function LandingPage() {
                                     <Button
                                         type="submit"
                                         size="lg"
-                                        disabled={processing || !activeInStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant}
+                                        disabled={processing || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant}
                                         className="w-full text-sm font-bold shadow-lg sm:text-base"
                                     >
                                         <Lock className="mr-2 h-4 w-4 shrink-0" />
