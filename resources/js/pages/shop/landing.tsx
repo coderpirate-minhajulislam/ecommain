@@ -38,6 +38,7 @@ import { GtmSsScript } from '@/components/ecommerce/gtm-ss-script';
 import { MetaPixelScript } from '@/components/ecommerce/meta-pixel-script';
 import { TikTokPixelScript } from '@/components/ecommerce/tiktok-pixel-script';
 import { Button } from '@/components/ui/button';
+import { readUtmValue, persistUtmValue, utmKeys } from '@/lib/utm';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -498,10 +499,9 @@ export default function LandingPage() {
     // landing-page UTMs for the whole session.
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
-        keys.forEach((key) => {
+        utmKeys.forEach((key) => {
             const val = params.get(key);
-            if (val) sessionStorage.setItem(key, val);
+            if (val) persistUtmValue(key, val);
         });
     }, []);
 
@@ -519,11 +519,11 @@ export default function LandingPage() {
         // Read UTMs from current URL first (synchronous), fallback to sessionStorage.
         // sessionStorage may not yet be populated when this form initialises because
         // the capture useEffect runs after the first render.
-        utm_source:   (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_source')   || sessionStorage.getItem('utm_source')   || ''; })(),
-        utm_medium:   (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_medium')   || sessionStorage.getItem('utm_medium')   || ''; })(),
-        utm_campaign: (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_campaign') || sessionStorage.getItem('utm_campaign') || ''; })(),
-        utm_content:  (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_content')  || sessionStorage.getItem('utm_content')  || ''; })(),
-        utm_term:     (() => { const p = new URLSearchParams(window.location.search); return p.get('utm_term')     || sessionStorage.getItem('utm_term')     || ''; })(),
+        utm_source:   readUtmValue('utm_source'),
+        utm_medium:   readUtmValue('utm_medium'),
+        utm_campaign: readUtmValue('utm_campaign'),
+        utm_content:  readUtmValue('utm_content'),
+        utm_term:     readUtmValue('utm_term'),
     });
 
     // Update form data with sessionStorage values after they're populated (handles mobile device delays)
@@ -791,10 +791,9 @@ export default function LandingPage() {
         }
 
         // Ensure UTM parameters are read fresh from sessionStorage at submit time
-        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
         const freshUtmData: Record<string, string> = {};
-        keys.forEach((key) => {
-            freshUtmData[key] = sessionStorage.getItem(key) || data[key] || '';
+        utmKeys.forEach((key) => {
+            freshUtmData[key] = readUtmValue(key) || data[key] || '';
         });
 
         if (hasMultipleProducts) {

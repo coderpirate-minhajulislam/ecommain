@@ -16,6 +16,7 @@ import { buildItem, gtmBeginCheckout, gtmAddShippingInfo, gtmAddPaymentInfo, gtm
 import { pixelInitiateCheckout, pixelAddPaymentInfo, buildContent } from '@/lib/meta-pixel';
 import { tiktokInitiateCheckout, tiktokAddPaymentInfo, buildTikTokContent } from '@/lib/tiktok-pixel';
 import { buildDistrictOptions, filterShippingZoneNamesForDistrict } from '@/lib/shipping-zone-class';
+import { persistUtmValue, readUtmValue, utmKeys } from '@/lib/utm';
 import { bangladeshDistricts } from '@/data/bangladesh-districts';
 
 function formatPrice(amount: number): string {
@@ -74,13 +75,12 @@ export default function CheckoutPage() {
             .catch(() => {/* silent fail */});
     }, []);
 
-    // Capture UTM parameters from URL and store in sessionStorage
+    // Capture UTM parameters from URL and store in sessionStorage and cookies.
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
-        keys.forEach((key) => {
+        utmKeys.forEach((key) => {
             const val = params.get(key);
-            if (val) sessionStorage.setItem(key, val);
+            if (val) persistUtmValue(key, val);
         });
     }, []);
 
@@ -125,11 +125,11 @@ export default function CheckoutPage() {
         payment_screenshot: null as File | null,
         items: [] as { product_id: number; variant_id: number | null; quantity: number }[],
         note: '',
-        utm_source:   typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_source')   ?? '') : '',
-        utm_medium:   typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_medium')   ?? '') : '',
-        utm_campaign: typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_campaign') ?? '') : '',
-        utm_content:  typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_content')  ?? '') : '',
-        utm_term:     typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem('utm_term')     ?? '') : '',
+        utm_source:   readUtmValue('utm_source'),
+        utm_medium:   readUtmValue('utm_medium'),
+        utm_campaign: readUtmValue('utm_campaign'),
+        utm_content:  readUtmValue('utm_content'),
+        utm_term:     readUtmValue('utm_term'),
     });
 
     // Update form data with sessionStorage values after they're populated (handles mobile device delays)
@@ -480,10 +480,9 @@ export default function CheckoutPage() {
         }
 
         // Ensure UTM parameters are read fresh from sessionStorage at submit time
-        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
         const freshUtmData: Record<string, string> = {};
-        keys.forEach((key) => {
-            freshUtmData[key] = typeof sessionStorage !== 'undefined' ? (sessionStorage.getItem(key) || data[key] || '') : (data[key] || '');
+        utmKeys.forEach((key) => {
+            freshUtmData[key] = readUtmValue(key) || data[key] || '';
         });
 
         transform((formData) => ({

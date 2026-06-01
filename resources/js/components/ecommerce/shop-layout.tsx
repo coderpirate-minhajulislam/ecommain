@@ -10,6 +10,7 @@ import { GtmSsScript } from '@/components/ecommerce/gtm-ss-script';
 import { MetaPixelScript } from '@/components/ecommerce/meta-pixel-script';
 import { TikTokPixelScript } from '@/components/ecommerce/tiktok-pixel-script';
 import PopupBanner from './popup-banner';
+import { persistUtmValue, utmKeys } from '@/lib/utm';
 
 function ScrollToTopButton() {
     const [visible, setVisible] = useState(false);
@@ -95,10 +96,9 @@ export function ShopLayout({ children }: { children: ReactNode }) {
     // present — preserving the original landing-page UTMs for the whole session.
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'] as const;
-        keys.forEach((key) => {
+        utmKeys.forEach((key) => {
             const val = params.get(key);
-            if (val) sessionStorage.setItem(key, val);
+            if (val) persistUtmValue(key, val);
         });
     }, []);
 

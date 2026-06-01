@@ -397,12 +397,12 @@ class OrderController extends Controller
                 }
                 return null;
             })(),
-            'gclid'        => \App\Services\TrackingService::resolveGclid($request),
-            'utm_source'   => $validated['utm_source'] ?? ($request->cookie('_fbc') ? 'facebook' : null),
-            'utm_medium'   => $validated['utm_medium'] ?? ($request->cookie('_fbc') ? 'paid' : null),
-            'utm_campaign' => $validated['utm_campaign'] ?? null,
-            'utm_content'  => $validated['utm_content'] ?? null,
-            'utm_term'     => $validated['utm_term'] ?? null,
+'gclid'        => \App\Services\TrackingService::resolveGclid($request),
+            'utm_source'   => $validated['utm_source'] ?? $request->cookie('utm_source') ?? ($request->cookie('_fbc') ? 'facebook' : null),
+            'utm_medium'   => $validated['utm_medium'] ?? $request->cookie('utm_medium') ?? ($request->cookie('_fbc') ? 'paid' : null),
+            'utm_campaign' => $validated['utm_campaign'] ?? $request->cookie('utm_campaign') ?? null,
+            'utm_content'  => $validated['utm_content'] ?? $request->cookie('utm_content') ?? null,
+            'utm_term'     => $validated['utm_term'] ?? $request->cookie('utm_term') ?? null,
         ]);
 
         // Handle payment screenshot upload
@@ -701,11 +701,11 @@ class OrderController extends Controller
                 return null;
             })(),
             'gclid'        => \App\Services\TrackingService::resolveGclid($request),
-            'utm_source'   => $validated['utm_source'] ?? ($request->cookie('_fbc') ? 'facebook' : null),
-            'utm_medium'   => $validated['utm_medium'] ?? ($request->cookie('_fbc') ? 'paid' : null),
-            'utm_campaign' => $validated['utm_campaign'] ?? null,
-            'utm_content'  => $validated['utm_content'] ?? null,
-            'utm_term'     => $validated['utm_term'] ?? null,
+            'utm_source'   => $validated['utm_source'] ?? $request->cookie('utm_source') ?? ($request->cookie('_fbc') ? 'facebook' : null),
+            'utm_medium'   => $validated['utm_medium'] ?? $request->cookie('utm_medium') ?? ($request->cookie('_fbc') ? 'paid' : null),
+            'utm_campaign' => $validated['utm_campaign'] ?? $request->cookie('utm_campaign') ?? null,
+            'utm_content'  => $validated['utm_content'] ?? $request->cookie('utm_content') ?? null,
+            'utm_term'     => $validated['utm_term'] ?? $request->cookie('utm_term') ?? null,
         ]);
 
         // Handle payment screenshot upload
