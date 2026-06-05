@@ -1,5 +1,5 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Minus, Plus, Phone, PlayCircle, ShoppingCart, Truck, X, Zap } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Minus, Plus, Phone, PlayCircle, ShoppingCart, Truck, X, Zap } from 'lucide-react';
 import { MessageCircle } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -140,6 +140,7 @@ export default function ProductDetail() {
     const [activeTab, setActiveTab] = useState<'details' | 'policy' | 'reviews'>('details');
     const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({ days: 0, hours: 0, minutes: 0, seconds: 0, expired: false });
     const [buyNowShake, setBuyNowShake] = useState(false);
+const [showFullDescription, setShowFullDescription] = useState(false);
     const imgDragStartX = useRef<number | null>(null);
     const imgIsDragging = useRef(false);
 
@@ -927,7 +928,31 @@ export default function ProductDetail() {
                     <div className="pt-4 sm:pt-6">
                         {activeTab === 'details' && product.long_description && (
                             <div className="rounded-lg bg-muted/30 p-3 sm:p-4 lg:p-6">
-                                <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base md:text-lg text-muted-foreground">{product.long_description}</p>
+                                <div className={`relative ${!showFullDescription ? 'max-h-[200px] sm:max-h-[280px] lg:max-h-[340px] overflow-hidden' : ''}`}>
+                                    <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base md:text-lg text-muted-foreground">
+                                        {product.long_description}
+                                    </p>
+                                    {!showFullDescription && product.long_description.length > 300 && (
+                                        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-muted/30 to-transparent pointer-events-none" />
+                                    )}
+                                </div>
+                                {product.long_description.length > 300 && (
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowFullDescription(!showFullDescription)}
+                                        className="mt-2 flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                                    >
+                                        {showFullDescription ? (
+                                            <>
+                                                See Less <ChevronUp className="h-4 w-4" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                See More <ChevronDown className="h-4 w-4" />
+                                            </>
+                                        )}
+                                    </button>
+                                )}
                             </div>
                         )}
                         {activeTab === 'details' && !product.long_description && (
