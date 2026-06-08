@@ -83,19 +83,7 @@ jobs:
       - name: Build NPM Assets
         run: npm run build
 
-      # - name: Remove Old Build Files on Server
-      #   uses: appleboy/ssh-action@v1.2.5
-      #   with:
-      #     host: ${{ secrets.VPS_HOST }}
-      #     username: ${{ secrets.VPS_USER }}
-      #     password: ${{ secrets.VPS_PASSWORD }}
-      #     script: |
-      #       rm -rf /var/www/html/ecommain/public/build
-      #       rm -rf /var/www/html/ecommain/bootstrap/cache/*.php
-      #       rm -rf /var/www/html/ecommain/database/migrations/*.php
-
-
-      - name: Synchronize Files To Server
+      - name: Synchronize Build Files To Server
         uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -103,8 +91,38 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           source: '.'
           target: '/var/www/html/ecommain/'
+          strip_components: 0
+          overwrite: true
+          exclude: |
+            .git
+            .github
+            node_modules
+            tests
+            .editorconfig
+            .gitattributes
+            .gitignore
+            .npmrc
+            .prettierignore
+            .prettierrc
+            Makefile
+            components.json
+            eslint.config.js
+            package.json
+            package-lock.json
+            phpunit.xml
+            pint.json
+            tsconfig.json
+            vite.config.ts
+            deploy-build.sh
+            deploy-build.bat
+            update-slugs.ps1
+            add-indexes.sql
+            resources/js
+            resources/css
+            er.name
+            note
 
-      - name: Run Remote/Artisan Commands
+      - name: Remove Raw Source Files From Server
         uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -112,10 +130,47 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             cd /var/www/html/ecommain
+
+            # Remove raw frontend source files (only compiled public/build/ is needed)
+            rm -rf resources/js
+            rm -rf resources/css
+
+            # Remove dev-only files and directories
+            rm -rf node_modules
+            rm -rf .git
+            rm -rf .github
+            rm -rf tests
+
+            # Remove dev config files
+            rm -f package.json
+            rm -f package-lock.json
+            rm -f tsconfig.json
+            rm -f vite.config.ts
+            rm -f eslint.config.js
+            rm -f phpunit.xml
+            rm -f pint.json
+            rm -f components.json
+            rm -f .editorconfig
+            rm -f .gitattributes
+            rm -f .gitignore
+            rm -f .npmrc
+            rm -f .prettierignore
+            rm -f .prettierrc
+            rm -f Makefile
+            rm -f deploy-build.sh
+            rm -f deploy-build.bat
+            rm -f update-slugs.ps1
+            rm -f add-indexes.sql
+            rm -f er.name
+            rm -f note
+
+
+            # Set correct permissions
             sudo chown -R www-data:www-data /var/www/html/ecommain
             sudo chmod -R 775 /var/www/html/ecommain/storage
             sudo chmod -R 775 /var/www/html/ecommain/bootstrap/cache
 
+            # Run Laravel commands
             php artisan migrate --force
 
             php artisan config:clear
@@ -125,6 +180,8 @@ jobs:
             php artisan event:clear
 
             php artisan optimize
+
+            echo "Deployment complete - raw source files removed!"
 
 # php artisan migrate:fresh --seed --force
 
