@@ -141,6 +141,9 @@ jobs:
             rm -rf .github
             rm -rf tests
 
+            # Remove seeder files
+            rm -f database/seeders/DatabaseSeeder.php
+
             # Remove dev config files
             rm -f package.json
             rm -f package-lock.json
