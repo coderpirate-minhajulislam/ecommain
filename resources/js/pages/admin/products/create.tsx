@@ -742,7 +742,7 @@ export default function CreateProduct({ categories, subCategories, shippingZones
                                         </div>
                                     )}
                                 </div>
-                                {/* Variant Image */}}
+                                {/* Variant Image */}
                                 <div className="flex items-end gap-2">
                                     {variantImagePreviews[i] ? (
                                         <div className="relative h-12 w-12 overflow-hidden rounded-md border">
