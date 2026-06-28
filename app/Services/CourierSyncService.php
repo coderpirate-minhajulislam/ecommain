@@ -210,7 +210,7 @@ class CourierSyncService
             ->where('redx_tracking_id', '!=', '')
             ->where(function ($q) {
                 $q->whereNull('redx_status')
-                  ->orWhereNotIn('redx_status', ['Delivered', 'Cancelled', 'Returned']);
+                  ->orWhereNotIn('redx_status', ['Delivered', 'Cancelled', 'Delivery Failed', 'Returned', 'Return In Transit', 'Partially Returned']);
             })
             ->get(['id', 'redx_tracking_id', 'redx_status', 'status']);
 
@@ -267,7 +267,7 @@ class CourierSyncService
             ->where('carrybee_consignment_id', '!=', '')
             ->where(function ($q) {
                 $q->whereNull('carrybee_status')
-                  ->orWhereNotIn('carrybee_status', ['Delivered', 'Cancelled', 'Returned']);
+                  ->orWhereNotIn('carrybee_status', ['Delivered', 'Cancelled', 'Pickup Cancel', 'Delivery Failed', 'Returned', 'Return In Transit', 'Partially Returned']);
             })
             ->get(['id', 'carrybee_consignment_id', 'carrybee_status', 'status']);
 
@@ -481,14 +481,18 @@ class CourierSyncService
 
         $notSynced = (int) $this->steadfastBase()->whereNull('steadfast_status')->count();
 
-        $deliveredAmount = (float) $this->steadfastBase()->where('steadfast_status', 'delivered')->sum('total');
+        // 'delivered_approval_pending' = Steadfast delivered the parcel, awaiting merchant approval for payment
+        $sfDeliveredStatuses = ['delivered', 'delivered_approval_pending'];
+        $sfReturnedStatuses  = ['partial_delivered', 'returned'];
+
+        $deliveredAmount = (float) $this->steadfastBase()->whereIn('steadfast_status', $sfDeliveredStatuses)->sum('total');
         $cancelledAmount = (float) $this->steadfastBase()->where('steadfast_status', 'cancelled')->sum('total');
-        $returnedAmount  = (float) $this->steadfastBase()->whereIn('steadfast_status', ['partial_delivered', 'returned'])->sum('total');
+        $returnedAmount  = (float) $this->steadfastBase()->whereIn('steadfast_status', $sfReturnedStatuses)->sum('total');
 
         return [
             'name'             => 'Steadfast',
             'total'            => $total,
-            'delivered'        => (int) ($rows->get('delivered', 0)),
+            'delivered'        => (int) ($rows->get('delivered', 0) + $rows->get('delivered_approval_pending', 0)),
             'cancelled'        => (int) ($rows->get('cancelled', 0)),
             'pending'          => (int) ($rows->get('pending', 0) + $rows->get('in_review', 0) + $rows->get('unknown', 0)),
             'in_transit'       => (int) ($rows->get('in_transit', 0)),
@@ -520,18 +524,27 @@ class CourierSyncService
 
         $notSynced = (int) $this->pathaoBase()->whereNull('pathao_order_status')->count();
 
+        // Pathao uses human-readable status strings (spaces, mixed case) from their API
+        $pathaoCancelledStatuses = ['Cancelled', 'Pickup Cancel', 'Pickup_cancel', 'Pickup Failed', 'Pickup_failed'];
+        $pathaoReturnedStatuses  = ['Returned', 'Return_in_transit', 'Paid Return', 'Paid_return', 'Return'];
+        $pathaoInTransitStatuses = ['Pickup_requested', 'Picked', 'In_transit', 'Out_for_delivery', 'Partial Delivery', 'Partial_delivery'];
+
         $deliveredAmount = (float) $this->pathaoBase()->where('pathao_order_status', 'Delivered')->sum('total');
-        $cancelledAmount = (float) $this->pathaoBase()->where('pathao_order_status', 'Cancelled')->sum('total');
-        $returnedAmount  = (float) $this->pathaoBase()->whereIn('pathao_order_status', ['Returned', 'Return_in_transit'])->sum('total');
+        $cancelledAmount = (float) $this->pathaoBase()->whereIn('pathao_order_status', $pathaoCancelledStatuses)->sum('total');
+        $returnedAmount  = (float) $this->pathaoBase()->whereIn('pathao_order_status', $pathaoReturnedStatuses)->sum('total');
+
+        $cancelled = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $pathaoCancelledStatuses));
+        $returned  = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $pathaoReturnedStatuses));
+        $inTransit = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $pathaoInTransitStatuses));
 
         return [
             'name'             => 'Pathao',
             'total'            => $total,
             'delivered'        => (int) ($rows->get('Delivered', 0)),
-            'cancelled'        => (int) ($rows->get('Cancelled', 0)),
+            'cancelled'        => $cancelled,
             'pending'          => (int) ($rows->get('Pending', 0)),
-            'in_transit'       => (int) ($rows->get('Pickup_requested', 0) + $rows->get('Picked', 0) + $rows->get('In_transit', 0) + $rows->get('Out_for_delivery', 0)),
-            'returned'         => (int) ($rows->get('Returned', 0) + $rows->get('Return_in_transit', 0)),
+            'in_transit'       => $inTransit,
+            'returned'         => $returned,
             'not_synced'       => $notSynced,
             'statuses'         => $rows->toArray(),
             'delivered_amount' => $deliveredAmount,
@@ -559,18 +572,27 @@ class CourierSyncService
 
         $notSynced = (int) $this->redxBase()->whereNull('redx_status')->count();
 
+        // RedX API status variants (with/without spaces, different casings)
+        $redxCancelledStatuses = ['Cancelled', 'Delivery Failed', 'Delivery_Failed', 'Out for Return', 'Out_for_Return'];
+        $redxReturnedStatuses  = ['Returned', 'Return In Transit', 'Return_In_Transit', 'Partially Returned', 'Partially_Returned'];
+        $redxInTransitStatuses = ['Picked up', 'Picked_up', 'In Transit', 'In_Transit', 'Out for Delivery', 'Out_for_Delivery', 'Partially Delivered', 'Partially_Delivered', 'Hold', 'On Hold'];
+
         $deliveredAmount = (float) $this->redxBase()->where('redx_status', 'Delivered')->sum('total');
-        $cancelledAmount = (float) $this->redxBase()->where('redx_status', 'Cancelled')->sum('total');
-        $returnedAmount  = (float) $this->redxBase()->where('redx_status', 'Returned')->sum('total');
+        $cancelledAmount = (float) $this->redxBase()->whereIn('redx_status', $redxCancelledStatuses)->sum('total');
+        $returnedAmount  = (float) $this->redxBase()->whereIn('redx_status', $redxReturnedStatuses)->sum('total');
+
+        $cancelled = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $redxCancelledStatuses));
+        $returned  = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $redxReturnedStatuses));
+        $inTransit = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $redxInTransitStatuses));
 
         return [
             'name'             => 'RedX',
             'total'            => $total,
             'delivered'        => (int) ($rows->get('Delivered', 0)),
-            'cancelled'        => (int) ($rows->get('Cancelled', 0)),
+            'cancelled'        => $cancelled,
             'pending'          => (int) ($rows->get('Pending', 0)),
-            'in_transit'       => (int) ($rows->get('Picked up', 0) + $rows->get('In Transit', 0) + $rows->get('Out for Delivery', 0)),
-            'returned'         => (int) ($rows->get('Returned', 0)),
+            'in_transit'       => $inTransit,
+            'returned'         => $returned,
             'not_synced'       => $notSynced,
             'statuses'         => $rows->toArray(),
             'delivered_amount' => $deliveredAmount,
@@ -598,18 +620,27 @@ class CourierSyncService
 
         $notSynced = (int) $this->carrybeeBase()->whereNull('carrybee_status')->count();
 
+        // Carrybee API status variants (with/without spaces, different casings)
+        $carrybeeCancelledStatuses = ['Cancelled', 'Pickup Cancel', 'Pickup Failed', 'Pickup_Failed', 'Delivery Failed', 'Delivery_Failed'];
+        $carrybeeReturnedStatuses  = ['Returned', 'Return In Transit', 'Return_In_Transit', 'Partially Returned', 'Partially_Returned'];
+        $carrybeeInTransitStatuses = ['Picked', 'Picked up', 'In Transit', 'In_Transit', 'Out for Delivery', 'Out_for_Delivery', 'Partially Delivered', 'Partially_Delivered', 'Hold', 'On Hold'];
+
         $deliveredAmount = (float) $this->carrybeeBase()->where('carrybee_status', 'Delivered')->sum('total');
-        $cancelledAmount = (float) $this->carrybeeBase()->where('carrybee_status', 'Cancelled')->sum('total');
-        $returnedAmount  = (float) $this->carrybeeBase()->whereIn('carrybee_status', ['Returned', 'Return In Transit'])->sum('total');
+        $cancelledAmount = (float) $this->carrybeeBase()->whereIn('carrybee_status', $carrybeeCancelledStatuses)->sum('total');
+        $returnedAmount  = (float) $this->carrybeeBase()->whereIn('carrybee_status', $carrybeeReturnedStatuses)->sum('total');
+
+        $cancelled = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $carrybeeCancelledStatuses));
+        $returned  = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $carrybeeReturnedStatuses));
+        $inTransit = array_sum(array_map(fn ($s) => (int) $rows->get($s, 0), $carrybeeInTransitStatuses));
 
         return [
             'name'             => 'Carrybee',
             'total'            => $total,
             'delivered'        => (int) ($rows->get('Delivered', 0)),
-            'cancelled'        => (int) ($rows->get('Cancelled', 0)),
+            'cancelled'        => $cancelled,
             'pending'          => (int) ($rows->get('Pending', 0)),
-            'in_transit'       => (int) ($rows->get('Picked', 0) + $rows->get('In Transit', 0) + $rows->get('Out for Delivery', 0)),
-            'returned'         => (int) ($rows->get('Returned', 0) + $rows->get('Return In Transit', 0)),
+            'in_transit'       => $inTransit,
+            'returned'         => $returned,
             'not_synced'       => $notSynced,
             'statuses'         => $rows->toArray(),
             'delivered_amount' => $deliveredAmount,
