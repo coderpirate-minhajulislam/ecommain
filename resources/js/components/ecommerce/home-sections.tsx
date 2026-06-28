@@ -48,6 +48,13 @@ export function HeroBanner() {
     // Touch handlers
     function onTouchStart(e: React.TouchEvent) {
         dragStartX.current = e.touches[0].clientX;
+        isDragging.current = false;
+    }
+
+    function onTouchMove(e: React.TouchEvent) {
+        if (dragStartX.current !== null && Math.abs(e.touches[0].clientX - dragStartX.current) > 8) {
+            isDragging.current = true;
+        }
     }
 
     function onTouchEnd(e: React.TouchEvent) {
@@ -57,7 +64,7 @@ export function HeroBanner() {
 
         const diff = dragStartX.current - e.changedTouches[0].clientX;
 
-        if (Math.abs(diff) > 40) {
+        if (isDragging.current && Math.abs(diff) > 40) {
             if (diff > 0) {
                 next();
             } else {
@@ -66,12 +73,21 @@ export function HeroBanner() {
         }
 
         dragStartX.current = null;
+        isDragging.current = false;
+    }
+
+    function onTouchCancel() {
+        dragStartX.current = null;
+        isDragging.current = false;
     }
 
     // Mouse drag handlers
     function onMouseDown(e: React.MouseEvent) {
+        if (e.button !== 0) return;
         dragStartX.current = e.clientX;
         isDragging.current = false;
+        (e.currentTarget as HTMLElement).setPointerCapture(e.nativeEvent.pointerId ?? 1);
+        e.preventDefault();
     }
 
     function onMouseMove() {
@@ -137,9 +153,11 @@ export function HeroBanner() {
     return (
         <div
             className="group relative overflow-hidden rounded-xl select-none cursor-grab active:cursor-grabbing"
-            style={{ minHeight: '220px' }}
+            style={{ minHeight: '220px', touchAction: 'pan-y' }}
             onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
+            onTouchCancel={onTouchCancel}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
@@ -363,6 +381,13 @@ export function MidBanner() {
 
     function onTouchStart(e: React.TouchEvent) {
         dragStartX.current = e.touches[0].clientX;
+        isDragging.current = false;
+    }
+
+    function onTouchMove(e: React.TouchEvent) {
+        if (dragStartX.current !== null && Math.abs(e.touches[0].clientX - dragStartX.current) > 8) {
+            isDragging.current = true;
+        }
     }
 
     function onTouchEnd(e: React.TouchEvent) {
@@ -372,7 +397,7 @@ export function MidBanner() {
 
         const diff = dragStartX.current - e.changedTouches[0].clientX;
 
-        if (Math.abs(diff) > 40) {
+        if (isDragging.current && Math.abs(diff) > 40) {
             if (diff > 0) {
                 next();
             } else {
@@ -381,11 +406,20 @@ export function MidBanner() {
         }
 
         dragStartX.current = null;
+        isDragging.current = false;
+    }
+
+    function onTouchCancel() {
+        dragStartX.current = null;
+        isDragging.current = false;
     }
 
     function onMouseDown(e: React.MouseEvent) {
+        if (e.button !== 0) return;
         dragStartX.current = e.clientX;
         isDragging.current = false;
+        (e.currentTarget as HTMLElement).setPointerCapture(e.nativeEvent.pointerId ?? 1);
+        e.preventDefault();
     }
 
     function onMouseMove() {
@@ -427,9 +461,11 @@ export function MidBanner() {
     return (
         <div
             className="group relative overflow-hidden rounded-xl select-none cursor-grab active:cursor-grabbing"
-            style={{ minHeight: '220px' }}
+            style={{ minHeight: '220px', touchAction: 'pan-y' }}
             onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
+            onTouchCancel={onTouchCancel}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
