@@ -30,6 +30,15 @@ export function readUtmValue(key: UtmKey): string {
         return '';
     }
 
+    // URL params are the most authoritative source — always prefer them on the current page.
+    // This avoids a race condition where the form initialises before the persist useEffect
+    // has had a chance to write URL params into sessionStorage (e.g. first-ever visit with
+    // utm_source=facebook&utm_campaign=... in the URL).
+    const urlValue = new URLSearchParams(window.location.search).get(key);
+    if (urlValue) {
+        return urlValue;
+    }
+
     const sessionValue = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(key) : null;
 
     if (sessionValue) {
