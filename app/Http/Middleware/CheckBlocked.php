@@ -12,11 +12,10 @@ class CheckBlocked
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $ip = $request->ip();
+        $ip    = $request->ip();
+        $phone = $request->input('phone');
 
-        $blocked = BlockedIp::where('ip_address', $ip)->first();
-
-        if ($blocked) {
+        if (BlockedIp::isBlocked($ip ?: null, $phone ?: null)) {
             if ($request->expectsJson()) {
                 return response()->json([
                     'message' => 'Your access has been restricted. You cannot place orders.',

@@ -202,7 +202,7 @@ class OrderController extends Controller
 
     public function store(Request $request)
     {
-        if (BlockedIp::isBlocked($request->ip())) {
+        if (BlockedIp::isBlocked($request->ip(), $request->input('phone') ?: null)) {
             return back()->withErrors(['blocked' => 'Your access has been restricted. You cannot place orders.']);
         }
 
@@ -485,7 +485,7 @@ class OrderController extends Controller
 
     public function storeLanding(Request $request, string $slug)
     {
-        if (BlockedIp::isBlocked($request->ip())) {
+        if (BlockedIp::isBlocked($request->ip(), $request->input('phone') ?: null)) {
             return back()->withErrors(['blocked' => 'Your access has been restricted. You cannot place orders.']);
         }
 
