@@ -8,6 +8,7 @@ import {
     ChevronRight,
     Cpu,
     Headphones,
+    Headset,
     ListChecks,
     Lock,
     MapPin,
@@ -37,6 +38,7 @@ import { GtmScript } from '@/components/ecommerce/gtm-script';
 import { GtmSsScript } from '@/components/ecommerce/gtm-ss-script';
 import { MetaPixelScript } from '@/components/ecommerce/meta-pixel-script';
 import { TikTokPixelScript } from '@/components/ecommerce/tiktok-pixel-script';
+import { ImageGallery } from '@/components/ecommerce/image-gallery';
 import { Button } from '@/components/ui/button';
 import { readUtmValue, persistUtmValue, utmKeys } from '@/lib/utm';
 import { Input } from '@/components/ui/input';
@@ -166,6 +168,34 @@ function getYouTubeEmbedUrl(url: string | null): string | null {
     if (!url) return null;
     const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
     return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : null;
+}
+
+function FloatingSupportBtn({ siteBranding }: { siteBranding?: { title?: string; phone?: string; whatsapp?: string } }) {
+    const [open, setOpen] = useState(false);
+    const phone    = siteBranding?.phone?.trim();
+    const whatsapp = siteBranding?.whatsapp?.trim()?.replace(/\D/g, '');
+    if (!phone && !whatsapp) return null;
+    return (
+        <div className="fixed bottom-20 left-4 z-50 flex flex-col items-start gap-2 lg:bottom-6">
+            {open && (
+                <div className="mb-1 flex flex-col gap-2">
+                    {whatsapp && (
+                        <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110" title="WhatsApp">
+                            <MessageCircle className="h-4 w-4" />
+                        </a>
+                    )}
+                    {phone && (
+                        <a href={`tel:${phone}`} className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg transition-transform hover:scale-110" title="Call Us">
+                            <Phone className="h-4 w-4" />
+                        </a>
+                    )}
+                </div>
+            )}
+            <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg transition-transform hover:scale-110" title="Support">
+                {open ? <X className="h-4 w-4" /> : <Headset className="h-5 w-5" />}
+            </button>
+        </div>
+    );
 }
 
 export default function LandingPage() {
@@ -953,7 +983,7 @@ export default function LandingPage() {
                                 {landingPage.title}
                             </h1>
                             {(landingPage.hero_text || product.description) && (
-                                <p className="mb-4 max-w-lg text-sm leading-relaxed text-primary-foreground/80 sm:mb-6 sm:text-base">{landingPage.hero_text || product.description}</p>
+                                <p className="mb-4 max-w-lg whitespace-pre-line text-sm leading-relaxed text-primary-foreground/80 sm:mb-6 sm:text-base">{landingPage.hero_text || product.description}</p>
                             )}
 
                             <div className="flex flex-wrap justify-center gap-3 md:justify-start">
@@ -983,46 +1013,13 @@ export default function LandingPage() {
                         {/* Image & Gallery */}
                         {heroImages.length > 0 && (
                         <div className="flex items-start justify-center">
-                            <div className="flex flex-col gap-2 w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
-                                {/* Large main image */}
-                                <div className="relative overflow-hidden rounded-2xl bg-background shadow-2xl">
-                                    <img
-                                        src={heroImages[selectedImageIndex].src}
-                                        alt={landingPage.title}
-                                        className="w-full object-cover"
-                                    />
-                                    {landingPage.hero_video && (
-                                        <button
-                                            onClick={() => setVideoOpen(true)}
-                                            className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-black/70 px-3 py-1.5 text-white transition-colors hover:bg-black/90"
-                                        >
-                                            <PlayCircle className="h-5 w-5 text-red-500" />
-                                            <span className="text-xs font-medium">Watch Video</span>
-                                        </button>
-                                    )}
-                                </div>
-                                {/* Thumbnails below */}
-                                {heroImages.length > 1 && (
-                                    <div className="flex flex-row gap-1.5 flex-wrap">
-                                        {heroImages.map((image, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => setSelectedImageIndex(index)}
-                                                className={`relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                                                    selectedImageIndex === index
-                                                        ? 'border-primary-foreground shadow-md'
-                                                        : 'border-primary-foreground/30 hover:border-primary-foreground/60'
-                                                }`}
-                                            >
-                                                <img
-                                                    src={image.src}
-                                                    alt={`${landingPage.title} - ${index + 1}`}
-                                                    className="h-full w-full object-cover"
-                                                />
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
+                            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                                <ImageGallery
+                                    images={heroImages}
+                                    alt={landingPage.title}
+                                    hasVideo={!!landingPage.hero_video}
+                                    onVideoClick={() => setVideoOpen(true)}
+                                />
                             </div>
                         </div>
                         )}
@@ -1053,7 +1050,7 @@ export default function LandingPage() {
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
                                         {item.icon_name ? getIconComponent(item.icon_name, 'h-5 w-5 text-primary') : useCaseIcons[i % useCaseIcons.length]}
                                     </div>
-                                    <span className="text-sm font-medium text-foreground">{item.label}</span>
+                                    <span className="whitespace-pre-line break-words text-sm font-medium text-foreground">{item.label}</span>
                                 </div>
                             ))}
                         </div>
@@ -1084,8 +1081,8 @@ export default function LandingPage() {
                                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
                                         {item.icon_name ? getIconComponent(item.icon_name, 'h-5 w-5 text-primary') : featureIcons[i % featureIcons.length]}
                                     </div>
-                                    <h3 className="mb-1 text-sm font-bold text-card-foreground">{item.title}</h3>
-                                    <p className="text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+                                    <h3 className="mb-1 break-words text-sm font-bold text-card-foreground">{item.title}</h3>
+                                    <p className="whitespace-pre-line break-words text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -1120,13 +1117,13 @@ export default function LandingPage() {
                                         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
                                             {item.icon_name ? getIconComponent(item.icon_name, 'h-4 w-4 text-primary') : specIcons[i % specIcons.length]}
                                         </div>
-                                        <h3 className="text-sm font-bold text-primary">{item.title}</h3>
+                                        <h3 className="break-words text-sm font-bold text-primary">{item.title}</h3>
                                     </div>
                                     <ul className="space-y-1.5">
                                         {item.specs.map((spec, si) => (
                                             <li key={si} className="flex items-start gap-2 text-sm text-muted-foreground">
                                                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                                {spec}
+                                                <span className="whitespace-pre-line break-words">{spec}</span>
                                             </li>
                                         ))}
                                     </ul>
@@ -1167,8 +1164,8 @@ export default function LandingPage() {
                                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 text-primary text-lg">
                                         {item.icon_name ? getIconComponent(item.icon_name, 'h-6 w-6 text-primary') : whyBuyIcons[i % whyBuyIcons.length]}
                                     </div>
-                                    <h3 className="text-sm font-bold">{item.title}</h3>
-                                    <p className="text-xs text-muted-foreground">{item.desc}</p>
+                                    <h3 className="break-words text-sm font-bold">{item.title}</h3>
+                                    <p className="whitespace-pre-line break-words text-xs text-muted-foreground">{item.desc}</p>
                                 </div>
                             ))}
                         </div>
@@ -1952,6 +1949,9 @@ export default function LandingPage() {
                     </div>
                 );
             })()}
+
+            {/* ── Floating Support Button ── */}
+            <FloatingSupportBtn siteBranding={siteBranding} />
         </>
     );
 }

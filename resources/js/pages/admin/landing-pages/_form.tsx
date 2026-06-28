@@ -343,8 +343,12 @@ export function LandingPageForm({
                     <select id="template" value={data.template || 'v1'} onChange={(e) => setData('template', e.target.value)} className={inputClass}>
                         <option value="v1">V1 — Dark (Original)</option>
                         <option value="v2">V2 — Light (Image-Rich)</option>
+                        <option value="v3">V3 — Modern (Split Hero + Grid)</option>
                     </select>
-                    <p className="text-xs text-muted-foreground">V2 uses a light background with large product images, feature showcase, two-column layout, and review sections.</p>
+                    <p className="text-xs text-muted-foreground">
+                        V2 — light background, large images, feature showcase, two-column layout and review sections.
+                        V3 — modern split hero (text left, image carousel right), auto-sliding images, icon grid use-cases, feature cards, sticky mobile order bar and floating support buttons.
+                    </p>
                 </div>
 
                 {/* ── Free Shipping Override ── */}
@@ -556,7 +560,7 @@ export function LandingPageForm({
                             <div key={i} className="flex flex-col gap-2 rounded-lg border border-input p-3">
                                 <div className="flex items-center gap-2">
                                     <span className="w-6 text-center text-xs text-muted-foreground">{i + 1}</span>
-                                    <input type="text" value={item.label} onChange={(e) => updateArrayItem<UseCase>('use_cases', i, 'label', e.target.value)} className={inputClass} placeholder="Use case label" />
+                                    <textarea rows={2} value={item.label} onChange={(e) => updateArrayItem<UseCase>('use_cases', i, 'label', e.target.value)} className={inputClass} placeholder="Use case label" />
                                     <button type="button" onClick={() => removeArrayItem<UseCase>('use_cases', i)} className="p-1.5 text-muted-foreground hover:text-destructive">
                                         <Trash2 className="h-4 w-4" />
                                     </button>
@@ -595,7 +599,7 @@ export function LandingPageForm({
                                 <span className="mt-2 w-5 text-center text-xs text-muted-foreground">{i + 1}</span>
                                 <div className="flex-1 space-y-2">
                                     <input type="text" value={item.title} onChange={(e) => updateArrayItem<Feature>('features', i, 'title', e.target.value)} className={inputClass} placeholder="Feature title" />
-                                    <input type="text" value={item.desc} onChange={(e) => updateArrayItem<Feature>('features', i, 'desc', e.target.value)} className={inputClass} placeholder="Feature description" />
+                                    <textarea rows={2} value={item.desc} onChange={(e) => updateArrayItem<Feature>('features', i, 'desc', e.target.value)} className={inputClass} placeholder="Feature description" />
                                     <div>
                                         <label className={labelClass + ' block mb-2'}>Icon</label>
                                         <IconPicker
@@ -669,7 +673,7 @@ export function LandingPageForm({
                                 {group.specs.map((spec, si) => (
                                     <div key={si} className="flex items-center gap-2">
                                         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                        <input type="text" value={spec} onChange={(e) => updateSpecItem(gi, si, e.target.value)} className={inputClass} placeholder="Spec detail" />
+                                        <textarea rows={2} value={spec} onChange={(e) => updateSpecItem(gi, si, e.target.value)} className={inputClass} placeholder="Spec detail" />
                                         <button type="button" onClick={() => removeSpecItem(gi, si)} className="p-1 text-muted-foreground hover:text-destructive">
                                             <Trash2 className="h-3.5 w-3.5" />
                                         </button>
@@ -795,7 +799,7 @@ export function LandingPageForm({
                                 <span className="mt-2 w-5 text-center text-xs text-muted-foreground">{i + 1}</span>
                                 <div className="flex-1 space-y-2">
                                     <input type="text" value={item.title} onChange={(e) => updateArrayItem<WhyBuy>('why_buy', i, 'title', e.target.value)} className={inputClass} placeholder="Title (e.g. 1 Year Warranty)" />
-                                    <input type="text" value={item.desc} onChange={(e) => updateArrayItem<WhyBuy>('why_buy', i, 'desc', e.target.value)} className={inputClass} placeholder="Description" />
+                                    <textarea rows={2} value={item.desc} onChange={(e) => updateArrayItem<WhyBuy>('why_buy', i, 'desc', e.target.value)} className={inputClass} placeholder="Description" />
                                 </div>
                                 <button type="button" onClick={() => removeArrayItem<WhyBuy>('why_buy', i)} className="mt-2 p-1.5 text-muted-foreground hover:text-destructive">
                                     <Trash2 className="h-4 w-4" />

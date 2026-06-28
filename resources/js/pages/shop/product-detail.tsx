@@ -143,6 +143,7 @@ export default function ProductDetail() {
 const [showFullDescription, setShowFullDescription] = useState(false);
     const imgDragStartX = useRef<number | null>(null);
     const imgIsDragging = useRef(false);
+    const imgAutoSlidePaused = useRef(false);
 
     useEffect(() => {
         const trigger = () => {
@@ -190,6 +191,8 @@ const [showFullDescription, setShowFullDescription] = useState(false);
     function handleGalleryThumbSelect(index: number) {
         setSelectedImage(index);
         setIsThumbnailOverride(true);
+        imgAutoSlidePaused.current = true;
+        setTimeout(() => { imgAutoSlidePaused.current = false; }, 8000);
     }
 
     function imgPrev() {
@@ -210,61 +213,71 @@ const [showFullDescription, setShowFullDescription] = useState(false);
         setIsThumbnailOverride(true);
     }
 
+    // Auto-slide every 4 seconds (pauses on interaction)
+    useEffect(() => {
+        if (imagePaths.length <= 1) return;
+        const timer = setInterval(() => {
+            if (!imgAutoSlidePaused.current && !hasVariantImage) {
+                setSelectedImage((i) => (i + 1) % imagePaths.length);
+                setIsThumbnailOverride(true);
+            }
+        }, 4000);
+        return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [imagePaths.length, hasVariantImage]);
+
     function onImgTouchStart(e: React.TouchEvent) {
         imgDragStartX.current = e.touches[0].clientX;
+        imgIsDragging.current = false;
+        imgAutoSlidePaused.current = true;
+    }
+
+    function onImgTouchMove(e: React.TouchEvent) {
+        if (imgDragStartX.current !== null && Math.abs(e.touches[0].clientX - imgDragStartX.current) > 8) {
+            imgIsDragging.current = true;
+        }
     }
 
     function onImgTouchEnd(e: React.TouchEvent) {
-        if (imgDragStartX.current === null) {
-            return;
-        }
-
+        if (imgDragStartX.current === null) return;
         const diff = imgDragStartX.current - e.changedTouches[0].clientX;
-
         if (Math.abs(diff) > 40) {
-            if (diff > 0) {
-                imgNext();
-            } else {
-                imgPrev();
-            }
+            diff > 0 ? imgNext() : imgPrev();
         }
-
         imgDragStartX.current = null;
+        imgIsDragging.current = false;
+        setTimeout(() => { imgAutoSlidePaused.current = false; }, 8000);
     }
 
     function onImgMouseDown(e: React.MouseEvent) {
+        if (e.button !== 0) return;
         imgDragStartX.current = e.clientX;
         imgIsDragging.current = false;
+        // Capture pointer so mouse-up fires even outside the element
+        (e.currentTarget as HTMLElement).setPointerCapture(e.nativeEvent.pointerId ?? 1);
+        e.preventDefault();
+        imgAutoSlidePaused.current = true;
     }
 
-    function onImgMouseMove() {
-        if (imgDragStartX.current !== null) {
+    function onImgMouseMove(e: React.MouseEvent) {
+        if (imgDragStartX.current !== null && Math.abs(e.clientX - imgDragStartX.current) > 8) {
             imgIsDragging.current = true;
         }
     }
 
     function onImgMouseUp(e: React.MouseEvent) {
-        if (imgDragStartX.current === null) {
-            return;
-        }
-
+        if (imgDragStartX.current === null) return;
         const diff = imgDragStartX.current - e.clientX;
-
-        if (Math.abs(diff) > 40) {
-            if (diff > 0) {
-                imgNext();
-            } else {
-                imgPrev();
-            }
+        if (imgIsDragging.current && Math.abs(diff) > 40) {
+            diff > 0 ? imgNext() : imgPrev();
         }
-
         imgDragStartX.current = null;
         imgIsDragging.current = false;
+        setTimeout(() => { imgAutoSlidePaused.current = false; }, 8000);
     }
 
     function onImgMouseLeave() {
-        imgDragStartX.current = null;
-        imgIsDragging.current = false;
+        // No-op: pointer capture handles out-of-bounds mouse movement
     }
 
     function onImgClickCapture(e: React.MouseEvent) {
@@ -420,12 +433,14 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                 <div
                                     className="group relative flex-1 overflow-hidden rounded-lg border border-border bg-muted/20 aspect-square select-none cursor-grab active:cursor-grabbing"
                                     onTouchStart={onImgTouchStart}
+                                    onTouchMove={onImgTouchMove}
                                     onTouchEnd={onImgTouchEnd}
                                     onMouseDown={onImgMouseDown}
                                     onMouseMove={onImgMouseMove}
                                     onMouseUp={onImgMouseUp}
                                     onMouseLeave={onImgMouseLeave}
                                     onClickCapture={onImgClickCapture}
+                                    style={{ touchAction: 'pan-y' }}
                                 >
                                     {imagePaths.length === 0 && (
                                         <span className="flex h-full w-full items-center justify-center text-8xl">📦</span>
@@ -470,14 +485,16 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                             {/* Mobile: main image top, thumbnails bottom */}
                             <div className="flex flex-col gap-2 sm:hidden">
                                 <div
-                                    className="relative w-full overflow-hidden rounded-lg border border-border bg-muted/20 aspect-square select-none"
+                                    className="relative w-full overflow-hidden rounded-lg border border-border bg-muted/20 aspect-square select-none cursor-grab active:cursor-grabbing"
                                     onTouchStart={onImgTouchStart}
+                                    onTouchMove={onImgTouchMove}
                                     onTouchEnd={onImgTouchEnd}
                                     onMouseDown={onImgMouseDown}
                                     onMouseMove={onImgMouseMove}
                                     onMouseUp={onImgMouseUp}
                                     onMouseLeave={onImgMouseLeave}
                                     onClickCapture={onImgClickCapture}
+                                    style={{ touchAction: 'pan-y' }}
                                 >
                                     {imagePaths.length === 0 && (
                                         <span className="flex h-full w-full items-center justify-center text-8xl">📦</span>

@@ -67,32 +67,43 @@ export function PopupBanner() {
             <div className="absolute inset-0 bg-black/50" onClick={() => setOpen(false)} />
 
             <div
-                className="group relative overflow-hidden rounded-xl select-none"
-                style={{ width: 'min(700px, 95vw)', height: 'min(700px, 95vw)' }}
-                onTouchStart={(e) => { dragStartX.current = e.touches[0].clientX; }}
+                className="group relative cursor-grab overflow-hidden rounded-xl select-none active:cursor-grabbing"
+                style={{ width: 'min(700px, 95vw)', height: 'min(700px, 95vw)', touchAction: 'pan-y' }}
+                onTouchStart={(e) => { dragStartX.current = e.touches[0].clientX; isDragging.current = false; }}
+                onTouchMove={(e) => {
+                    if (dragStartX.current !== null && Math.abs(e.touches[0].clientX - dragStartX.current) > 8) {
+                        isDragging.current = true;
+                    }
+                }}
                 onTouchEnd={(e) => {
                     if (dragStartX.current === null) return;
                     const diff = dragStartX.current - e.changedTouches[0].clientX;
-                    if (Math.abs(diff) > 40) {
-                        if (diff > 0) setIndex((c) => (c + 1) % banners.length);
-                        else setIndex((c) => (c - 1 + banners.length) % banners.length);
-                    }
-                    dragStartX.current = null;
-                }}
-                onMouseDown={(e) => { dragStartX.current = e.clientX; isDragging.current = false; }}
-                onMouseMove={() => { if (dragStartX.current !== null) isDragging.current = true; }}
-                onMouseUp={(e) => {
-                    if (dragStartX.current === null) return;
-                    const diff = dragStartX.current - e.clientX;
-                    if (Math.abs(diff) > 40) {
-                        if (diff > 0) setIndex((c) => (c + 1) % banners.length);
-                        else setIndex((c) => (c - 1 + banners.length) % banners.length);
+                    if (isDragging.current && Math.abs(diff) > 40) {
+                        diff > 0 ? setIndex((c) => (c + 1) % banners.length) : setIndex((c) => (c - 1 + banners.length) % banners.length);
                     }
                     dragStartX.current = null; isDragging.current = false;
                 }}
-                onMouseLeave={() => { dragStartX.current = null; isDragging.current = false; }}
+                onMouseDown={(e) => {
+                    if (e.button !== 0) return;
+                    dragStartX.current = e.clientX; isDragging.current = false;
+                    (e.currentTarget as HTMLElement).setPointerCapture(e.nativeEvent.pointerId ?? 1);
+                    e.preventDefault();
+                }}
+                onMouseMove={(e) => {
+                    if (dragStartX.current !== null && Math.abs(e.clientX - dragStartX.current) > 8) {
+                        isDragging.current = true;
+                    }
+                }}
+                onMouseUp={(e) => {
+                    if (dragStartX.current === null) return;
+                    const diff = dragStartX.current - e.clientX;
+                    if (isDragging.current && Math.abs(diff) > 40) {
+                        diff > 0 ? setIndex((c) => (c + 1) % banners.length) : setIndex((c) => (c - 1 + banners.length) % banners.length);
+                    }
+                    dragStartX.current = null; isDragging.current = false;
+                }}
             >
-                <button onClick={() => setOpen(false)} className="absolute right-3 top-3 z-30 rounded-full bg-white/90 p-1 text-black">
+                <button onMouseDown={(e) => e.stopPropagation()} onClick={() => setOpen(false)} className="absolute right-3 top-3 z-30 rounded-full bg-white/90 p-1 text-black">
                     <X className="h-4 w-4" />
                 </button>
 
@@ -124,6 +135,7 @@ export function PopupBanner() {
                 {banners.length > 1 && (
                     <>
                         <button
+                            onMouseDown={(e) => e.stopPropagation()}
                             onClick={() => setIndex((c) => (c - 1 + banners.length) % banners.length)}
                             className="absolute left-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
                             aria-label="Previous slide"
@@ -131,6 +143,7 @@ export function PopupBanner() {
                             <ChevronLeft className="h-5 w-5" />
                         </button>
                         <button
+                            onMouseDown={(e) => e.stopPropagation()}
                             onClick={() => setIndex((c) => (c + 1) % banners.length)}
                             className="absolute right-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
                             aria-label="Next slide"
