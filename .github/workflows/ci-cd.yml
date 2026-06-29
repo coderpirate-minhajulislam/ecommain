@@ -12,13 +12,13 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: '@Minhaz_1332!S'
+          MYSQL_ROOT_PASSWORD: '@Minhaz_1332!SS'
           MYSQL_DATABASE: primehaatbd
           MYSQL_USER: primehaatbd
-          MYSQL_PASSWORD: '@Minhaz_1332!S'
+          MYSQL_PASSWORD: '@Minhaz_1332!SS'
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost -u primehaatbd -p@Minhaz_1332!S" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: --health-cmd="mysqladmin ping -h localhost -u primehaatbd -p@Minhaz_1332!SS" --health-interval=10s --health-timeout=5s --health-retries=5
 
       redis:
         image: redis:latest
@@ -47,7 +47,7 @@ jobs:
           sed -i "s/# DB_PORT=3306/DB_PORT=3306/" .env
           sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=primehaatbd/" .env
           sed -i "s/# DB_USERNAME=root/DB_USERNAME=primehaatbd/" .env
-          sed -i "s/# DB_PASSWORD=/DB_PASSWORD=@Minhaz_1332!S/" .env
+          sed -i "s/# DB_PASSWORD=/DB_PASSWORD=@Minhaz_1332!SS/" .env
           sed -i 's/CACHE_STORE=database/CACHE_STORE=redis/' .env
           sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=redis/' .env
           sed -i 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=redis/' .env
@@ -60,7 +60,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h127.0.0.1 -uprimehaatbd -p'@Minhaz_1332!S' --silent; do
+          until mysqladmin ping -h127.0.0.1 -uprimehaatbd -p'@Minhaz_1332!SS' --silent; do
             echo 'Waiting for MySQL...'
             sleep 2
           done
