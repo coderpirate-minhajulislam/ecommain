@@ -244,6 +244,7 @@ export default function LandingPageV3() {
     const [selectedReviewIndex, setSelectedReviewIndex] = useState(0);
     const [videoOpen, setVideoOpen] = useState(false);
     const checkoutRef = useRef<HTMLDivElement>(null);
+    const formRef = useRef<HTMLFormElement>(null);
 
     const variants = useMemo(() => product.variants || [], [product.variants]);
     const sizes = useMemo(() => [...new Set(variants.filter((v) => v.size).map((v) => v.size!))], [variants]);
@@ -1089,7 +1090,7 @@ export default function LandingPageV3() {
                             <p className="mt-1 text-xs text-gray-500 sm:text-sm">Fill in your details below to place your order</p>
                         </div>
 
-                        <form onSubmit={handleSubmit}>
+                        <form ref={formRef} onSubmit={handleSubmit}>
                             <div className="grid gap-6 lg:grid-cols-2">
                                 {/* Left — Form */}
                                 <div className="space-y-5">
@@ -1496,8 +1497,18 @@ export default function LandingPageV3() {
 
                 {/* ── Sticky Mobile Bottom Bar ── */}
                 <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white px-4 py-3 shadow-lg md:hidden">
-                    <Button onClick={scrollToCheckout} className="w-full rounded-xl font-bold shadow-md" size="lg">
-                        {landingPage.order_now_text || 'Order Now'} — {formatPrice(activePrice)}
+                    <Button
+                        onClick={() => {
+                            if (formRef.current) {
+                                formRef.current.requestSubmit();
+                            }
+                        }}
+                        disabled={processing || phoneCheckLoading || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant}
+                        className="w-full rounded-xl font-bold shadow-md"
+                        size="lg"
+                    >
+                        <Lock className="mr-2 h-4 w-4" />
+                        {phoneCheckLoading ? 'Verifying...' : processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
                     </Button>
                 </div>
 
