@@ -215,3 +215,37 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* ── Global font-size boost (all pages) ── */
+/* Bump every text-* utility one step larger site-wide */
+body .text-\[9px\]   { font-size: 11px !important; }
+body .text-\[10px\]  { font-size: 13px !important; }
+body .text-\[11px\]  { font-size: 14px !important; }
+body .text-xs        { font-size: 0.875rem !important; } /* 14px  was 12px */
+body .text-sm        { font-size: 1rem !important; }     /* 16px  was 14px */
+body .text-base      { font-size: 1.125rem !important; }  /* 18px  was 16px */
+body .text-lg        { font-size: 1.25rem !important; }   /* 20px  was 18px */
+body .text-xl        { font-size: 1.5rem !important; }    /* 24px  was 20px */
+body .text-2xl       { font-size: 1.875rem !important; }  /* 30px  was 24px */
+body .text-3xl       { font-size: 2.25rem !important; }   /* 36px  was 30px */
+body .text-4xl       { font-size: 3rem !important; }      /* 48px  was 36px */
+
+/* Responsive variants — site-wide */
+body .sm\:text-\[9px\]   { font-size: 11px !important; }
+body .sm\:text-\[10px\]  { font-size: 13px !important; }
+body .sm\:text-xs        { font-size: 0.875rem !important; }
+body .sm\:text-sm        { font-size: 1rem !important; }
+body .sm\:text-base      { font-size: 1.125rem !important; }
+body .sm\:text-lg        { font-size: 1.25rem !important; }
+body .sm\:text-xl        { font-size: 1.5rem !important; }
+body .sm\:text-2xl       { font-size: 1.875rem !important; }
+
+body .md\:text-xs        { font-size: 0.875rem !important; }
+body .md\:text-sm        { font-size: 1rem !important; }
+body .md\:text-base      { font-size: 1.125rem !important; }
+body .md\:text-lg        { font-size: 1.25rem !important; }
+body .md\:text-xl        { font-size: 1.5rem !important; }
+body .md\:text-2xl       { font-size: 1.875rem !important; }
+body .md\:text-3xl       { font-size: 2.25rem !important; }
+
+body .lg\:text-4xl       { font-size: 3rem !important; }

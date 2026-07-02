@@ -943,7 +943,7 @@ export default function LandingPage() {
             {gtmSsUrl ? <GtmSsScript gtmId={gtmId} gtmSsUrl={gtmSsUrl} /> : <GtmScript gtmId={gtmId} />}
             <MetaPixelScript pixelId={metaPixelId} pixelExternalId={pixelExternalId} />
             <TikTokPixelScript pixelId={tiktokPixelId} />
-            <div className="dark min-h-screen bg-background text-foreground">
+            <div className="landing-page dark min-h-screen bg-background text-foreground">
                 {/* ── Sticky Top Bar ── */}
                 <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">

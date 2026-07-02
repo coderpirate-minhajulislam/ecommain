@@ -711,7 +711,7 @@ export default function LandingPageV2() {
             <MetaPixelScript pixelId={metaPixelId} pixelExternalId={pixelExternalId} />
             <TikTokPixelScript pixelId={tiktokPixelId} />
 
-            <div className="min-h-screen bg-white text-gray-900">
+            <div className="landing-page min-h-screen bg-white text-gray-900">
                 {/* ── Sticky Top Bar ── */}
                 <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
                     <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-2">
