@@ -67,7 +67,7 @@ export function ReviewSubmissionForm({ productId, labels }: ReviewSubmissionForm
                             onChange={(e) => setData('name', e.target.value)}
                             disabled={processing}
                         />
-                        {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
+                        {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
                     </div>
 
                     {/* Email */}
@@ -81,7 +81,7 @@ export function ReviewSubmissionForm({ productId, labels }: ReviewSubmissionForm
                             onChange={(e) => setData('email', e.target.value)}
                             disabled={processing}
                         />
-                        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+                        {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                     </div>
 
                     {/* Rating */}
@@ -109,11 +109,11 @@ export function ReviewSubmissionForm({ productId, labels }: ReviewSubmissionForm
                                     />
                                 </button>
                             ))}
-                            <span className="ml-2 text-sm text-muted-foreground">
+                            <span className="ml-2 text-xs text-muted-foreground">
                                 {hoverRating || rating} out of 5
                             </span>
                         </div>
-                        {errors.rating && <p className="text-sm text-red-500">{errors.rating}</p>}
+                        {errors.rating && <p className="text-xs text-red-500">{errors.rating}</p>}
                     </div>
 
                     {/* Comment */}
@@ -126,9 +126,9 @@ export function ReviewSubmissionForm({ productId, labels }: ReviewSubmissionForm
                             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setData('comment', e.target.value)}
                             disabled={processing}
                             rows={5}
-                            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                             className="w-full rounded-lg border border-input bg-background px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-ring"
                         />
-                        {errors.comment && <p className="text-sm text-red-500">{errors.comment}</p>}
+                        {errors.comment && <p className="text-xs text-red-500">{errors.comment}</p>}
                     </div>
 
                     {/* Submit Button */}

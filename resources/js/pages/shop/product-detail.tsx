@@ -609,7 +609,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                             )}
 
                             {product.short_description && (
-                                <p className="whitespace-pre-wrap text-xs sm:text-sm md:text-base leading-relaxed text-muted-foreground w-full">{product.short_description}</p>
+                                <p className="whitespace-pre-wrap text-xs sm:text-xs md:text-sm leading-relaxed text-muted-foreground w-full">{product.short_description}</p>
                             )}
 
                             {/* Stock Status Badge */}
@@ -946,7 +946,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                         {activeTab === 'details' && product.long_description && (
                             <div className="rounded-lg bg-muted/30 p-3 sm:p-4 lg:p-6">
                                 <div className={`relative ${!showFullDescription ? 'max-h-[200px] sm:max-h-[280px] lg:max-h-[340px] overflow-hidden' : ''}`}>
-                                    <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm md:text-base text-muted-foreground">
+                                    <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-xs md:text-sm text-muted-foreground">
                                         {product.long_description}
                                     </p>
                                     {!showFullDescription && product.long_description.length > 300 && (

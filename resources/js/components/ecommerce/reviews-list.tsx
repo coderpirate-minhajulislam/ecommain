@@ -49,7 +49,7 @@ export function ReviewsList({ reviews, customerReviewsLabel }: ReviewsListProps)
                     <CardTitle>{heading}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p className="text-center text-muted-foreground py-8">
+                    <p className="text-xs text-center text-muted-foreground py-8">
                         No reviews yet. Be the first to review this product!
                     </p>
                 </CardContent>
@@ -69,15 +69,15 @@ export function ReviewsList({ reviews, customerReviewsLabel }: ReviewsListProps)
                             <div className="mb-2 flex flex-col gap-2">
                                 <div className="flex items-center gap-2">
                                     <StarRating rating={review.rating} />
-                                    <span className="text-sm font-semibold text-muted-foreground">
+                                    <span className="text-xs font-semibold text-muted-foreground">
                                         {review.rating} out of 5
                                     </span>
                                 </div>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-xs text-muted-foreground">
                                     By {review.name} on {formatDate(review.created_at)}
                                 </p>
                             </div>
-                            <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300">
+                            <p className="text-xs leading-relaxed text-gray-700 dark:text-gray-300">
                                 {review.comment}
                             </p>
                         </div>
