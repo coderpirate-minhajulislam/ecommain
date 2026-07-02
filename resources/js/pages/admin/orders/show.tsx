@@ -1,4 +1,4 @@
-﻿import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { ArrowLeft, AlertTriangle, Ban, CheckCircle2, FileText, Loader2, Pencil, RefreshCw, Send, ShieldX, X, Save } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useFlashToast } from '@/hooks/use-flash-toast';
@@ -1448,15 +1448,52 @@ export default function OrderShow() {
                             <Pencil className="h-4 w-4" />
                             <span>Edit</span>
                         </Link>
-                        <a
-                            href={`/admin/orders/${order.id}/invoice`}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            onClick={() => {
+                                const iframe = document.createElement('iframe');
+                                iframe.style.position = 'fixed';
+                                iframe.style.top = '-9999px';
+                                iframe.style.left = '-9999px';
+                                iframe.style.width = '210mm';
+                                iframe.style.height = '297mm';
+                                iframe.style.border = 'none';
+                                iframe.src = `/admin/orders/${order.id}/invoice`;
+                                document.body.appendChild(iframe);
+                                iframe.onload = () => {
+                                    setTimeout(() => {
+                                        iframe.contentWindow?.print();
+                                        setTimeout(() => document.body.removeChild(iframe), 500);
+                                    }, 500);
+                                };
+                            }}
                             className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-medium text-primary-foreground hover:bg-primary/90 sm:flex-none sm:text-sm"
                         >
                             <FileText className="h-4 w-4" />
                             <span>Invoice</span>
-                        </a>
+                        </button>
+                        <button
+                            onClick={() => {
+                                const iframe = document.createElement('iframe');
+                                iframe.style.position = 'fixed';
+                                iframe.style.top = '-9999px';
+                                iframe.style.left = '-9999px';
+                                iframe.style.width = '76.2mm';
+                                iframe.style.height = '76.2mm';
+                                iframe.style.border = 'none';
+                                iframe.src = `/admin/orders/${order.id}/label`;
+                                document.body.appendChild(iframe);
+                                iframe.onload = () => {
+                                    setTimeout(() => {
+                                        iframe.contentWindow?.print();
+                                        setTimeout(() => document.body.removeChild(iframe), 500);
+                                    }, 500);
+                                };
+                            }}
+                            className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-medium text-white hover:bg-emerald-700 sm:flex-none sm:text-sm"
+                        >
+                            <FileText className="h-4 w-4" />
+                            <span>Label</span>
+                        </button>
                         {pathaoConnected && (
                             <button
                                 onClick={() => setShowPathaoModal(true)}

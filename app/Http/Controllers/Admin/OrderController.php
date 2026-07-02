@@ -443,6 +443,37 @@ class OrderController extends Controller
         return view('exports.invoice', compact('order', 'siteTitle', 'siteLogo'));
     }
 
+    public function label(int $id)
+    {
+        $order        = Order::with(['items'])->findOrFail($id);
+        $siteTitle    = Setting::get('site_title', config('app.name'));
+        $siteLogo     = Setting::get('site_logo', '');
+        $sitePhone    = Setting::get('site_phone', '');
+        $siteWhatsapp = Setting::get('site_whatsapp', '');
+        $siteSubtitle = Setting::get('site_subtitle', '');
+        $siteUrl      = config('app.url', config('app.fallback_url', 'https://localhost'));
+
+        // Determine courier name and consignment ID
+        $courierName     = null;
+        $consignmentId   = null;
+
+        if ($order->steadfast_consignment_id) {
+            $courierName   = 'Steadfast';
+            $consignmentId = $order->steadfast_consignment_id;
+        } elseif ($order->pathao_consignment_id) {
+            $courierName   = 'Pathao';
+            $consignmentId = $order->pathao_consignment_id;
+        } elseif ($order->redx_tracking_id) {
+            $courierName   = 'RedX';
+            $consignmentId = $order->redx_tracking_id;
+        } elseif ($order->carrybee_consignment_id) {
+            $courierName   = 'Carrybee';
+            $consignmentId = $order->carrybee_consignment_id;
+        }
+
+        return view('exports.label', compact('order', 'siteTitle', 'siteLogo', 'sitePhone', 'siteWhatsapp', 'siteSubtitle', 'siteUrl', 'courierName', 'consignmentId'));
+    }
+
     public function courierCheck(Request $request, int $id): JsonResponse
     {
         $order = Order::findOrFail($id);

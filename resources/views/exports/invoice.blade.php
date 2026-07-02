@@ -1,11 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <title>Invoice {{ $order->order_number }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; font-size: 12px; color: #333; padding: 30px; }
+        body { font-family: Arial, sans-serif; font-size: 14px; color: #333; padding: 30px; }
         .print-bar { margin-bottom: 20px; padding: 10px 14px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
         .print-bar button { padding: 7px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
         .btn-p { background: #2563eb; color: #fff; }
@@ -26,19 +26,19 @@
         .status-cancelled { background: #fee2e2; color: #991b1b; }
         .info-row { display: flex; gap: 40px; margin-bottom: 25px; }
         .info-block { flex: 1; }
-        .info-block h3 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; font-weight: 600; }
-        .info-block p { margin-bottom: 3px; font-size: 12px; line-height: 1.6; }
+        .info-block h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 8px; font-weight: 600; }
+        .info-block p { margin-bottom: 3px; font-size: 14px; line-height: 1.6; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        table thead th { background: #f3f4f6; padding: 8px 10px; text-align: left; font-size: 11px; font-weight: 700; border-bottom: 2px solid #d1d5db; }
-        table tbody td { padding: 8px 10px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+        table thead th { background: #f3f4f6; padding: 10px 12px; text-align: left; font-size: 13px; font-weight: 700; border-bottom: 2px solid #d1d5db; }
+        table tbody td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
         table tbody tr:nth-child(even) td { background: #f9fafb; }
         .text-right { text-align: right; }
         .totals { width: 260px; margin-left: auto; margin-top: 10px; }
         .totals table { margin: 0; }
-        .totals td { padding: 5px 0; font-size: 13px; border: none; background: none !important; }
-        .totals .total-row td { border-top: 2px solid #333; font-size: 15px; font-weight: 700; padding-top: 8px; }
+        .totals td { padding: 6px 0; font-size: 15px; border: none; background: none !important; }
+        .totals .total-row td { border-top: 2px solid #333; font-size: 17px; font-weight: 700; padding-top: 10px; }
         .divider { border: none; border-top: 1px solid #e5e7eb; margin: 20px 0; }
-        .footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 11px; color: #888; }
+        .footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 13px; color: #888; }
         @media print { .print-bar { display: none !important; } }
     </style>
 </head>
@@ -101,7 +101,7 @@
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->product_name }}</td>
-                <td>{{ $item->variant_label ?? 'â€”' }}</td>
+                <td>{{ $item->variant_label }}</td>
                 <td class="text-right">{{ number_format($item->price, 2) }}</td>
                 <td class="text-right">{{ $item->quantity }}</td>
                 <td class="text-right">{{ number_format($item->total, 2) }}</td>
@@ -134,7 +134,8 @@
     </div>
 
     <div class="footer">
-        Thank you for your business! &mdash; Generated on {{ now()->format('F j, Y \a\t g:i A') }}
+        <div>&copy; {{ now()->year }} {{ $siteTitle }}. All rights reserved.</div>
+        <div>Develop & Maintain by <strong>Grow Ever</strong></div>
     </div>
 
 </body>

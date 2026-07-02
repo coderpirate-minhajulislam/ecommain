@@ -78,6 +78,7 @@
             <tr>
                 <td>
                     <a class="order-link" href="{{ url('/admin/orders/' . $order->id . '/invoice') }}" target="_blank">{{ $order->order_number }}</a>
+                    <a class="order-link" href="{{ url('/admin/orders/' . $order->id . '/label') }}" target="_blank" style="margin-left:6px; font-size:10px; color:#16a34a;">[Label]</a>
                 </td>
                 <td>{{ $order->first_name }}</td>
                 <td>{{ $order->phone }}</td>

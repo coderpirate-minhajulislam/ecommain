@@ -143,6 +143,7 @@ Route::middleware(['auth', 'verified', 'role:admin,manager'])->prefix('admin')->
     Route::resource('sub-categories', SubCategoryController::class)->except(['show']);
     Route::resource('products', ProductController::class)->except(['show']);
     Route::get('orders/{order}/invoice', [AdminOrderController::class, 'invoice'])->name('orders.invoice');
+    Route::get('orders/{order}/label', [AdminOrderController::class, 'label'])->name('orders.label');
     Route::patch('orders/{order}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.status');
     Route::patch('orders/{order}/note', [AdminOrderController::class, 'updateNote'])->name('orders.note');
     Route::resource('orders', AdminOrderController::class);
