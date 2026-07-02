@@ -245,6 +245,7 @@ export default function LandingPageV3() {
     const [videoOpen, setVideoOpen] = useState(false);
     const checkoutRef = useRef<HTMLDivElement>(null);
     const formRef = useRef<HTMLFormElement>(null);
+    const [checkoutVisible, setCheckoutVisible] = useState(false);
 
     const variants = useMemo(() => product.variants || [], [product.variants]);
     const sizes = useMemo(() => [...new Set(variants.filter((v) => v.size).map((v) => v.size!))], [variants]);
@@ -767,6 +768,20 @@ export default function LandingPageV3() {
         }
         checkoutRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
+
+    // Hide mobile bottom bar when checkout form is visible
+    useEffect(() => {
+        const el = checkoutRef.current;
+        if (!el) return;
+        const observer = new IntersectionObserver(
+            (entries) => {
+                setCheckoutVisible(entries[0].isIntersecting);
+            },
+            { threshold: 0.1 },
+        );
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, []);
 
     const heroImages = (landingPage.hero_images && landingPage.hero_images.length > 0) ? landingPage.hero_images.map((path) => ({ src: `/${path}` })) : [];
     const productFirstImage = product.images?.[0]?.image_path ? `/${product.images[0].image_path}` : null;
@@ -1495,22 +1510,14 @@ export default function LandingPageV3() {
                     </p>
                 </footer>
 
-                {/* ── Sticky Mobile Bottom Bar ── */}
-                <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white px-4 py-3 shadow-lg md:hidden">
-                    <Button
-                        onClick={() => {
-                            if (formRef.current) {
-                                formRef.current.requestSubmit();
-                            }
-                        }}
-                        disabled={processing || phoneCheckLoading || isOutOfStock || selectedItems.filter((i) => i.selected).length === 0 || missingVariant}
-                        className="w-full rounded-xl font-bold shadow-md"
-                        size="lg"
-                    >
-                        <Lock className="mr-2 h-4 w-4" />
-                        {phoneCheckLoading ? 'Verifying...' : processing ? 'Placing Order...' : `${landingPage.order_now_text || 'Order Now'} — ${paidAmount > 0 ? formatPrice(dueAmount) + ' Due' : formatPrice(total)}`}
-                    </Button>
-                </div>
+                {/* ── Sticky Mobile Bottom Bar (hidden when checkout is visible) ── */}
+                {!checkoutVisible && (
+                    <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white px-4 py-3 shadow-lg md:hidden">
+                        <Button size="lg" onClick={scrollToCheckout} className="w-full rounded-xl text-base font-bold shadow-lg">
+                            {landingPage.order_now_text || 'Order Now'} <ChevronRight className="ml-2 h-5 w-5" />
+                        </Button>
+                    </div>
+                )}
 
                 {/* ── Floating Support Button ── */}
                 <FloatingSupportBtn siteBranding={siteBranding} />
