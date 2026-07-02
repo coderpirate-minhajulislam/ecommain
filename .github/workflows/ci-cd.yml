@@ -12,13 +12,13 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: '@Minhaz_1332!EL'
-          MYSQL_DATABASE: elitecollectionbdshop
-          MYSQL_USER: elitecollectionbdshop
-          MYSQL_PASSWORD: '@Minhaz_1332!EL'
+          MYSQL_ROOT_PASSWORD: '@Minhaz_1332!T'
+          MYSQL_DATABASE: techeverbd
+          MYSQL_USER: techeverbd
+          MYSQL_PASSWORD: '@Minhaz_1332!T'
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping -h localhost -u elitecollectionbdshop -p@Minhaz_1332!EL" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: --health-cmd="mysqladmin ping -h localhost -u techeverbd -p@Minhaz_1332!T" --health-interval=10s --health-timeout=5s --health-retries=5
 
       redis:
         image: redis:latest
@@ -41,13 +41,13 @@ jobs:
 
       - name: Configure Database for CI
         run: |
-          sed -i 's/APP_NAME=Laravel/APP_NAME="elitecollectionbdshop"/' .env
+          sed -i 's/APP_NAME=Laravel/APP_NAME="techeverbd"/' .env
           sed -i 's/DB_CONNECTION=sqlite/DB_CONNECTION=mysql/' .env
           sed -i "s/# DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/" .env
           sed -i "s/# DB_PORT=3306/DB_PORT=3306/" .env
-          sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=elitecollectionbdshop/" .env
-          sed -i "s/# DB_USERNAME=root/DB_USERNAME=elitecollectionbdshop/" .env
-          sed -i "s/# DB_PASSWORD=/DB_PASSWORD=@Minhaz_1332!EL/" .env
+          sed -i "s/# DB_DATABASE=laravel/DB_DATABASE=techeverbd/" .env
+          sed -i "s/# DB_USERNAME=root/DB_USERNAME=techeverbd/" .env
+          sed -i "s/# DB_PASSWORD=/DB_PASSWORD=@Minhaz_1332!T/" .env
           sed -i 's/CACHE_STORE=database/CACHE_STORE=redis/' .env
           sed -i 's/SESSION_DRIVER=database/SESSION_DRIVER=redis/' .env
           sed -i 's/QUEUE_CONNECTION=database/QUEUE_CONNECTION=redis/' .env
@@ -60,7 +60,7 @@ jobs:
 
       - name: Wait for MySQL to be ready
         run: |
-          until mysqladmin ping -h127.0.0.1 -uelitecollectionbdshop -p'@Minhaz_1332!EL' --silent; do
+          until mysqladmin ping -h127.0.0.1 -utecheverbd -p'@Minhaz_1332!T' --silent; do
             echo 'Waiting for MySQL...'
             sleep 2
           done
@@ -90,7 +90,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           source: '.'
-          target: '/var/www/html/elitecollectionbdshop/'
+          target: '/var/www/html/techeverbd/'
           strip_components: 0
           overwrite: true
           exclude: |
@@ -129,7 +129,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            cd /var/www/html/elitecollectionbdshop
+            cd /var/www/html/techeverbd
 
             # Remove raw frontend source files (only compiled public/build/ is needed)
             rm -rf resources/js
@@ -169,9 +169,9 @@ jobs:
 
 
             # Set correct permissions
-            sudo chown -R www-data:www-data /var/www/html/elitecollectionbdshop
-            sudo chmod -R 775 /var/www/html/elitecollectionbdshop/storage
-            sudo chmod -R 775 /var/www/html/elitecollectionbdshop/bootstrap/cache
+            sudo chown -R www-data:www-data /var/www/html/techeverbd
+            sudo chmod -R 775 /var/www/html/techeverbd/storage
+            sudo chmod -R 775 /var/www/html/techeverbd/bootstrap/cache
 
             # Run Laravel commands
             php artisan migrate --force
