@@ -570,7 +570,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                 {product.is_featured && <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground text-[11px] sm:text-xs py-0.5 px-1.5">⭐ Featured</Badge>}
                                 {product.is_new_arrival && <Badge className="bg-accent text-accent-foreground hover:bg-accent/90 text-[11px] sm:text-xs py-0.5 px-1.5">🆕 New</Badge>}
                             </div>
-                            <h1 className="mb-2 sm:mb-3 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight wrap-break-word">{product.name}</h1>
+                                <h1 className="mb-2 sm:mb-3 text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold tracking-tight wrap-break-word">{product.name}</h1>
 
                             {/* Price Section */}
                             <div className="mb-2 sm:mb-3 flex flex-wrap items-center gap-1 sm:gap-2 w-full">
@@ -609,7 +609,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                             )}
 
                             {product.short_description && (
-                                <p className="whitespace-pre-wrap text-sm sm:text-base md:text-lg leading-relaxed text-muted-foreground w-full">{product.short_description}</p>
+                                <p className="whitespace-pre-wrap text-xs sm:text-sm md:text-base leading-relaxed text-muted-foreground w-full">{product.short_description}</p>
                             )}
 
                             {/* Stock Status Badge */}
@@ -946,7 +946,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                         {activeTab === 'details' && product.long_description && (
                             <div className="rounded-lg bg-muted/30 p-3 sm:p-4 lg:p-6">
                                 <div className={`relative ${!showFullDescription ? 'max-h-[200px] sm:max-h-[280px] lg:max-h-[340px] overflow-hidden' : ''}`}>
-                                    <p className="whitespace-pre-wrap leading-relaxed text-sm sm:text-base md:text-lg text-muted-foreground">
+                                    <p className="whitespace-pre-wrap leading-relaxed text-xs sm:text-sm md:text-base text-muted-foreground">
                                         {product.long_description}
                                     </p>
                                     {!showFullDescription && product.long_description.length > 300 && (
