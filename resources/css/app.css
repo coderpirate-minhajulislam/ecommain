@@ -221,6 +221,7 @@
 body .text-\[9px\]   { font-size: 10px !important; }
 body .text-\[10px\]  { font-size: 11px !important; }
 body .text-\[11px\]  { font-size: 12px !important; }
+body .text-\[13px\]  { font-size: 15px !important; } /* product name */
 body .text-xs        { font-size: 0.8125rem !important; } /* 13px  was 12px */
 body .text-sm        { font-size: 0.9375rem !important; } /* 15px  was 14px */
 body .text-base      { font-size: 1.0625rem !important; } /* 17px  was 16px */
@@ -233,6 +234,7 @@ body .text-4xl       { font-size: 2.5rem !important; }    /* 40px  was 36px */
 /* Responsive variants — site-wide */
 body .sm\:text-\[9px\]   { font-size: 10px !important; }
 body .sm\:text-\[10px\]  { font-size: 11px !important; }
+body .sm\:text-\[13px\]  { font-size: 15px !important; }
 body .sm\:text-xs        { font-size: 0.8125rem !important; }
 body .sm\:text-sm        { font-size: 0.9375rem !important; }
 body .sm\:text-base      { font-size: 1.0625rem !important; }
