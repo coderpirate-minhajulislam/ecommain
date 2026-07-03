@@ -17,7 +17,6 @@ class LandingPage extends Model
         'hero_images',
         'badge_text',
         'icon_name',
-        'phone',
         'authentic_badge_text',
         'authentic_badge_icon',
         'delivery_badge_text',
@@ -29,8 +28,7 @@ class LandingPage extends Model
         'price_banner_current_price',
         'mid_order_button_text',
         'mid_order_button_icon',
-        'benefits_items',
-        'benefits_title',
+        'benefits_sections',
         'checkout_title',
         'review_images_title',
         'order_now_text',
@@ -55,7 +53,7 @@ class LandingPage extends Model
             'hero_images' => 'array',
             'review_images' => 'array',
             'extra_product_ids' => 'array',
-            'benefits_items' => 'array',
+            'benefits_sections' => 'array',
         ];
     }
 

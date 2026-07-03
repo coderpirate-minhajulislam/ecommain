@@ -1,4 +1,4 @@
-import { ChevronDown, Upload, X } from 'lucide-react';
+import { ChevronDown, Plus, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { IconPicker } from '@/components/icon-picker';
 
@@ -16,7 +16,6 @@ export type LandingPageFormData = {
     existing_hero_images: string[];
     badge_text: string;
     icon_name: string;
-    phone: string;
     authentic_badge_text: string;
     authentic_badge_icon: string;
     delivery_badge_text: string;
@@ -27,8 +26,7 @@ export type LandingPageFormData = {
     price_banner_current_price: string;
     mid_order_button_text: string;
     mid_order_button_icon: string;
-    benefits_items: string[];
-    benefits_title: string;
+    benefits_sections: { title: string; items: string[] }[];
     checkout_banner_text: string;
     checkout_title: string;
     review_images_title: string;
@@ -56,7 +54,6 @@ export const defaultFormData: LandingPageFormData = {
     existing_hero_images: [],
     badge_text: 'Limited Offer',
     icon_name: 'package',
-    phone: '+1 (234) 567-890',
     authentic_badge_text: '100% Authentic Product',
     authentic_badge_icon: 'shield-check',
     delivery_badge_text: 'Free Shipping',
@@ -67,15 +64,19 @@ export const defaultFormData: LandingPageFormData = {
     price_banner_current_price: '1,500',
     mid_order_button_text: 'Order Now',
     mid_order_button_icon: 'shopping-cart',
-    benefits_items: [
-        'Everything included in one package',
-        'Premium quality materials and craftsmanship',
-        'Perfect gift for yourself or loved ones',
-        'Great value — save more when you buy together',
-        'Cash on delivery available',
-        '7-day return guarantee for peace of mind',
+    benefits_sections: [
+        {
+            title: 'Why Buy This Package?',
+            items: [
+                'Everything included in one package',
+                'Premium quality materials and craftsmanship',
+                'Perfect gift for yourself or loved ones',
+                'Great value — save more when you buy together',
+                'Cash on delivery available',
+                '7-day return guarantee for peace of mind',
+            ],
+        },
     ],
-    benefits_title: 'Why Buy This Package?',
     checkout_banner_text: 'Order now and get free shipping on orders over $50!',
     checkout_title: 'Order Now',
     review_images_title: 'Customer Reviews',
@@ -344,11 +345,6 @@ export function LandingPageForm({
                         />
                     </div>
                 </div>
-                <div className="space-y-2">
-                    <label htmlFor="phone" className={labelClass}>Phone Number</label>
-                    <input id="phone" type="text" value={data.phone} onChange={(e) => setData('phone', e.target.value)} placeholder="+1 (234) 567-890" className={inputClass} />
-                    {errors.phone && <p className="text-sm text-destructive">{errors.phone}</p>}
-                </div>
             </Section>
 
             {/* ── Hero Section ── */}
@@ -448,15 +444,33 @@ export function LandingPageForm({
                     </div>
                 </div>
 
-                {/* Hero Delivery Badge */}
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                        <label htmlFor="hero_delivery_badge_text" className={labelClass}>Delivery Badge Text</label>
-                        <input id="hero_delivery_badge_text" type="text" value={data.delivery_badge_text} onChange={(e) => setData('delivery_badge_text', e.target.value)} className={inputClass} placeholder="Free Shipping" />
+                {/* Authentic Badge */}
+                <div className="border-t border-border pt-4 mt-4">
+                    <p className="text-xs text-muted-foreground mb-3">Authentic Badge — shown below the hero title</p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                            <label htmlFor="authentic_badge_text" className={labelClass}>Authentic Badge Text</label>
+                            <input id="authentic_badge_text" type="text" value={data.authentic_badge_text} onChange={(e) => setData('authentic_badge_text', e.target.value)} className={inputClass} placeholder="100% Authentic Product" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className={labelClass}>Authentic Badge Icon</label>
+                            <IconPicker value={data.authentic_badge_icon} onChange={(val) => setData('authentic_badge_icon', val)} />
+                        </div>
                     </div>
-                    <div className="space-y-2">
-                        <label className={labelClass}>Delivery Badge Icon</label>
-                        <IconPicker value={data.delivery_badge_icon} onChange={(val) => setData('delivery_badge_icon', val)} />
+                </div>
+
+                {/* Hero Delivery Badge */}
+                <div className="border-t border-border pt-4 mt-4">
+                    <p className="text-xs text-muted-foreground mb-3">Delivery Badge — shown below the hero title</p>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                            <label htmlFor="hero_delivery_badge_text" className={labelClass}>Delivery Badge Text</label>
+                            <input id="hero_delivery_badge_text" type="text" value={data.delivery_badge_text} onChange={(e) => setData('delivery_badge_text', e.target.value)} className={inputClass} placeholder="Free Shipping" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className={labelClass}>Delivery Badge Icon</label>
+                            <IconPicker value={data.delivery_badge_icon} onChange={(val) => setData('delivery_badge_icon', val)} />
+                        </div>
                     </div>
                 </div>
             </Section>
@@ -474,23 +488,50 @@ export function LandingPageForm({
                 </div>
             </Section>
 
-            {/* ── Benefits Checklist ── */}
-            <Section title="Benefits Checklist">
-                <div className="space-y-2">
-                    <label htmlFor="benefits_title" className={labelClass}>Section Title</label>
-                    <input id="benefits_title" type="text" value={data.benefits_title} onChange={(e) => setData('benefits_title', e.target.value)} className={inputClass} placeholder="Why Buy This Package?" />
-                </div>
-                <div className="space-y-2">
-                    <label className={labelClass}>Benefit Items (one per line)</label>
-                    <textarea
-                        value={(data.benefits_items || []).join('\n')}
-                        onChange={(e) => setData('benefits_items', e.target.value.split('\n').filter((s: string) => s.trim()))}
-                        rows={6}
-                        className={inputClass}
-                        placeholder="Everything included in one package&#10;Premium quality materials&#10;Great value"
-                    />
-                    <p className="text-xs text-muted-foreground">Enter each benefit on a new line.</p>
-                </div>
+            {/* ── Benefits Sections ── */}
+            <Section title="Benefits Sections" defaultOpen>
+                <p className="text-xs text-muted-foreground mb-3">Add multiple benefits checklist sections. Each section has a title and items.</p>
+                {(data.benefits_sections || []).map((section, si) => (
+                    <div key={si} className="mb-4 rounded-lg border border-input p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <span className="text-xs font-semibold text-muted-foreground">Section {si + 1}</span>
+                            <button type="button" onClick={() => {
+                                const updated = [...data.benefits_sections];
+                                updated.splice(si, 1);
+                                setData('benefits_sections', updated);
+                            }} className="text-xs text-destructive hover:underline">Remove Section</button>
+                        </div>
+                        <div className="space-y-2">
+                            <label className={labelClass}>Section Title</label>
+                            <input type="text" value={section.title} onChange={(e) => {
+                                const updated = [...data.benefits_sections];
+                                updated[si] = { ...updated[si], title: e.target.value };
+                                setData('benefits_sections', updated);
+                            }} className={inputClass} placeholder="Why Buy This Package?" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className={labelClass}>Benefit Items (one per line)</label>
+                            <textarea
+                                value={(section.items || []).join('\n')}
+                                onChange={(e) => {
+                                    const updated = [...data.benefits_sections];
+                                    updated[si] = { ...updated[si], items: e.target.value.split('\n').filter((s: string) => s.trim()) };
+                                    setData('benefits_sections', updated);
+                                }}
+                                rows={5}
+                                className={inputClass}
+                                placeholder="Everything included in one package&#10;Premium quality materials&#10;Great value"
+                            />
+                            <p className="text-xs text-muted-foreground">Enter each benefit on a new line.</p>
+                        </div>
+                    </div>
+                ))}
+                <button type="button" onClick={() => {
+                    const updated = [...(data.benefits_sections || []), { title: '', items: [''] }];
+                    setData('benefits_sections', updated);
+                }} className="flex items-center gap-1 text-sm text-primary hover:underline">
+                    <Plus className="h-3.5 w-3.5" /> Add Benefits Section
+                </button>
             </Section>
 
             {/* ── Price Banner ── */}

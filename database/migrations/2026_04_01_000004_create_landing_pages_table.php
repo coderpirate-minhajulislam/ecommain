@@ -19,7 +19,6 @@ return new class extends Migration
             $table->json('hero_images')->nullable();
             $table->string('badge_text')->nullable();
             $table->string('icon_name')->nullable();
-            $table->string('phone')->nullable();
             $table->string('authentic_badge_text', 255)->nullable();
             $table->string('authentic_badge_icon', 50)->nullable();
             $table->string('delivery_badge_text', 255)->nullable();
@@ -31,8 +30,7 @@ return new class extends Migration
             $table->string('price_banner_current_price', 50)->nullable();
             $table->string('mid_order_button_text', 100)->nullable();
             $table->string('mid_order_button_icon', 50)->nullable();
-            $table->json('benefits_items')->nullable();
-            $table->string('benefits_title')->nullable();
+            $table->json('benefits_sections')->nullable();
             $table->string('checkout_title')->nullable();
             $table->string('review_images_title')->nullable();
             $table->string('order_now_text', 100)->nullable();

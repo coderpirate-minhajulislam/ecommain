@@ -15,24 +15,17 @@ type LandingPageRecord = {
     hero_text: string | null;
     badge_text: string | null;
     icon_name: string | null;
-    phone: string | null;
-    use_cases: { label: string; icon_name?: string }[] | null;
-    use_cases_title: string | null;
-    use_cases_subtitle: string | null;
-    features: { title: string; desc: string; icon_name?: string }[] | null;
-    features_title: string | null;
-    features_subtitle: string | null;
-    specifications: { title: string; specs: string[]; icon_name?: string }[] | null;
-    specifications_title: string | null;
-    specifications_subtitle: string | null;
     authentic_badge_text: string | null;
     authentic_badge_icon: string | null;
     delivery_badge_text: string | null;
     delivery_badge_icon: string | null;
-    why_buy: { title: string; desc: string; icon_name?: string }[] | null;
-    why_buy_title: string | null;
-    why_buy_super_text: string | null;
-    why_buy_subtitle: string | null;
+    price_banner_original_label: string | null;
+    price_banner_original_price: string | null;
+    price_banner_current_label: string | null;
+    price_banner_current_price: string | null;
+    mid_order_button_text: string | null;
+    mid_order_button_icon: string | null;
+    benefits_sections: { title: string; items: string[] }[] | null;
     checkout_banner_text: string | null;
     checkout_title: string | null;
     review_images_title: string | null;
@@ -62,24 +55,17 @@ export default function EditLandingPage() {
         existing_hero_images: landingPage.hero_images || [],
         badge_text: landingPage.badge_text || defaultFormData.badge_text,
         icon_name: landingPage.icon_name || defaultFormData.icon_name,
-        phone: landingPage.phone || defaultFormData.phone,
-        use_cases_title: landingPage.use_cases_title || defaultFormData.use_cases_title,
-        use_cases_subtitle: landingPage.use_cases_subtitle || defaultFormData.use_cases_subtitle,
-        use_cases: landingPage.use_cases || defaultFormData.use_cases,
-        features_title: landingPage.features_title || defaultFormData.features_title,
-        features_subtitle: landingPage.features_subtitle || defaultFormData.features_subtitle,
-        features: landingPage.features || defaultFormData.features,
-        specifications_title: landingPage.specifications_title || defaultFormData.specifications_title,
-        specifications_subtitle: landingPage.specifications_subtitle || defaultFormData.specifications_subtitle,
+        price_banner_original_label: landingPage.price_banner_original_label || '',
+        price_banner_original_price: landingPage.price_banner_original_price || '',
+        price_banner_current_label: landingPage.price_banner_current_label || '',
+        price_banner_current_price: landingPage.price_banner_current_price || '',
+        mid_order_button_text: landingPage.mid_order_button_text || '',
+        mid_order_button_icon: landingPage.mid_order_button_icon || '',
+        benefits_sections: landingPage.benefits_sections || [],
         authentic_badge_text: landingPage.authentic_badge_text || defaultFormData.authentic_badge_text,
         authentic_badge_icon: landingPage.authentic_badge_icon || defaultFormData.authentic_badge_icon,
         delivery_badge_text: landingPage.delivery_badge_text || defaultFormData.delivery_badge_text,
         delivery_badge_icon: landingPage.delivery_badge_icon || defaultFormData.delivery_badge_icon,
-        specifications: landingPage.specifications || defaultFormData.specifications,
-        why_buy_title: landingPage.why_buy_title || defaultFormData.why_buy_title,
-        why_buy_super_text: landingPage.why_buy_super_text || defaultFormData.why_buy_super_text,
-        why_buy_subtitle: landingPage.why_buy_subtitle || defaultFormData.why_buy_subtitle,
-        why_buy: landingPage.why_buy || defaultFormData.why_buy,
         checkout_banner_text: landingPage.checkout_banner_text || defaultFormData.checkout_banner_text,
         checkout_title: landingPage.checkout_title || defaultFormData.checkout_title,
         review_images_title: landingPage.review_images_title || defaultFormData.review_images_title,

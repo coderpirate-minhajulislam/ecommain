@@ -1,33 +1,19 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import {
-    Award,
-    Battery,
-    Bluetooth,
-    Box,
     CheckCircle,
     ChevronRight,
-    Cpu,
-    Headphones,
     Headset,
-    ListChecks,
     Lock,
-    MapPin,
     MessageCircle,
     Minus,
     Phone,
-    PlayCircle,
     Plus,
     RefreshCcw,
-    Shield,
     ShieldCheck,
-    Signal,
     Tag,
-    ThumbsUp,
     Truck,
     Upload,
-    Volume2,
     Wallet,
-    Wifi,
     X,
     Zap,
 } from 'lucide-react';
@@ -76,7 +62,6 @@ type LandingPageData = {
     hero_images: string[] | null;
     badge_text: string | null;
     icon_name: string | null;
-    phone: string | null;
     authentic_badge_text: string | null;
     authentic_badge_icon: string | null;
     delivery_badge_text: string | null;
@@ -87,8 +72,7 @@ type LandingPageData = {
     price_banner_current_price: string | null;
     mid_order_button_text: string | null;
     mid_order_button_icon: string | null;
-    benefits_items: string[] | null;
-    benefits_title: string | null;
+    benefits_sections: { title: string; items: string[] }[] | null;
     checkout_banner_text: string | null;
     checkout_title: string | null;
     review_images_title: string | null;
@@ -173,7 +157,7 @@ function FloatingSupportBtn({ siteBranding }: { siteBranding?: { title?: string;
     return (
         <div className="fixed bottom-20 left-4 z-50 flex flex-col items-start gap-2 lg:bottom-6">
             {open && (
-                <div className="mb-1 flex flex-col gap-2">
+                <div className="flex flex-col gap-2 mb-1">
                     {whatsapp && (
                         <a href={`https://wa.me/${whatsapp}`} target="_blank" rel="noopener noreferrer" className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110" title="WhatsApp">
                             <MessageCircle className="h-4 w-4" />
@@ -194,7 +178,7 @@ function FloatingSupportBtn({ siteBranding }: { siteBranding?: { title?: string;
 }
 
 export default function LandingPage() {
-    const { product, landingPage, paymentMethods: serverMethods, extraProducts = [], gtmId, gtmSsUrl, metaPixelId, pixelExternalId, tiktokPixelId, freeShippingAmount = 0, freeShippingEnabled = true, siteBranding, labels, hasGlobalCoupons, couponProductIds, isBlocked, shippingZones: serverZones = [], shippingZoneClasses = [], viewEventId } = usePage<{ product: Product; landingPage: LandingPageData; paymentMethods: PaymentMethodOption[]; extraProducts: ExtraProduct[]; gtmId?: string; gtmSsUrl?: string; metaPixelId?: string; pixelExternalId?: string; tiktokPixelId?: string; freeShippingAmount: number; freeShippingEnabled: boolean; siteBranding?: { title?: string; phone?: string; whatsapp?: string }; labels?: Record<string, string>; hasGlobalCoupons?: boolean; couponProductIds?: number[]; isBlocked?: boolean; shippingZones?: string[]; shippingZoneClasses?: { name: string; districts?: string[] | null }[]; viewEventId?: string }>().props;
+    const { product, landingPage, paymentMethods: serverMethods, extraProducts = [], gtmId, gtmSsUrl, metaPixelId, pixelExternalId, tiktokPixelId, freeShippingAmount = 0, freeShippingEnabled = true, siteBranding, labels, hasGlobalCoupons, couponProductIds, isBlocked, shippingZones: serverZones = [], shippingZoneClasses = [], viewEventId } = usePage<{ product: Product; landingPage: LandingPageData; paymentMethods: PaymentMethodOption[]; extraProducts: ExtraProduct[]; gtmId?: string; gtmSsUrl?: string; metaPixelId?: string; pixelExternalId?: string; tiktokPixelId?: string; freeShippingAmount: number; freeShippingEnabled: boolean; siteBranding?: { logo?: string; title?: string; phone?: string; whatsapp?: string }; labels?: Record<string, string>; hasGlobalCoupons?: boolean; couponProductIds?: number[]; isBlocked?: boolean; shippingZones?: string[]; shippingZoneClasses?: { name: string; districts?: string[] | null }[]; viewEventId?: string }>().props;
 
     const [selectedVariantId, setSelectedVariantId] = useState<number | null>(null);
     const [extraVariants, setExtraVariants] = useState<Record<number, number | null>>({});
@@ -902,23 +886,20 @@ export default function LandingPage() {
             <div className="landing-page dark min-h-screen bg-background text-foreground">
                 {/* ── Sticky Top Bar ── */}
                 <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
-                    <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">
-                        <div className="flex items-center gap-3">
-                            <span className="text-sm font-bold text-foreground">{siteBranding?.title || 'Our Store'}</span>
-                            {landingPage.phone && (
-                                <a href={`tel:${landingPage.phone.replace(/[^+\d]/g, '')}`} className="flex items-center gap-1 text-xs text-primary hover:underline sm:text-sm">
-                                    <Phone className="h-3.5 w-3.5" />
-                                    <span className="hidden sm:inline">{landingPage.phone}</span>
-                                </a>
+                    <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-2 sm:px-4">
+                        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+                            {siteBranding?.logo && (
+                                <img src={`/${siteBranding.logo}`} alt={siteBranding?.title || 'Logo'} className="h-6 w-auto shrink-0 rounded sm:h-7 lg:h-8" />
                             )}
+                            <span className="truncate text-xs font-bold text-foreground sm:text-sm">{siteBranding?.title || 'Our Store'}</span>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
                             {countdownRemaining && (
-                                <div className="flex items-center gap-1">
+                                <div className="flex items-center gap-0.5 sm:gap-1">
                                     {(['days', 'hours', 'minutes', 'seconds'] as const).map((unit, idx) => (
                                         <span key={unit} className="flex items-center">
-                                            {idx > 0 && <span className="mx-0.5 text-xs font-bold text-primary">:</span>}
-                                            <span className="flex h-7 w-7 items-center justify-center rounded bg-primary text-[10px] font-bold text-primary-foreground sm:h-8 sm:w-8 sm:text-xs">
+                                            {idx > 0 && <span className="mx-0.5 text-[10px] font-bold text-primary sm:text-xs">:</span>}
+                                            <span className="flex h-6 w-6 items-center justify-center rounded bg-primary text-[8px] font-bold text-primary-foreground sm:h-7 sm:w-7 sm:text-[10px] lg:h-8 lg:w-8 lg:text-xs">
                                                 {String(countdownRemaining[unit]).padStart(2, '0')}
                                             </span>
                                         </span>
@@ -928,9 +909,9 @@ export default function LandingPage() {
                             <button
                                 type="button"
                                 onClick={scrollToCheckout}
-                                className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-105"
+                                className="flex shrink-0 items-center gap-1 rounded-full bg-primary px-2 py-1 text-[10px] font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-105 sm:gap-1.5 sm:px-3 sm:py-1.5 sm:text-xs"
                             >
-                                {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-3.5 w-3.5')}
+                                {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-3 w-3')}
                                 {landingPage.badge_text || 'Limited Offer'}
                             </button>
                         </div>
@@ -972,9 +953,10 @@ export default function LandingPage() {
                                     size="lg"
                                     type="button"
                                     onClick={scrollToCheckout}
-                                    className="px-8 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90"
+                                    className="px-10 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90"
                                 >
-                                    {landingPage.order_now_text || 'Order Now'} <ChevronRight className="ml-1 h-4 w-4" />
+                                    {getIconComponent(landingPage.mid_order_button_icon || 'shopping-cart', 'h-5 w-5 mr-2')}
+                                    {landingPage.mid_order_button_text || 'Order Now'}
                                 </Button>
                             </div>
                         </div>
@@ -996,34 +978,67 @@ export default function LandingPage() {
 
                 {/* ── Price Banner ── */}
                 {(landingPage.price_banner_original_label || landingPage.price_banner_original_price || landingPage.price_banner_current_label || landingPage.price_banner_current_price) && (
-                    <section className="bg-gradient-to-r from-orange-500 via-orange-400 to-amber-400">
+                    <>
+                    <style>{`
+                        @keyframes pricePulse {
+                            0%, 100% { text-decoration-thickness: 2px; }
+                            50% { text-decoration-thickness: 4px; }
+                        }
+                        .price-underline-anim {
+                            text-decoration: underline;
+                            text-decoration-color: hsl(var(--primary));
+                            text-underline-offset: 4px;
+                            animation: pricePulse 2s ease-in-out infinite;
+                        }
+                    `}</style>
+                    <section className="bg-primary/5">
                         <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
-                            {landingPage.price_banner_original_label && landingPage.price_banner_original_price && (
-                                <div className="mb-3 rounded-lg bg-red-400/90 px-6 py-3 text-center">
-                                    <p className="text-sm font-bold text-white sm:text-base">
+                            <div className="rounded-xl bg-card px-6 py-5 text-center shadow-sm border border-border">
+                                {landingPage.price_banner_original_label && landingPage.price_banner_original_price && (
+                                    <p className="mb-3 text-lg font-bold text-muted-foreground sm:text-xl">
                                         {landingPage.price_banner_original_label}{' '}
-                                        <span className="relative inline-block">
-                                            <span className="line-through decoration-2">{landingPage.price_banner_original_price} ৳</span>
-                                            <span className="absolute left-1/2 top-1/2 h-0.5 w-full -translate-x-1/2 -translate-y-1/2 rotate-[-15deg] bg-red-900" />
+                                        <span className="relative inline-block ml-1">
+                                            <span className="line-through decoration-2 decoration-destructive text-destructive text-xl sm:text-2xl">{landingPage.price_banner_original_price} ৳</span>
                                         </span>
                                     </p>
-                                </div>
-                            )}
-                            {landingPage.price_banner_current_label && landingPage.price_banner_current_price && (
-                                <div className="rounded-lg bg-amber-600/90 px-6 py-3 text-center">
-                                    <p className="text-sm font-bold text-white sm:text-base">
+                                )}
+                                {landingPage.price_banner_current_label && landingPage.price_banner_current_price && (
+                                    <p className="text-lg font-bold text-primary sm:text-xl">
                                         {landingPage.price_banner_current_label}{' '}
-                                        <span className="underline decoration-2 underline-offset-2">{landingPage.price_banner_current_price} ৳</span>
+                                        <span className="ml-1 text-2xl font-extrabold sm:text-3xl price-underline-anim">{landingPage.price_banner_current_price} ৳</span>
                                     </p>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
                     </section>
+                    </>
                 )}
 
-                {/* ── Mid-Page Order Button ── */}
+                {/* ── Mid-Page Order Button with Timer ── */}
                 <section className="bg-card border-t border-border">
                     <div className="mx-auto max-w-3xl px-4 py-8 text-center sm:py-12">
+                        {countdownRemaining && (
+                            <div className="mb-5 flex items-center justify-center gap-2 sm:gap-3">
+                                <div className="flex items-center gap-1 sm:gap-1.5">
+                                    {(['days', 'hours', 'minutes', 'seconds'] as const).map((unit, idx) => (
+                                        <span key={unit} className="flex items-center">
+                                            {idx > 0 && <span className="mx-0.5 text-sm font-bold text-primary sm:text-base">:</span>}
+                                            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground shadow-sm sm:h-11 sm:w-11 sm:text-base lg:h-12 lg:w-12 lg:text-lg">
+                                                {String(countdownRemaining[unit]).padStart(2, '0')}
+                                            </span>
+                                        </span>
+                                    ))}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={scrollToCheckout}
+                                    className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-105 sm:px-4 sm:py-2.5 sm:text-sm"
+                                >
+                                    {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-4 w-4')}
+                                    {landingPage.badge_text || 'Limited Offer'}
+                                </button>
+                            </div>
+                        )}
                         <Button
                             size="lg"
                             type="button"
@@ -1036,33 +1051,38 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* ── Benefits Checklist ── */}
-                <section className="bg-primary/5">
-                    <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
-                        {landingPage.benefits_title && (
-                            <h2 className="mb-6 text-center text-xl font-extrabold text-foreground sm:text-2xl md:text-3xl">
-                                {landingPage.benefits_title}
-                            </h2>
-                        )}
-                        <div className="space-y-0 rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-                            {(landingPage.benefits_items || [
-                                'Everything included in one package',
-                                'Premium quality materials and craftsmanship',
-                                'Perfect gift for yourself or loved ones',
-                                'Great value — save more when you buy together',
-                                'Cash on delivery available',
-                                '7-day return guarantee for peace of mind',
-                            ]).map((item, i) => (
-                                <div key={i} className={`flex items-center gap-4 px-5 py-4 ${i > 0 ? 'border-t border-border' : ''}`}>
-                                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-green-500 text-white">
-                                        <CheckCircle className="h-4 w-4" />
+                {/* ── Benefits Sections (Side by Side) ── */}
+                {(landingPage.benefits_sections && landingPage.benefits_sections.length > 0) && (
+                    <section className="bg-primary/5">
+                        <div className="mx-auto max-w-6xl px-4 py-10 sm:py-14">
+                            <div className={`grid gap-6 ${landingPage.benefits_sections.length === 1 ? 'md:grid-cols-1 md:max-w-3xl md:mx-auto' : 'md:grid-cols-2'}`}>
+                                {landingPage.benefits_sections.map((section, si) => (
+                                    <div key={si} className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                                        {section.title && (
+                                            <div className="bg-primary px-5 py-3">
+                                                <h2 className="text-base font-bold text-primary-foreground sm:text-lg md:text-xl text-center">
+                                                    {section.title}
+                                                </h2>
+                                            </div>
+                                        )}
+                                        {section.items && section.items.length > 0 && (
+                                            <div className="space-y-0">
+                                                {section.items.map((item, i) => (
+                                                    <div key={i} className={`flex items-center gap-4 px-5 py-4 ${i > 0 ? 'border-t border-border' : ''}`}>
+                                                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-green-500 text-white">
+                                                            <CheckCircle className="h-4 w-4" />
+                                                        </div>
+                                                        <span className="text-sm text-foreground leading-relaxed">{item}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
-                                    <span className="text-sm text-foreground leading-relaxed">{item}</span>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
+                )}
 
                 {/* ── Review Images Gallery ── */}
                 {landingPage.review_images && landingPage.review_images.length > 0 && (
