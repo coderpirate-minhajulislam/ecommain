@@ -487,13 +487,7 @@ class ShopController extends Controller
         // (via /api/tracking/view-content) so the request carries the settled _fbc cookie.
         $viewEventId = \App\Services\TrackingService::eventId('view');
 
-        $view = match ($landingPage->template) {
-            'v2'    => 'shop/landing-v2',
-            'v3'    => 'shop/landing-v3',
-            default => 'shop/landing',
-        };
-
-        return Inertia::render($view, [
+        return Inertia::render('shop/landing', [
             'landingPage'         => $landingPage,
             'viewEventId'         => $viewEventId,
             'product'             => $product,

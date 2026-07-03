@@ -1,13 +1,9 @@
-import { ChevronDown, Plus, Trash2, Upload, X } from 'lucide-react';
+import { ChevronDown, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { IconPicker } from '@/components/icon-picker';
 
 type ProductOption = { id: number; name: string };
 
-type UseCase = { label: string; icon_name?: string };
-type Feature = { title: string; desc: string; icon_name?: string };
-type Specification = { title: string; specs: string[]; icon_name?: string };
-type WhyBuy = { title: string; desc: string; icon_name?: string };
 
 export type LandingPageFormData = {
     product_id: string;
@@ -21,23 +17,18 @@ export type LandingPageFormData = {
     badge_text: string;
     icon_name: string;
     phone: string;
-    use_cases_title: string;
-    use_cases_subtitle: string;
-    use_cases: UseCase[];
-    features_title: string;
-    features_subtitle: string;
-    features: Feature[];
-    specifications_title: string;
-    specifications_subtitle: string;
     authentic_badge_text: string;
     authentic_badge_icon: string;
     delivery_badge_text: string;
     delivery_badge_icon: string;
-    specifications: Specification[];
-    why_buy_title: string;
-    why_buy_super_text: string;
-    why_buy_subtitle: string;
-    why_buy: WhyBuy[];
+    price_banner_original_label: string;
+    price_banner_original_price: string;
+    price_banner_current_label: string;
+    price_banner_current_price: string;
+    mid_order_button_text: string;
+    mid_order_button_icon: string;
+    benefits_items: string[];
+    benefits_title: string;
     checkout_banner_text: string;
     checkout_title: string;
     review_images_title: string;
@@ -66,53 +57,25 @@ export const defaultFormData: LandingPageFormData = {
     badge_text: 'Limited Offer',
     icon_name: 'package',
     phone: '+1 (234) 567-890',
-    use_cases_title: 'What Is This Product Used For?',
-    use_cases_subtitle: 'Discover the many ways this product makes your life easier',
-    use_cases: [
-        { label: 'Track Your Keys', icon_name: 'package' },
-        { label: 'Find Your Bags', icon_name: 'box' },
-        { label: 'Secure Valuables', icon_name: 'shield' },
-        { label: 'Remote Tracking', icon_name: 'zap' },
-        { label: 'Ring to Find', icon_name: 'zap' },
-        { label: 'Wide Range', icon_name: 'wifi' },
-        { label: 'Long Battery Life', icon_name: 'battery' },
-        { label: 'Easy Connection', icon_name: 'gift' },
-    ],
-    features_title: 'Amazing Features That Keep You Worry-Free',
-    features_subtitle: 'Engineered with cutting-edge technology for your peace of mind',
-    features: [
-        { title: 'Bluetooth 5.1', desc: 'Latest Bluetooth technology for fast, stable connections', icon_name: 'zap' },
-        { title: 'Long Battery', desc: 'Up to 12 months battery life on a single charge', icon_name: 'battery' },
-        { title: 'Loud Speaker', desc: 'Built-in speaker rings loud so you can find things fast', icon_name: 'gift' },
-        { title: 'Instant Alerts', desc: 'Get notified immediately when you leave something behind', icon_name: 'zap' },
-        { title: 'Privacy First', desc: 'Encrypted communications keep your data fully secure', icon_name: 'shield' },
-        { title: 'Smart Chip', desc: 'Advanced processor for accurate real-time tracking', icon_name: 'award' },
-        { title: 'Replaceable Battery', desc: 'Easy to replace standard battery — no charging needed', icon_name: 'box' },
-        { title: '24/7 Support', desc: 'Our support team is always ready to help you', icon_name: 'heart' },
-    ],
-    specifications_title: 'Detailed Specifications',
-    specifications_subtitle: 'Everything you need to know about this product',
     authentic_badge_text: '100% Authentic Product',
     authentic_badge_icon: 'shield-check',
     delivery_badge_text: 'Free Shipping',
     delivery_badge_icon: 'truck',
-    specifications: [
-        { title: 'Connectivity', specs: ['Bluetooth 5.1', 'Compatible with iOS & Android', 'Range up to 100ft'], icon_name: 'wifi' },
-        { title: 'Battery', specs: ['CR2032 Coin Cell', 'Up to 12 months', 'Easy replacement'], icon_name: 'battery' },
-        { title: 'Security', specs: ['End-to-end encryption', 'Anti-stalking feature', 'Privacy certified'], icon_name: 'shield' },
-        { title: 'Dimensions', specs: ['Compact & lightweight', 'Water-resistant design', 'Durable materials'], icon_name: 'box' },
-        { title: 'Performance', specs: ['Ultra-low latency', 'Location accuracy', 'Real-time updates'], icon_name: 'zap' },
-        { title: 'Warranty', specs: ['1 year guarantee', 'Free replacements', '30-day returns'], icon_name: 'award' },
+    price_banner_original_label: 'Regular Price',
+    price_banner_original_price: '2,500',
+    price_banner_current_label: 'Current Offer Price',
+    price_banner_current_price: '1,500',
+    mid_order_button_text: 'Order Now',
+    mid_order_button_icon: 'shopping-cart',
+    benefits_items: [
+        'Everything included in one package',
+        'Premium quality materials and craftsmanship',
+        'Perfect gift for yourself or loved ones',
+        'Great value — save more when you buy together',
+        'Cash on delivery available',
+        '7-day return guarantee for peace of mind',
     ],
-    why_buy_title: 'Why Buy From Us?',
-    why_buy_super_text: 'Customers love our store',
-    why_buy_subtitle: 'We\'re committed to your satisfaction every step of the way',
-    why_buy: [
-        { title: '1 Year Warranty', desc: 'Full product warranty', icon_name: 'award' },
-        { title: '7-Day Returns', desc: 'Easy return policy', icon_name: 'check-circle' },
-        { title: 'Fast Delivery', desc: 'Nationwide shipping', icon_name: 'truck' },
-        { title: '100% Genuine', desc: 'Authentic products only', icon_name: 'star' },
-    ],
+    benefits_title: 'Why Buy This Package?',
     checkout_banner_text: 'Order now and get free shipping on orders over $50!',
     checkout_title: 'Order Now',
     review_images_title: 'Customer Reviews',
@@ -236,45 +199,6 @@ export function LandingPageForm({
             setData('extra_product_ids', [...current, id]);
         }
     }
-    function updateArrayItem<T>(field: string, index: number, key: keyof T, value: string) {
-        const arr = [...(data[field as keyof LandingPageFormData] as T[])];
-        arr[index] = { ...arr[index], [key]: value };
-        setData(field, arr);
-    }
-
-    function addArrayItem<T>(field: string, template: T) {
-        const arr = [...(data[field as keyof LandingPageFormData] as T[]), template];
-        setData(field, arr);
-    }
-
-    function removeArrayItem<T>(field: string, index: number) {
-        const arr = [...(data[field as keyof LandingPageFormData] as T[])];
-        arr.splice(index, 1);
-        setData(field, arr);
-    }
-
-    function updateSpecItem(specIndex: number, itemIndex: number, value: string) {
-        const specs = [...data.specifications];
-        const updated = { ...specs[specIndex], specs: [...specs[specIndex].specs] };
-        updated.specs[itemIndex] = value;
-        specs[specIndex] = updated;
-        setData('specifications', specs);
-    }
-
-    function addSpecItem(specIndex: number) {
-        const specs = [...data.specifications];
-        specs[specIndex] = { ...specs[specIndex], specs: [...specs[specIndex].specs, ''] };
-        setData('specifications', specs);
-    }
-
-    function removeSpecItem(specIndex: number, itemIndex: number) {
-        const specs = [...data.specifications];
-        const updatedSpecs = [...specs[specIndex].specs];
-        updatedSpecs.splice(itemIndex, 1);
-        specs[specIndex] = { ...specs[specIndex], specs: updatedSpecs };
-        setData('specifications', specs);
-    }
-
     return (
         <div className="max-w-3xl space-y-5">
             {/* ── General Settings ── */}
@@ -342,13 +266,7 @@ export function LandingPageForm({
                     <label htmlFor="template" className={labelClass}>Template</label>
                     <select id="template" value={data.template || 'v1'} onChange={(e) => setData('template', e.target.value)} className={inputClass}>
                         <option value="v1">V1 — Dark (Original)</option>
-                        <option value="v2">V2 — Light (Image-Rich)</option>
-                        <option value="v3">V3 — Modern (Split Hero + Grid)</option>
                     </select>
-                    <p className="text-xs text-muted-foreground">
-                        V2 — light background, large images, feature showcase, two-column layout and review sections.
-                        V3 — modern split hero (text left, image carousel right), auto-sliding images, icon grid use-cases, feature cards, sticky mobile order bar and floating support buttons.
-                    </p>
                 </div>
 
                 {/* ── Free Shipping Override ── */}
@@ -543,152 +461,63 @@ export function LandingPageForm({
                 </div>
             </Section>
 
-            {/* ── Use Cases ── */}
-            <Section title="Use Cases Section">
+            {/* ── Mid-Page Order Button ── */}
+            <Section title="Mid-Page Order Button">
+                <p className="text-xs text-muted-foreground mb-3">Adds an "Order Now" button and checklist section after the price banner.</p>
                 <div className="space-y-2">
-                    <label htmlFor="use_cases_title" className={labelClass}>Section Title</label>
-                    <input id="use_cases_title" type="text" value={data.use_cases_title} onChange={(e) => setData('use_cases_title', e.target.value)} className={inputClass} />
+                    <label htmlFor="mid_order_button_text" className={labelClass}>Button Text</label>
+                    <input id="mid_order_button_text" type="text" value={data.mid_order_button_text} onChange={(e) => setData('mid_order_button_text', e.target.value)} className={inputClass} placeholder="Order Now" />
                 </div>
                 <div className="space-y-2">
-                    <label htmlFor="use_cases_subtitle" className={labelClass}>Section Subtitle</label>
-                    <input id="use_cases_subtitle" type="text" value={data.use_cases_subtitle} onChange={(e) => setData('use_cases_subtitle', e.target.value)} className={inputClass} placeholder="Discover the many ways this product makes your life easier" />
-                </div>
-                <div className="space-y-2">
-                    <label className={labelClass}>Items</label>
-                    <div className="space-y-3">
-                        {data.use_cases.map((item, i) => (
-                            <div key={i} className="flex flex-col gap-2 rounded-lg border border-input p-3">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-6 text-center text-xs text-muted-foreground">{i + 1}</span>
-                                    <textarea rows={2} value={item.label} onChange={(e) => updateArrayItem<UseCase>('use_cases', i, 'label', e.target.value)} className={inputClass} placeholder="Use case label" />
-                                    <button type="button" onClick={() => removeArrayItem<UseCase>('use_cases', i)} className="p-1.5 text-muted-foreground hover:text-destructive">
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                                <div>
-                                    <label className={labelClass + ' block mb-2'}>Icon</label>
-                                    <IconPicker
-                                        value={item.icon_name}
-                                        onChange={(val) => updateArrayItem<UseCase>('use_cases', i, 'icon_name', val)}
-                                    />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <button type="button" onClick={() => addArrayItem<UseCase>('use_cases', { label: '', icon_name: 'package' })} className="flex items-center gap-1 text-sm text-primary hover:underline">
-                        <Plus className="h-3.5 w-3.5" /> Add Use Case
-                    </button>
+                    <label className={labelClass}>Button Icon</label>
+                    <IconPicker value={data.mid_order_button_icon} onChange={(val) => setData('mid_order_button_icon', val)} />
                 </div>
             </Section>
 
-            {/* ── Features ── */}
-            <Section title="Features Section">
+            {/* ── Benefits Checklist ── */}
+            <Section title="Benefits Checklist">
                 <div className="space-y-2">
-                    <label htmlFor="features_title" className={labelClass}>Section Title</label>
-                    <input id="features_title" type="text" value={data.features_title} onChange={(e) => setData('features_title', e.target.value)} className={inputClass} />
+                    <label htmlFor="benefits_title" className={labelClass}>Section Title</label>
+                    <input id="benefits_title" type="text" value={data.benefits_title} onChange={(e) => setData('benefits_title', e.target.value)} className={inputClass} placeholder="Why Buy This Package?" />
                 </div>
                 <div className="space-y-2">
-                    <label htmlFor="features_subtitle" className={labelClass}>Section Subtitle</label>
-                    <input id="features_subtitle" type="text" value={data.features_subtitle} onChange={(e) => setData('features_subtitle', e.target.value)} className={inputClass} placeholder="Engineered with cutting-edge technology for your peace of mind" />
-                </div>
-                <div className="space-y-3">
-                    <label className={labelClass}>Feature Cards</label>
-                    {data.features.map((item, i) => (
-                        <div key={i} className="flex flex-col gap-2 rounded-lg border border-input p-3">
-                            <div className="flex items-start gap-2">
-                                <span className="mt-2 w-5 text-center text-xs text-muted-foreground">{i + 1}</span>
-                                <div className="flex-1 space-y-2">
-                                    <input type="text" value={item.title} onChange={(e) => updateArrayItem<Feature>('features', i, 'title', e.target.value)} className={inputClass} placeholder="Feature title" />
-                                    <textarea rows={2} value={item.desc} onChange={(e) => updateArrayItem<Feature>('features', i, 'desc', e.target.value)} className={inputClass} placeholder="Feature description" />
-                                    <div>
-                                        <label className={labelClass + ' block mb-2'}>Icon</label>
-                                        <IconPicker
-                                            value={item.icon_name}
-                                            onChange={(val) => updateArrayItem<Feature>('features', i, 'icon_name', val)}
-                                        />
-                                    </div>
-                                </div>
-                                <button type="button" onClick={() => removeArrayItem<Feature>('features', i)} className="mt-2 p-1.5 text-muted-foreground hover:text-destructive">
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    <button type="button" onClick={() => addArrayItem<Feature>('features', { title: '', desc: '', icon_name: 'zap' })} className="flex items-center gap-1 text-sm text-primary hover:underline">
-                        <Plus className="h-3.5 w-3.5" /> Add Feature
-                    </button>
+                    <label className={labelClass}>Benefit Items (one per line)</label>
+                    <textarea
+                        value={(data.benefits_items || []).join('\n')}
+                        onChange={(e) => setData('benefits_items', e.target.value.split('\n').filter((s: string) => s.trim()))}
+                        rows={6}
+                        className={inputClass}
+                        placeholder="Everything included in one package&#10;Premium quality materials&#10;Great value"
+                    />
+                    <p className="text-xs text-muted-foreground">Enter each benefit on a new line.</p>
                 </div>
             </Section>
 
-            {/* ── Specifications ── */}
-            <Section title="Specifications Section">
-                <div className="space-y-2">
-                    <label htmlFor="specifications_title" className={labelClass}>Section Title</label>
-                    <input id="specifications_title" type="text" value={data.specifications_title} onChange={(e) => setData('specifications_title', e.target.value)} className={inputClass} />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="specifications_subtitle" className={labelClass}>Section Subtitle</label>
-                    <input id="specifications_subtitle" type="text" value={data.specifications_subtitle} onChange={(e) => setData('specifications_subtitle', e.target.value)} className={inputClass} placeholder="Everything you need to know about this product" />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                        <label htmlFor="authentic_badge_text" className={labelClass}>Authentic Badge Text</label>
-                        <input id="authentic_badge_text" type="text" value={data.authentic_badge_text} onChange={(e) => setData('authentic_badge_text', e.target.value)} className={inputClass} placeholder="100% Authentic Product" />
-                    </div>
-                    <div className="space-y-2">
-                        <label htmlFor="delivery_badge_text" className={labelClass}>Delivery Badge Text</label>
-                        <input id="delivery_badge_text" type="text" value={data.delivery_badge_text} onChange={(e) => setData('delivery_badge_text', e.target.value)} className={inputClass} placeholder="Free Shipping" />
-                    </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                        <label className={labelClass}>Authentic Badge Icon</label>
-                        <IconPicker value={data.authentic_badge_icon} onChange={(val) => setData('authentic_badge_icon', val)} />
-                    </div>
-                    <div className="space-y-2">
-                        <label className={labelClass}>Delivery Badge Icon</label>
-                        <IconPicker value={data.delivery_badge_icon} onChange={(val) => setData('delivery_badge_icon', val)} />
-                    </div>
-                </div>
-                <div className="space-y-3">
-                    <label className={labelClass}>Specification Groups</label>
-                    {data.specifications.map((group, gi) => (
-                        <div key={gi} className="rounded-lg border border-input p-3 space-y-3">
-                            <div className="flex items-start gap-2">
-                                <div className="flex-1">
-                                    <input type="text" value={group.title} onChange={(e) => updateArrayItem<Specification>('specifications', gi, 'title', e.target.value)} className={inputClass} placeholder="Group title (e.g. Connectivity)" />
-                                </div>
-                                <button type="button" onClick={() => removeArrayItem<Specification>('specifications', gi)} className="p-1.5 text-muted-foreground hover:text-destructive">
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
+            {/* ── Price Banner ── */}
+            <Section title="Price Banner">
+                <div className="space-y-4">
+                    <p className="text-xs text-muted-foreground">Displays a pricing banner after the hero section. Leave all fields empty to hide it.</p>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                                <label className={labelClass}>Original Price Label</label>
+                                <input type="text" value={data.price_banner_original_label} onChange={(e) => setData('price_banner_original_label', e.target.value)} className={inputClass} placeholder="Regular Price" />
                             </div>
-                            <div>
-                                <label className={labelClass + ' block mb-2'}>Icon</label>
-                                <IconPicker
-                                    value={group.icon_name}
-                                    onChange={(val) => updateArrayItem<Specification>('specifications', gi, 'icon_name', val)}
-                                />
-                            </div>
-                            <div className="ml-4 space-y-1.5">
-                                {group.specs.map((spec, si) => (
-                                    <div key={si} className="flex items-center gap-2">
-                                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                        <textarea rows={2} value={spec} onChange={(e) => updateSpecItem(gi, si, e.target.value)} className={inputClass} placeholder="Spec detail" />
-                                        <button type="button" onClick={() => removeSpecItem(gi, si)} className="p-1 text-muted-foreground hover:text-destructive">
-                                            <Trash2 className="h-3.5 w-3.5" />
-                                        </button>
-                                    </div>
-                                ))}
-                                <button type="button" onClick={() => addSpecItem(gi)} className="ml-3.5 flex items-center gap-1 text-xs text-primary hover:underline">
-                                    <Plus className="h-3 w-3" /> Add Spec
-                                </button>
+                            <div className="space-y-2">
+                                <label className={labelClass}>Original Price</label>
+                                <input type="text" value={data.price_banner_original_price} onChange={(e) => setData('price_banner_original_price', e.target.value)} className={inputClass} placeholder="2,500" />
                             </div>
                         </div>
-                    ))}
-                    <button type="button" onClick={() => addArrayItem<Specification>('specifications', { title: '', specs: [''], icon_name: 'package' })} className="flex items-center gap-1 text-sm text-primary hover:underline">
-                        <Plus className="h-3.5 w-3.5" /> Add Specification Group
-                    </button>
-                </div>
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-2">
+                                <label className={labelClass}>Current Price Label</label>
+                                <input type="text" value={data.price_banner_current_label} onChange={(e) => setData('price_banner_current_label', e.target.value)} className={inputClass} placeholder="Current Offer Price" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className={labelClass}>Current Price</label>
+                                <input type="text" value={data.price_banner_current_price} onChange={(e) => setData('price_banner_current_price', e.target.value)} className={inputClass} placeholder="1,500" />
+                            </div>
+                        </div>
+                    </div>
             </Section>
 
             {/* ── Review Images ── */}
@@ -699,7 +528,7 @@ export function LandingPageForm({
                     {errors.review_images_title && <p className="text-sm text-destructive">{errors.review_images_title}</p>}
                 </div>
                 <div className="space-y-3">
-                    <label className={labelClass}>Upload review screenshots or customer feedback images <span className="text-xs text-muted-foreground">(gallery shown below specifications on V2)</span></label>
+                    <label className={labelClass}>Upload review screenshots or customer feedback images</label>
 
                     {/* Existing images */}
                     {(data.existing_review_images as string[]).length > 0 && (
@@ -774,49 +603,6 @@ export function LandingPageForm({
                             );
                         })()}
                     </div>
-                </div>
-            </Section>
-
-            {/* ── Why Buy From Us ── */}
-            <Section title="Why Buy From Us Section">
-                <div className="space-y-2">
-                    <label htmlFor="why_buy_title" className={labelClass}>Section Title</label>
-                    <input id="why_buy_title" type="text" value={data.why_buy_title} onChange={(e) => setData('why_buy_title', e.target.value)} className={inputClass} />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="why_buy_super_text" className={labelClass}>Pre-heading Text</label>
-                    <input id="why_buy_super_text" type="text" value={data.why_buy_super_text} onChange={(e) => setData('why_buy_super_text', e.target.value)} className={inputClass} placeholder="Customers love our store" />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="why_buy_subtitle" className={labelClass}>Section Subtitle</label>
-                    <input id="why_buy_subtitle" type="text" value={data.why_buy_subtitle} onChange={(e) => setData('why_buy_subtitle', e.target.value)} className={inputClass} placeholder="We're committed to your satisfaction every step of the way" />
-                </div>
-                <div className="space-y-3">
-                    <label className={labelClass}>Trust Items</label>
-                    {data.why_buy.map((item, i) => (
-                        <div key={i} className="flex flex-col gap-2 rounded-lg border border-input p-3">
-                            <div className="flex items-start gap-2">
-                                <span className="mt-2 w-5 text-center text-xs text-muted-foreground">{i + 1}</span>
-                                <div className="flex-1 space-y-2">
-                                    <input type="text" value={item.title} onChange={(e) => updateArrayItem<WhyBuy>('why_buy', i, 'title', e.target.value)} className={inputClass} placeholder="Title (e.g. 1 Year Warranty)" />
-                                    <textarea rows={2} value={item.desc} onChange={(e) => updateArrayItem<WhyBuy>('why_buy', i, 'desc', e.target.value)} className={inputClass} placeholder="Description" />
-                                </div>
-                                <button type="button" onClick={() => removeArrayItem<WhyBuy>('why_buy', i)} className="mt-2 p-1.5 text-muted-foreground hover:text-destructive">
-                                    <Trash2 className="h-4 w-4" />
-                                </button>
-                            </div>
-                            <div>
-                                <label className={labelClass + ' block mb-2'}>Icon</label>
-                                <IconPicker
-                                    value={item.icon_name}
-                                    onChange={(val) => updateArrayItem<WhyBuy>('why_buy', i, 'icon_name', val)}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                    <button type="button" onClick={() => addArrayItem<WhyBuy>('why_buy', { title: '', desc: '', icon_name: 'heart' })} className="flex items-center gap-1 text-sm text-primary hover:underline">
-                        <Plus className="h-3.5 w-3.5" /> Add Trust Item
-                    </button>
                 </div>
             </Section>
 

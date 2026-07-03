@@ -77,23 +77,18 @@ type LandingPageData = {
     badge_text: string | null;
     icon_name: string | null;
     phone: string | null;
-    use_cases: { label: string; icon_name?: string }[] | null;
-    use_cases_title: string | null;
-    use_cases_subtitle: string | null;
-    features: { title: string; desc: string; icon_name?: string }[] | null;
-    features_title: string | null;
-    features_subtitle: string | null;
-    specifications: { title: string; specs: string[]; icon_name?: string }[] | null;
-    specifications_title: string | null;
-    specifications_subtitle: string | null;
     authentic_badge_text: string | null;
     authentic_badge_icon: string | null;
     delivery_badge_text: string | null;
     delivery_badge_icon: string | null;
-    why_buy: { title: string; desc: string; icon_name?: string }[] | null;
-    why_buy_title: string | null;
-    why_buy_super_text: string | null;
-    why_buy_subtitle: string | null;
+    price_banner_original_label: string | null;
+    price_banner_original_price: string | null;
+    price_banner_current_label: string | null;
+    price_banner_current_price: string | null;
+    mid_order_button_text: string | null;
+    mid_order_button_icon: string | null;
+    benefits_items: string[] | null;
+    benefits_title: string | null;
     checkout_banner_text: string | null;
     checkout_title: string | null;
     review_images_title: string | null;
@@ -211,7 +206,6 @@ export default function LandingPage() {
     const [deliveryZone, setDeliveryZone] = useState('');
     const [countdownRemaining, setCountdownRemaining] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [selectedReviewIndex, setSelectedReviewIndex] = useState(0);
     const [videoOpen, setVideoOpen] = useState(false);
     const checkoutRef = useRef<HTMLDivElement>(null);
 
@@ -899,44 +893,6 @@ export default function LandingPage() {
     const productFirstImage = product.images?.[0]?.image_path ? `/${product.images[0].image_path}` : null;
     const heroImage = heroImages.length > 0 ? heroImages[0].src : productFirstImage;
 
-    const useCaseIcons = [
-        <MapPin key="mp" className="h-5 w-5 text-primary" />,
-        <Box key="bx" className="h-5 w-5 text-primary" />,
-        <Shield key="sh" className="h-5 w-5 text-primary" />,
-        <Wifi key="wf" className="h-5 w-5 text-primary" />,
-        <Volume2 key="v2" className="h-5 w-5 text-primary" />,
-        <Signal key="sg" className="h-5 w-5 text-primary" />,
-        <Battery key="bt" className="h-5 w-5 text-primary" />,
-        <Bluetooth key="bl" className="h-5 w-5 text-primary" />,
-    ];
-
-    const featureIcons = [
-        <Bluetooth key="bl" className="h-5 w-5 text-primary" />,
-        <Battery key="bt" className="h-5 w-5 text-primary" />,
-        <Volume2 key="v2" className="h-5 w-5 text-primary" />,
-        <Zap key="zp" className="h-5 w-5 text-primary" />,
-        <Shield key="sh" className="h-5 w-5 text-primary" />,
-        <Cpu key="cp" className="h-5 w-5 text-primary" />,
-        <RefreshCcw key="rc" className="h-5 w-5 text-primary" />,
-        <Headphones key="hp" className="h-5 w-5 text-primary" />,
-    ];
-
-    const specIcons = [
-        <Bluetooth key="bl" className="h-4 w-4 text-primary" />,
-        <Battery key="bt" className="h-4 w-4 text-primary" />,
-        <Shield key="sh" className="h-4 w-4 text-primary" />,
-        <ListChecks key="lc" className="h-4 w-4 text-primary" />,
-        <Zap key="zp" className="h-4 w-4 text-primary" />,
-        <Award key="aw" className="h-4 w-4 text-primary" />,
-    ];
-
-    const whyBuyIcons = [
-        <ShieldCheck key="sc" className="h-6 w-6 text-primary" />,
-        <RefreshCcw key="rc" className="h-6 w-6 text-primary" />,
-        <Truck key="tr" className="h-6 w-6 text-primary" />,
-        <ThumbsUp key="tu" className="h-6 w-6 text-primary" />,
-    ];
-
     return (
         <>
             <Head title={landingPage.title} />
@@ -947,72 +903,84 @@ export default function LandingPage() {
                 {/* ── Sticky Top Bar ── */}
                 <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur">
                     <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">
-                        <div className="flex items-center gap-2">
-                            <div className="flex items-center gap-1.5 rounded-md bg-primary px-2 py-1">
-                                {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-3.5 w-3.5 text-primary-foreground')}
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-primary-foreground sm:text-xs">{landingPage.badge_text || 'Limited Offer'}</span>
-                            </div>
+                        <div className="flex items-center gap-3">
+                            <span className="text-sm font-bold text-foreground">{siteBranding?.title || 'Our Store'}</span>
+                            {landingPage.phone && (
+                                <a href={`tel:${landingPage.phone.replace(/[^+\d]/g, '')}`} className="flex items-center gap-1 text-xs text-primary hover:underline sm:text-sm">
+                                    <Phone className="h-3.5 w-3.5" />
+                                    <span className="hidden sm:inline">{landingPage.phone}</span>
+                                </a>
+                            )}
                         </div>
-                        {countdownRemaining && (
-                            <div className="flex items-center gap-1">
-                                {(['days', 'hours', 'minutes', 'seconds'] as const).map((unit, idx) => (
-                                    <span key={unit} className="flex items-center">
-                                        {idx > 0 && <span className="mx-0.5 text-xs font-bold text-primary">:</span>}
-                                        <span className="flex h-7 w-7 items-center justify-center rounded bg-primary text-[10px] font-bold text-primary-foreground sm:h-8 sm:w-8 sm:text-xs">
-                                            {String(countdownRemaining[unit]).padStart(2, '0')}
+                        <div className="flex items-center gap-3">
+                            {countdownRemaining && (
+                                <div className="flex items-center gap-1">
+                                    {(['days', 'hours', 'minutes', 'seconds'] as const).map((unit, idx) => (
+                                        <span key={unit} className="flex items-center">
+                                            {idx > 0 && <span className="mx-0.5 text-xs font-bold text-primary">:</span>}
+                                            <span className="flex h-7 w-7 items-center justify-center rounded bg-primary text-[10px] font-bold text-primary-foreground sm:h-8 sm:w-8 sm:text-xs">
+                                                {String(countdownRemaining[unit]).padStart(2, '0')}
+                                            </span>
                                         </span>
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                        <a href={`tel:${(landingPage.phone || '').replace(/[^+\d]/g, '')}`} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground sm:text-sm">
-                            <Phone className="h-3.5 w-3.5" />
-                            <span className="hidden sm:inline">{landingPage.phone}</span>
-                        </a>
+                                    ))}
+                                </div>
+                            )}
+                            <button
+                                type="button"
+                                onClick={scrollToCheckout}
+                                className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-105"
+                            >
+                                {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-3.5 w-3.5')}
+                                {landingPage.badge_text || 'Limited Offer'}
+                            </button>
+                        </div>
                     </div>
                 </header>
 
                 {/* ── 1. Hero Section ── */}
-                <section className="relative overflow-hidden bg-primary">
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,0,0,0.2),transparent_70%)]" />
-                    <div className={`relative mx-auto grid max-w-6xl items-center gap-6 px-4 py-8 sm:gap-8 sm:py-12 md:py-20 ${heroImages.length > 0 ? 'md:grid-cols-2' : 'max-w-2xl'}`}>
+                <section className="relative bg-background">
+                    <div className="relative mx-auto grid max-w-6xl items-center gap-6 px-4 py-8 sm:gap-8 sm:py-12 md:grid-cols-2 md:py-16">
                         {/* Text */}
-                        <div className={heroImages.length > 0 ? 'text-center md:text-left' : 'text-center'}>
-                            <p className="mb-2 text-xs font-medium uppercase tracking-widest text-primary-foreground/70 sm:mb-3 sm:text-sm">{landingPage.subtitle || 'Keep your valuables safe'}</p>
-                            <h1 className="mb-3 text-2xl font-extrabold leading-tight text-primary-foreground sm:mb-4 sm:text-3xl md:text-4xl lg:text-5xl">
+                        <div className="text-center md:text-left">
+                            {landingPage.subtitle && (
+                                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:text-xs">
+                                    {getIconComponent(landingPage.icon_name, 'h-3 w-3') || <Zap className="h-3 w-3" />}
+                                    {landingPage.subtitle}
+                                </div>
+                            )}
+                            <h1 className="mb-3 text-2xl font-extrabold leading-tight text-foreground sm:mb-4 sm:text-3xl md:text-4xl lg:text-5xl">
                                 {landingPage.title}
                             </h1>
                             {(landingPage.hero_text || product.description) && (
-                                <p className="mb-4 max-w-lg whitespace-pre-line text-sm leading-relaxed text-primary-foreground/80 sm:mb-6 sm:text-base">{landingPage.hero_text || product.description}</p>
+                                <p className="mb-5 max-w-lg whitespace-pre-line text-sm leading-relaxed text-muted-foreground sm:mb-6 sm:text-base">{landingPage.hero_text || product.description}</p>
                             )}
+
+                            {/* Badges */}
+                            <div className="mb-6 flex flex-wrap justify-center gap-2 md:justify-start">
+                                <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                                    {getIconComponent(landingPage.authentic_badge_icon || 'shield-check', 'h-3.5 w-3.5') || <ShieldCheck className="h-3.5 w-3.5" />}
+                                    {landingPage.authentic_badge_text || '100% Authentic'}
+                                </div>
+                                <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                                    {getIconComponent(landingPage.delivery_badge_icon || 'truck', 'h-3.5 w-3.5') || <Truck className="h-3.5 w-3.5" />}
+                                    {product.free_shipping ? (landingPage.delivery_badge_text || 'Free Shipping') : (landingPage.delivery_badge_text || 'Fast Delivery')}
+                                </div>
+                            </div>
 
                             <div className="flex flex-wrap justify-center gap-3 md:justify-start">
                                 <Button
                                     size="lg"
                                     type="button"
-                                    variant="secondary"
                                     onClick={scrollToCheckout}
-                                    className="px-8 shadow-lg"
+                                    className="px-8 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90"
                                 >
                                     {landingPage.order_now_text || 'Order Now'} <ChevronRight className="ml-1 h-4 w-4" />
                                 </Button>
-                                <div className="flex items-center gap-1.5 text-sm text-primary-foreground/80">
-                                    {getIconComponent(landingPage.delivery_badge_icon || 'truck', 'h-4 w-4') || <Truck className="h-4 w-4" />}
-                                    {product.free_shipping ? (
-                                        <span className="font-medium">{landingPage.delivery_badge_text || 'Free Shipping'}</span>
-                                    ) : shippingZones.length > 0 ? (
-                                        <span>{landingPage.delivery_badge_text || 'Delivery'}: {shippingZones.map((z, i) => (
-                                            <span key={z.zone}>{i > 0 ? ' / ' : ''}৳{Number(z.charge).toFixed(0)} ({z.zone})</span>
-                                        ))}</span>
-                                    ) : (
-                                        <span>{landingPage.delivery_badge_text || 'Delivery charges apply'}</span>
-                                    )}
-                                </div>
                             </div>
                         </div>
                         {/* Image & Gallery */}
                         {heroImages.length > 0 && (
-                        <div className="flex items-start justify-center">
+                        <div className="flex items-start justify-center order-first md:order-last">
                             <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
                                 <ImageGallery
                                     images={heroImages}
@@ -1026,146 +994,70 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* ── 2. Use Cases Section ── */}
-                <section className="bg-card">
-                    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-14">
-                        <div className="mb-6 text-center sm:mb-10">
-                            <h2 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">
-                                {landingPage.use_cases_title || <>What Is <span className="text-primary">{product.name}</span> Used For?</>}
-                            </h2>
-                            <p className="text-xs text-muted-foreground sm:text-sm">{landingPage.use_cases_subtitle || 'Discover the many ways this product makes your life easier'}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-4">
-                            {(landingPage.use_cases || [
-                                { label: 'Track Your Keys' },
-                                { label: 'Find Your Bags' },
-                                { label: 'Secure Valuables' },
-                                { label: 'Remote Tracking' },
-                                { label: 'Ring to Find' },
-                                { label: 'Wide Range' },
-                                { label: 'Long Battery Life' },
-                                { label: 'Easy Connection' },
-                            ]).map((item, i) => (
-                                <div key={i} className="flex flex-col items-center gap-3 rounded-xl bg-muted/50 p-5 text-center transition-colors hover:bg-muted">
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/20 text-primary">
-                                        {item.icon_name ? getIconComponent(item.icon_name, 'h-5 w-5 text-primary') : useCaseIcons[i % useCaseIcons.length]}
-                                    </div>
-                                    <span className="whitespace-pre-line break-words text-sm font-medium text-foreground">{item.label}</span>
+                {/* ── Price Banner ── */}
+                {(landingPage.price_banner_original_label || landingPage.price_banner_original_price || landingPage.price_banner_current_label || landingPage.price_banner_current_price) && (
+                    <section className="bg-gradient-to-r from-orange-500 via-orange-400 to-amber-400">
+                        <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
+                            {landingPage.price_banner_original_label && landingPage.price_banner_original_price && (
+                                <div className="mb-3 rounded-lg bg-red-400/90 px-6 py-3 text-center">
+                                    <p className="text-sm font-bold text-white sm:text-base">
+                                        {landingPage.price_banner_original_label}{' '}
+                                        <span className="relative inline-block">
+                                            <span className="line-through decoration-2">{landingPage.price_banner_original_price} ৳</span>
+                                            <span className="absolute left-1/2 top-1/2 h-0.5 w-full -translate-x-1/2 -translate-y-1/2 rotate-[-15deg] bg-red-900" />
+                                        </span>
+                                    </p>
                                 </div>
-                            ))}
+                            )}
+                            {landingPage.price_banner_current_label && landingPage.price_banner_current_price && (
+                                <div className="rounded-lg bg-amber-600/90 px-6 py-3 text-center">
+                                    <p className="text-sm font-bold text-white sm:text-base">
+                                        {landingPage.price_banner_current_label}{' '}
+                                        <span className="underline decoration-2 underline-offset-2">{landingPage.price_banner_current_price} ৳</span>
+                                    </p>
+                                </div>
+                            )}
                         </div>
+                    </section>
+                )}
+
+                {/* ── Mid-Page Order Button ── */}
+                <section className="bg-card border-t border-border">
+                    <div className="mx-auto max-w-3xl px-4 py-8 text-center sm:py-12">
+                        <Button
+                            size="lg"
+                            type="button"
+                            onClick={scrollToCheckout}
+                            className="px-10 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90"
+                        >
+                            {getIconComponent(landingPage.mid_order_button_icon || 'shopping-cart', 'h-5 w-5 mr-2')}
+                            {landingPage.mid_order_button_text || 'Order Now'}
+                        </Button>
                     </div>
                 </section>
 
-                {/* ── 3. Features Section ── */}
-                <section className="bg-secondary text-secondary-foreground">
-                    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-14">
-                        <div className="mb-6 text-center sm:mb-10">
-                            <h2 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">
-                                {landingPage.features_title || <>Amazing Features That Keep You <span className="text-primary">Worry-Free</span></>}
+                {/* ── Benefits Checklist ── */}
+                <section className="bg-primary/5">
+                    <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
+                        {landingPage.benefits_title && (
+                            <h2 className="mb-6 text-center text-xl font-extrabold text-foreground sm:text-2xl md:text-3xl">
+                                {landingPage.benefits_title}
                             </h2>
-                            <p className="text-xs text-muted-foreground sm:text-sm">{landingPage.features_subtitle || 'Engineered with cutting-edge technology for your peace of mind'}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
-                            {(landingPage.features || [
-                                { title: 'Bluetooth 5.1', desc: 'Latest Bluetooth technology for fast, stable connections' },
-                                { title: 'Long Battery', desc: 'Up to 12 months battery life on a single charge' },
-                                { title: 'Loud Speaker', desc: 'Built-in speaker rings loud so you can find things fast' },
-                                { title: 'Instant Alerts', desc: 'Get notified immediately when you leave something behind' },
-                                { title: 'Privacy First', desc: 'Encrypted communications keep your data fully secure' },
-                                { title: 'Smart Chip', desc: 'Advanced processor for accurate real-time tracking' },
-                                { title: 'Replaceable Battery', desc: 'Easy to replace standard battery — no charging needed' },
-                                { title: '24/7 Support', desc: 'Our support team is always ready to help you' },
+                        )}
+                        <div className="space-y-0 rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                            {(landingPage.benefits_items || [
+                                'Everything included in one package',
+                                'Premium quality materials and craftsmanship',
+                                'Perfect gift for yourself or loved ones',
+                                'Great value — save more when you buy together',
+                                'Cash on delivery available',
+                                '7-day return guarantee for peace of mind',
                             ]).map((item, i) => (
-                                <div key={i} className="rounded-xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md">
-                                    <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                                        {item.icon_name ? getIconComponent(item.icon_name, 'h-5 w-5 text-primary') : featureIcons[i % featureIcons.length]}
+                                <div key={i} className={`flex items-center gap-4 px-5 py-4 ${i > 0 ? 'border-t border-border' : ''}`}>
+                                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-green-500 text-white">
+                                        <CheckCircle className="h-4 w-4" />
                                     </div>
-                                    <h3 className="mb-1 break-words text-sm font-bold text-card-foreground">{item.title}</h3>
-                                    <p className="whitespace-pre-line break-words text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-8 flex justify-center">
-                            <Button size="lg" onClick={scrollToCheckout} className="px-8">
-                                {landingPage.order_now_text || 'Order Now'} <ChevronRight className="ml-1 h-4 w-4" />
-                            </Button>
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── 4. Specifications Section ── */}
-                <section className="bg-card">
-                    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-14">
-                        <div className="mb-6 text-center sm:mb-10">
-                            <h2 className="mb-1 text-xl font-bold sm:text-2xl md:text-3xl">
-                                {landingPage.specifications_title || <>Detailed <span className="text-primary">Specifications</span></>}
-                            </h2>
-                            <p className="text-xs text-muted-foreground sm:text-sm">{landingPage.specifications_subtitle || 'Everything you need to know about this product'}</p>
-                        </div>
-                        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            {(landingPage.specifications || [
-                                { title: 'Connectivity', specs: ['Bluetooth 5.1', 'Compatible with iOS & Android', 'Range up to 100ft'] },
-                                { title: 'Battery', specs: ['CR2032 Coin Cell', 'Up to 12 months', 'Easy replacement'] },
-                                { title: 'Security', specs: ['End-to-end encryption', 'Anti-stalking feature', 'Privacy certified'] },
-                                { title: 'Dimensions', specs: ['Compact & lightweight', 'Water-resistant design', 'Durable materials'] },
-                                { title: 'Performance', specs: ['Ultra-low latency', 'Location accuracy', 'Real-time updates'] },
-                                { title: 'Warranty', specs: ['1 year guarantee', 'Free replacements', '30-day returns'] },
-                            ]).map((item, i) => (
-                                <div key={i} className="rounded-xl border border-border bg-muted/50 p-5">
-                                    <div className="mb-3 flex items-center gap-2">
-                                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/20 text-primary">
-                                            {item.icon_name ? getIconComponent(item.icon_name, 'h-4 w-4 text-primary') : specIcons[i % specIcons.length]}
-                                        </div>
-                                        <h3 className="break-words text-sm font-bold text-primary">{item.title}</h3>
-                                    </div>
-                                    <ul className="space-y-1.5">
-                                        {item.specs.map((spec, si) => (
-                                            <li key={si} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
-                                                <span className="whitespace-pre-line break-words">{spec}</span>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-6 flex flex-wrap justify-center gap-4">
-                            <div className="flex items-center gap-2 rounded-full bg-chart-4/10 px-4 py-2 text-sm text-chart-4">
-                                {getIconComponent(landingPage.authentic_badge_icon || 'shield-check', 'h-4 w-4') || <ShieldCheck className="h-4 w-4" />}
-                                {landingPage.authentic_badge_text || '100% Authentic Product'}
-                            </div>
-                            <div className="flex items-center gap-2 rounded-full bg-chart-2/10 px-4 py-2 text-sm text-chart-2">
-                                {getIconComponent(landingPage.delivery_badge_icon || 'truck', 'h-4 w-4') || <Truck className="h-4 w-4" />}
-                                {landingPage.delivery_badge_text || (product.free_shipping ? 'Free Shipping' : 'Cash on Delivery Available')}
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── 5. Why Buy From Us ── */}
-                <section className="bg-background">
-                    <div className="mx-auto max-w-6xl px-4 py-8 sm:py-14">
-                        <div className="mb-6 text-center sm:mb-10">
-                            <p className="mb-1 text-xs text-muted-foreground sm:text-sm">{landingPage.why_buy_super_text || 'Customers love our store'}</p>
-                            <h2 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">
-                                {landingPage.why_buy_title || <>Why Buy From <span className="text-primary">Us?</span></>}
-                            </h2>
-                            <p className="text-xs text-muted-foreground sm:text-sm">{landingPage.why_buy_subtitle || 'We\'re committed to your satisfaction every step of the way'}</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4">
-                            {(landingPage.why_buy || [
-                                { title: '1 Year Warranty', desc: 'Full product warranty' },
-                                { title: '7-Day Returns', desc: 'Easy return policy' },
-                                { title: 'Fast Delivery', desc: 'Nationwide shipping' },
-                                { title: '100% Genuine', desc: 'Authentic products only' },
-                            ]).map((item, i) => (
-                                <div key={i} className="flex flex-col items-center gap-3 text-center">
-                                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/20 text-primary text-lg">
-                                        {item.icon_name ? getIconComponent(item.icon_name, 'h-6 w-6 text-primary') : whyBuyIcons[i % whyBuyIcons.length]}
-                                    </div>
-                                    <h3 className="break-words text-sm font-bold">{item.title}</h3>
-                                    <p className="whitespace-pre-line break-words text-xs text-muted-foreground">{item.desc}</p>
+                                    <span className="text-sm text-foreground leading-relaxed">{item}</span>
                                 </div>
                             ))}
                         </div>
@@ -1174,21 +1066,18 @@ export default function LandingPage() {
 
                 {/* ── Review Images Gallery ── */}
                 {landingPage.review_images && landingPage.review_images.length > 0 && (
-                    <section className="border-t border-border bg-background">
-                        <div className="mx-auto max-w-6xl px-4 py-14">
-                            <h2 className="mb-6 text-center text-2xl font-bold md:text-3xl">{landingPage.review_images_title || 'Customer Reviews'}</h2>
-                            <div className="mx-auto mb-4 max-w-2xl overflow-hidden rounded-xl border border-border shadow-sm">
-                                <img src={`/${landingPage.review_images[selectedReviewIndex]}`} alt={`Customer review ${selectedReviewIndex + 1}`} className="h-auto w-full object-cover" />
+                    <section className="border-t border-border bg-card">
+                        <div className="mx-auto max-w-6xl px-4 py-10 sm:py-16">
+                            <div className="mb-8 text-center">
+                                <span className="mb-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Reviews</span>
+                                <h2 className="text-2xl font-extrabold md:text-3xl">{landingPage.review_images_title || 'Customer Reviews'}</h2>
                             </div>
-                            {landingPage.review_images.length > 1 && (
-                                <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
-                                    {landingPage.review_images.map((img, i) => (
-                                        <button key={i} onClick={() => setSelectedReviewIndex(i)} className={`h-12 w-12 shrink-0 overflow-hidden rounded-lg border-2 transition-colors sm:h-16 sm:w-16 ${i === selectedReviewIndex ? 'border-primary' : 'border-border'}`}>
-                                            <img src={`/${img}`} alt="" className="h-full w-full object-cover" />
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
+                            <div className="mx-auto max-w-lg">
+                                <ImageGallery
+                                    images={landingPage.review_images.map((path) => ({ src: `/${path}` }))}
+                                    alt="Customer Reviews"
+                                />
+                            </div>
                         </div>
                     </section>
                 )}
