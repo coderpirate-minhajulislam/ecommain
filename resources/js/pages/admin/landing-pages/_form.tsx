@@ -489,7 +489,7 @@ export function LandingPageForm({
             </Section>
 
             {/* ── Benefits Sections ── */}
-            <Section title="Benefits Sections" defaultOpen>
+            <Section title="Benefits Sections">
                 <p className="text-xs text-muted-foreground mb-3">Add multiple benefits checklist sections. Each section has a title and items.</p>
                 {(data.benefits_sections || []).map((section, si) => (
                     <div key={si} className="mb-4 rounded-lg border border-input p-4 space-y-3">
