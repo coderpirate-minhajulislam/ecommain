@@ -1140,6 +1140,13 @@ export default function LandingPage() {
                             </p>
                         </div>
 
+                        {/* Checkout Title */}
+                        {landingPage.checkout_title && (
+                            <div className="mb-6 text-center sm:mb-8">
+                                <h2 className="text-xl font-extrabold text-foreground sm:text-2xl md:text-3xl">{landingPage.checkout_title}</h2>
+                            </div>
+                        )}
+
                         {/* Blocked warning */}
                         {(isBlocked || errors.blocked) && (
                             <div className="mb-6 rounded-xl border border-destructive bg-destructive/5 p-4">
