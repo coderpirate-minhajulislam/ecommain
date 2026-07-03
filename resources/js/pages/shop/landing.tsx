@@ -963,7 +963,7 @@ export default function LandingPage() {
                         {/* Image & Gallery */}
                         {heroImages.length > 0 && (
                         <div className="flex items-start justify-center order-first md:order-last">
-                            <div className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg">
+                            <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl">
                                 <ImageGallery
                                     images={heroImages}
                                     alt={landingPage.title}
@@ -1092,7 +1092,7 @@ export default function LandingPage() {
                                 <span className="mb-2 inline-block rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">Reviews</span>
                                 <h2 className="text-2xl font-extrabold md:text-3xl">{landingPage.review_images_title || 'Customer Reviews'}</h2>
                             </div>
-                            <div className="mx-auto max-w-lg">
+                            <div className="mx-auto max-w-sm sm:max-w-md">
                                 <ImageGallery
                                     images={landingPage.review_images.map((path) => ({ src: `/${path}` }))}
                                     alt="Customer Reviews"
