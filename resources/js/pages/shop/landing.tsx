@@ -1443,7 +1443,7 @@ export default function LandingPage() {
                                                                                 const match = mv.find((v) => !selectedVariant?.color || v.color === selectedVariant.color) || mv[0];
                                                                                 setSelectedVariantId(match.id);
                                                                             }}
-                                                                            className={`rounded-md border px-3 py-1 text-xs font-medium transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
+                                                                            className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground shadow-sm' : 'border-border text-muted-foreground hover:border-primary/50 bg-background'}`}
                                                                         >
                                                                             {size}
                                                                         </button>
@@ -1467,7 +1467,7 @@ export default function LandingPage() {
                                                                                 const match = mv.find((v) => !selectedVariant?.size || v.size === selectedVariant.size) || mv[0];
                                                                                 setSelectedVariantId(match.id);
                                                                             }}
-                                                                            className={`rounded-md border px-3 py-1 text-xs font-medium transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
+                                                                            className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground shadow-sm' : 'border-border text-muted-foreground hover:border-primary/50 bg-background'}`}
                                                                         >
                                                                             {color}
                                                                         </button>
@@ -1564,7 +1564,7 @@ export default function LandingPage() {
                                                                                             const match = mv.find((v) => !epSelected?.color || v.color === epSelected.color) || mv[0];
                                                                                             setExtraVariants((prev) => ({ ...prev, [ep.id]: match.id }));
                                                                                         }}
-                                                                                        className={`rounded-md border px-3 py-1 text-xs font-medium transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
+                                                                                        className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground shadow-sm' : 'border-border text-muted-foreground hover:border-primary/50 bg-background'}`}
                                                                                     >
                                                                                         {size}
                                                                                     </button>
@@ -1589,7 +1589,7 @@ export default function LandingPage() {
                                                                                             const match = mv.find((v) => !epSelected?.size || v.size === epSelected.size) || mv[0];
                                                                                             setExtraVariants((prev) => ({ ...prev, [ep.id]: match.id }));
                                                                                         }}
-                                                                                        className={`rounded-md border px-3 py-1 text-xs font-medium transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
+                                                                                        className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${isSelected ? 'border-primary bg-primary text-primary-foreground shadow-sm' : 'border-border text-muted-foreground hover:border-primary/50 bg-background'}`}
                                                                                     >
                                                                                         {color}
                                                                                     </button>
