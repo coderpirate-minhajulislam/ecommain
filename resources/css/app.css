@@ -12,18 +12,21 @@
 }
 
 @keyframes crossX {
-    from { transform: rotate(-12deg) scaleX(0); }
-    to { transform: rotate(-12deg) scaleX(1); }
+    0%, 15% { transform: rotate(-12deg) scaleX(0); opacity: 0; }
+    30%, 70% { transform: rotate(-12deg) scaleX(1); opacity: 1; }
+    85%, 100% { transform: rotate(-12deg) scaleX(0); opacity: 0; }
 }
 
 @keyframes crossY {
-    from { transform: rotate(12deg) scaleX(0); }
-    to { transform: rotate(12deg) scaleX(1); }
+    0%, 30% { transform: rotate(12deg) scaleX(0); opacity: 0; }
+    45%, 75% { transform: rotate(12deg) scaleX(1); opacity: 1; }
+    90%, 100% { transform: rotate(12deg) scaleX(0); opacity: 0; }
 }
 
 @keyframes lineGrow {
-    from { clip-path: inset(0 100% 0 0); }
-    to { clip-path: inset(0 0 0 0); }
+    0%, 20% { clip-path: inset(0 100% 0 0); }
+    50%, 70% { clip-path: inset(0 0 0 0); }
+    90%, 100% { clip-path: inset(0 100% 0 0); }
 }
 
 @keyframes cart-bump {

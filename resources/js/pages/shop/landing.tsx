@@ -1002,23 +1002,23 @@ export default function LandingPage() {
                             <div className="rounded-xl border-2 border-primary/20 bg-card px-6 py-5 shadow-md">
                                 {landingPage.price_banner_original_label && landingPage.price_banner_original_price && (
                                     <div className="mb-3 text-center">
-                                        <span className="text-base font-bold text-muted-foreground sm:text-lg">{landingPage.price_banner_original_label}</span>
+                                        <span className="text-lg font-bold text-muted-foreground sm:text-xl">{landingPage.price_banner_original_label}</span>
                                         <div className="mt-1 inline-block">
-                                            <span className="relative text-2xl font-bold text-destructive sm:text-3xl">
+                                            <span className="relative text-3xl font-bold text-destructive sm:text-4xl lg:text-5xl">
                                                 {landingPage.price_banner_original_price}
-                                                <span className="absolute left-0 top-1/2 h-[3px] w-full -rotate-12 bg-destructive" style={{animation:'crossX 0.5s ease-out forwards', transformOrigin:'center'}} />
-                                                <span className="absolute left-0 top-1/2 h-[3px] w-full rotate-12 bg-destructive" style={{animation:'crossY 0.5s ease-out 0.3s forwards', transformOrigin:'center'}} />
+                                                <span className="absolute left-0 top-1/2 h-[3px] w-full -rotate-12 bg-destructive" style={{animation:'crossX 4s ease-in-out infinite', transformOrigin:'center'}} />
+                                                <span className="absolute left-0 top-1/2 h-[3px] w-full rotate-12 bg-destructive" style={{animation:'crossY 4s ease-in-out infinite', transformOrigin:'center'}} />
                                             </span>
                                         </div>
                                     </div>
                                 )}
                                 {landingPage.price_banner_current_label && landingPage.price_banner_current_price && (
                                     <div className="text-center">
-                                        <span className="text-base font-bold text-primary sm:text-lg">{landingPage.price_banner_current_label}</span>
-                                        <div className="mt-1 inline-block">
-                                            <span className="relative text-3xl font-extrabold text-primary sm:text-4xl">
+                                        <span className="text-lg font-bold text-primary sm:text-xl">{landingPage.price_banner_current_label}</span>
+                                        <div className="mt-2 inline-block">
+                                            <span className="relative text-4xl font-extrabold text-primary sm:text-5xl lg:text-6xl">
                                                 {landingPage.price_banner_current_price}
-                                                <span className="absolute bottom-1 left-0 h-[4px] w-full bg-primary" style={{animation:'lineGrow 0.6s ease-out forwards'}} />
+                                                <span className="absolute bottom-1 left-0 h-[4px] w-full bg-primary" style={{animation:'lineGrow 4s ease-in-out infinite'}} />
                                             </span>
                                         </div>
                                     </div>
