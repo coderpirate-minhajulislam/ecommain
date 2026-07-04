@@ -997,80 +997,35 @@ export default function LandingPage() {
 
                 {/* ── Price Banner ── */}
                 {(landingPage.price_banner_original_label || landingPage.price_banner_original_price || landingPage.price_banner_current_label || landingPage.price_banner_current_price) && (
-                    <>
-                    <style>{`
-                        @keyframes drawLine1 {
-                            0% { transform: translate(-50%, -50%) rotate(-45deg) scaleX(0); opacity: 0; }
-                            100% { transform: translate(-50%, -50%) rotate(-45deg) scaleX(1); opacity: 1; }
-                        }
-                        @keyframes drawLine2 {
-                            0% { transform: translate(-50%, -50%) rotate(45deg) scaleX(0); opacity: 0; }
-                            100% { transform: translate(-50%, -50%) rotate(45deg) scaleX(1); opacity: 1; }
-                        }
-                        .price-cross {
-                            position: relative;
-                            display: inline-block;
-                        }
-                        .price-cross::before,
-                        .price-cross::after {
-                            content: '';
-                            position: absolute;
-                            top: 50%;
-                            left: 50%;
-                            width: 120%;
-                            height: 4px;
-                            background: hsl(var(--destructive));
-                            border-radius: 2px;
-                            opacity: 0;
-                        }
-                        .price-cross::before {
-                            transform: translate(-50%, -50%) rotate(-45deg) scaleX(0);
-                            animation: drawLine1 0.4s ease-out 0.4s forwards;
-                        }
-                        .price-cross::after {
-                            transform: translate(-50%, -50%) rotate(45deg) scaleX(0);
-                            animation: drawLine2 0.4s ease-out 0.7s forwards;
-                        }
-                        @keyframes drawUnderline {
-                            0% { clip-path: inset(0 100% 0 0); }
-                            100% { clip-path: inset(0 0% 0 0); }
-                        }
-                        .price-under {
-                            position: relative;
-                            display: inline-block;
-                        }
-                        .price-under::after {
-                            content: '';
-                            position: absolute;
-                            left: 0;
-                            bottom: -4px;
-                            width: 100%;
-                            height: 4px;
-                            background: hsl(var(--primary));
-                            border-radius: 2px;
-                            clip-path: inset(0 100% 0 0);
-                            animation: drawUnderline 0.6s ease-out 0.6s forwards;
-                        }
-                    `}</style>
-                    <section className="bg-primary/5">
+                    <section className="border-y border-border bg-primary/5" style={{'--crossX': 'crossX', '--crossY': 'crossY', '--lineGrow': 'lineGrow'} as React.CSSProperties}>
                         <div className="mx-auto max-w-3xl px-4 py-6 sm:py-8">
-                            <div className="rounded-xl bg-card px-6 py-5 text-center shadow-sm border border-border">
+                            <div className="rounded-xl border-2 border-primary/20 bg-card px-6 py-5 shadow-md">
                                 {landingPage.price_banner_original_label && landingPage.price_banner_original_price && (
-                                    <p className="mb-3 text-lg font-bold text-muted-foreground sm:text-xl">
-                                        {landingPage.price_banner_original_label}{' '}
-                                        <span className="ml-1 text-xl font-bold text-destructive sm:text-2xl price-cross">{landingPage.price_banner_original_price} ৳</span>
-                                    </p>
+                                    <div className="mb-3 text-center">
+                                        <span className="text-base font-bold text-muted-foreground sm:text-lg">{landingPage.price_banner_original_label}</span>
+                                        <div className="mt-1 inline-block">
+                                            <span className="relative text-2xl font-bold text-destructive sm:text-3xl">
+                                                {landingPage.price_banner_original_price}
+                                                <span className="absolute left-0 top-1/2 h-[3px] w-full -rotate-12 bg-destructive" style={{animation:'crossX 0.5s ease-out forwards', transformOrigin:'center'}} />
+                                                <span className="absolute left-0 top-1/2 h-[3px] w-full rotate-12 bg-destructive" style={{animation:'crossY 0.5s ease-out 0.3s forwards', transformOrigin:'center'}} />
+                                            </span>
+                                        </div>
+                                    </div>
                                 )}
                                 {landingPage.price_banner_current_label && landingPage.price_banner_current_price && (
-                                    <p className="text-lg font-bold text-primary sm:text-xl">
-                                        {landingPage.price_banner_current_label}{' '}
-                                        <span className="ml-1 text-2xl font-extrabold sm:text-3xl price-under">{landingPage.price_banner_current_price} ৳</span>
-                                    </p>
+                                    <div className="text-center">
+                                        <span className="text-base font-bold text-primary sm:text-lg">{landingPage.price_banner_current_label}</span>
+                                        <div className="mt-1 inline-block">
+                                            <span className="relative text-3xl font-extrabold text-primary sm:text-4xl">
+                                                {landingPage.price_banner_current_price}
+                                                <span className="absolute bottom-1 left-0 h-[4px] w-full bg-primary" style={{animation:'lineGrow 0.6s ease-out forwards'}} />
+                                            </span>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
                     </section>
-                    </>
                 )}
 
                 {/* ── Mid-Page Order Button with Timer ── */}
