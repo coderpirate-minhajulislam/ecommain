@@ -540,25 +540,6 @@ export default function CheckoutPage() {
                     <div className="grid gap-6 lg:grid-cols-3">
                         {/* Form */}
                         <div className="space-y-6 lg:col-span-2">
-                            {/* Delivery Zone */}
-                            {filteredZones.length > 0 && (
-                                <Card className="p-4">
-                                    <h2 className="mb-3 text-base font-semibold">{labels?.deliveryArea ?? 'Delivery Area'}</h2>
-                                    <div className="flex flex-wrap gap-3">
-                                        {filteredZones.map((zone) => (
-                                            <button
-                                                key={zone}
-                                                type="button"
-                                                onClick={() => setDeliveryZone(zone)}
-                                                className={`rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary/10 text-primary' : 'border-input hover:border-primary/50'}`}
-                                            >
-                                                {zone}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </Card>
-                            )}
-
                             {/* Blocked warning */}
                             {errors.blocked && (
                                 <Card className="border-destructive bg-destructive/5 p-4">
@@ -682,6 +663,25 @@ export default function CheckoutPage() {
                                     </div>
                                 </div>
                             </Card>
+
+                            {/* Delivery Zone */}
+                            {filteredZones.length > 0 && (
+                                <Card className="p-4">
+                                    <h2 className="mb-3 text-base font-semibold">{labels?.deliveryArea ?? 'Delivery Area'}</h2>
+                                    <div className="flex flex-wrap gap-3">
+                                        {filteredZones.map((zone) => (
+                                            <button
+                                                key={zone}
+                                                type="button"
+                                                onClick={() => setDeliveryZone(zone)}
+                                                className={`rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary/10 text-primary' : 'border-input hover:border-primary/50'}`}
+                                            >
+                                                {zone}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </Card>
+                            )}
 
                             {/* Payment Method */}
                             <Card className="p-4">

@@ -632,7 +632,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                             <div className="space-y-2 sm:space-y-3">
                                 {sizes.length > 0 && (
                                     <div className="w-full">
-                                        <label className="mb-2 block text-xs sm:text-sm font-semibold">{product.size_label || 'Size'}</label>
+                                        <label className="mb-2 block text-sm font-semibold text-foreground">{product.size_label || 'Size'}</label>
                                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {sizes.map((size) => {
                                                 const matchingVariants = variants.filter((v) => v.size === size);
@@ -648,10 +648,10 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                                             ) || matchingVariants[0];
                                                             setSelectedVariantId(match.id);
                                                         }}
-                                                        className={`rounded-md border-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all ${
+                                                        className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                                                             isSelected
-                                                                ? 'border-primary bg-primary text-primary-foreground'
-                                                                : 'border-input hover:border-primary/70 hover:bg-muted/50'
+                                                                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                                                                : 'border-border text-muted-foreground hover:border-primary/50 bg-background'
                                                         }`}
                                                     >
                                                         {size}
@@ -663,7 +663,7 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                 )}
                                 {colors.length > 0 && (
                                     <div className="w-full">
-                                        <label className="mb-2 block text-xs sm:text-sm font-semibold">{product.color_label || 'Color'}</label>
+                                        <label className="mb-2 block text-sm font-semibold text-foreground">{product.color_label || 'Color'}</label>
                                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                             {colors.map((color) => {
                                                 const matchingVariants = variants.filter((v) => v.color === color);
@@ -679,10 +679,10 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                                             ) || matchingVariants[0];
                                                             setSelectedVariantId(match.id);
                                                         }}
-                                                        className={`rounded-md border-2 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all ${
+                                                        className={`rounded-lg border px-4 py-2 text-sm font-semibold transition-colors ${
                                                             isSelected
-                                                                ? 'border-primary bg-primary text-primary-foreground'
-                                                                : 'border-input hover:border-primary/70 hover:bg-muted/50'
+                                                                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                                                                : 'border-border text-muted-foreground hover:border-primary/50 bg-background'
                                                         }`}
                                                     >
                                                         {color}
