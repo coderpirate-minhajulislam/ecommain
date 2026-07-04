@@ -219,5 +219,5 @@ php artisan tinker --execute="DB::statement('ALTER TABLE banners ADD COLUMN popu
 php artisan tinker --execute="Schema::dropIfExists('landing_pages');"
 
 
-cd /var/www/html/primehaatbd && php artisan tinker --execute="DB::table('migrations')->where('migration', '2026_04_01_000004_create_landing_pages_table')->delete();"
-cd /var/www/html/primehaatbd && php artisan migrate --path=database/migrations/2026_04_01_000004_create_landing_pages_table.php
+php artisan tinker --execute="DB::table('migrations')->where('migration', '2026_04_01_000004_create_landing_pages_table')->delete();"
+php artisan migrate --path=database/migrations/2026_04_01_000004_create_landing_pages_table.php
