@@ -1006,33 +1006,45 @@ export default function LandingPage() {
                         .price-strike-anim {
                             position: relative;
                             display: inline-block;
+                            animation: priceFadeIn 0.8s ease-out;
                         }
                         .price-strike-anim::after {
                             content: '';
                             position: absolute;
-                            left: 0;
+                            left: -5%;
                             top: 50%;
-                            width: 100%;
+                            width: 110%;
                             height: 3px;
                             background: hsl(var(--destructive));
-                            transform: translateY(-50%) rotate(-3deg);
-                            animation: priceStrikeAnim 1.5s ease-out forwards;
+                            transform: translateY(-50%) rotate(-4deg);
+                            animation: priceStrikeAnim 1.2s ease-out 0.3s forwards;
+                            opacity: 0;
                         }
-                        @keyframes pricePulseGlow {
-                            0%, 100% { text-decoration-thickness: 2px; text-shadow: 0 0 0 transparent; }
-                            50% { text-decoration-thickness: 4px; text-shadow: 0 4px 12px hsl(var(--primary) / 0.3); }
+                        @keyframes priceFadeIn {
+                            0% { opacity: 0; transform: translateY(-5px); }
+                            100% { opacity: 1; transform: translateY(0); }
+                        }
+                        @keyframes priceUnderlineSlide {
+                            0% { text-decoration-thickness: 0px; }
+                            40% { text-decoration-thickness: 4px; }
+                            100% { text-decoration-thickness: 2px; }
+                        }
+                        @keyframes priceUnderlineGlow {
+                            0%, 100% { text-shadow: 0 0 0 transparent; }
+                            50% { text-shadow: 0 2px 8px hsl(var(--primary) / 0.4); }
                         }
                         .price-underline-anim {
                             text-decoration: underline;
                             text-decoration-color: hsl(var(--primary));
                             text-underline-offset: 6px;
-                            text-decoration-thickness: 2px;
-                            animation: pricePulseGlow 2s ease-in-out infinite;
+                            text-decoration-thickness: 0px;
                             display: inline-block;
-                            transition: transform 0.3s ease;
+                            animation: priceUnderlineSlide 1s ease-out 0.5s forwards, priceUnderlineGlow 2.5s ease-in-out 1.5s infinite;
+                            transition: transform 0.3s ease, text-decoration-thickness 0.3s ease;
                         }
                         .price-underline-anim:hover {
                             transform: scale(1.05);
+                            text-decoration-thickness: 4px;
                         }
                     `}</style>
                     <section className="bg-primary/5">
