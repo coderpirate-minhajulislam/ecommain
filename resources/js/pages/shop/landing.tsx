@@ -943,8 +943,8 @@ export default function LandingPage() {
                         {/* Text */}
                         <div className="text-center md:text-left">
                             {landingPage.subtitle && (
-                                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-primary sm:text-xs">
-                                    {getIconComponent(landingPage.icon_name, 'h-3 w-3') || <Zap className="h-3 w-3" />}
+                                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary sm:text-sm">
+                                    {getIconComponent(landingPage.icon_name, 'h-4 w-4') || <Zap className="h-4 w-4" />}
                                     {landingPage.subtitle}
                                 </div>
                             )}
@@ -999,52 +999,43 @@ export default function LandingPage() {
                 {(landingPage.price_banner_original_label || landingPage.price_banner_original_price || landingPage.price_banner_current_label || landingPage.price_banner_current_price) && (
                     <>
                     <style>{`
-                        @keyframes priceStrikeAnim {
-                            0% { width: 0; opacity: 0; }
-                            100% { width: 100%; opacity: 1; }
+                        @keyframes strikeThrough {
+                            0% { width: 0; }
+                            100% { width: 100%; }
                         }
-                        .price-strike-anim {
+                        .price-cross {
                             position: relative;
                             display: inline-block;
-                            animation: priceFadeIn 0.8s ease-out;
                         }
-                        .price-strike-anim::after {
+                        .price-cross::after {
                             content: '';
                             position: absolute;
-                            left: -5%;
+                            left: -4%;
                             top: 50%;
-                            width: 110%;
+                            width: 108%;
                             height: 3px;
                             background: hsl(var(--destructive));
-                            transform: translateY(-50%) rotate(-4deg);
-                            animation: priceStrikeAnim 1.2s ease-out 0.3s forwards;
-                            opacity: 0;
+                            transform: translateY(-50%) rotate(-3deg);
+                            animation: strikeThrough 0.8s ease-out 0.4s both;
                         }
-                        @keyframes priceFadeIn {
-                            0% { opacity: 0; transform: translateY(-5px); }
-                            100% { opacity: 1; transform: translateY(0); }
+                        @keyframes underlineGrow {
+                            0% { width: 0; }
+                            100% { width: 100%; }
                         }
-                        @keyframes priceUnderlineSlide {
-                            0% { text-decoration-thickness: 0px; }
-                            40% { text-decoration-thickness: 4px; }
-                            100% { text-decoration-thickness: 2px; }
-                        }
-                        @keyframes priceUnderlineGlow {
-                            0%, 100% { text-shadow: 0 0 0 transparent; }
-                            50% { text-shadow: 0 2px 8px hsl(var(--primary) / 0.4); }
-                        }
-                        .price-underline-anim {
-                            text-decoration: underline;
-                            text-decoration-color: hsl(var(--primary));
-                            text-underline-offset: 6px;
-                            text-decoration-thickness: 0px;
+                        .price-under {
+                            position: relative;
                             display: inline-block;
-                            animation: priceUnderlineSlide 1s ease-out 0.5s forwards, priceUnderlineGlow 2.5s ease-in-out 1.5s infinite;
-                            transition: transform 0.3s ease, text-decoration-thickness 0.3s ease;
                         }
-                        .price-underline-anim:hover {
-                            transform: scale(1.05);
-                            text-decoration-thickness: 4px;
+                        .price-under::after {
+                            content: '';
+                            position: absolute;
+                            left: 0;
+                            bottom: -2px;
+                            width: 0;
+                            height: 3px;
+                            background: hsl(var(--primary));
+                            border-radius: 2px;
+                            animation: underlineGrow 0.6s ease-out 0.6s forwards;
                         }
                     `}</style>
                     <section className="bg-primary/5">
@@ -1053,15 +1044,13 @@ export default function LandingPage() {
                                 {landingPage.price_banner_original_label && landingPage.price_banner_original_price && (
                                     <p className="mb-3 text-lg font-bold text-muted-foreground sm:text-xl">
                                         {landingPage.price_banner_original_label}{' '}
-                                        <span className="relative inline-block ml-1">
-                                            <span className="price-strike-anim decoration-2 decoration-destructive text-destructive text-xl sm:text-2xl">{landingPage.price_banner_original_price} ৳</span>
-                                        </span>
+                                        <span className="ml-1 text-xl font-bold text-destructive sm:text-2xl price-cross">{landingPage.price_banner_original_price} ৳</span>
                                     </p>
                                 )}
                                 {landingPage.price_banner_current_label && landingPage.price_banner_current_price && (
                                     <p className="text-lg font-bold text-primary sm:text-xl">
                                         {landingPage.price_banner_current_label}{' '}
-                                        <span className="ml-1 text-2xl font-extrabold sm:text-3xl price-underline-anim">{landingPage.price_banner_current_price} ৳</span>
+                                        <span className="ml-1 text-2xl font-extrabold sm:text-3xl price-under">{landingPage.price_banner_current_price} ৳</span>
                                     </p>
                                 )}
                             </div>
