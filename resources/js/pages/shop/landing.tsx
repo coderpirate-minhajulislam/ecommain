@@ -943,8 +943,8 @@ export default function LandingPage() {
                         {/* Text */}
                         <div className="text-center md:text-left">
                             {landingPage.subtitle && (
-                                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary sm:text-sm">
-                                    {getIconComponent(landingPage.icon_name, 'h-4 w-4') || <Zap className="h-4 w-4" />}
+                                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-primary sm:text-base lg:text-lg">
+                                    {getIconComponent(landingPage.icon_name, 'h-4 w-4 sm:h-5 sm:w-5') || <Zap className="h-4 w-4 sm:h-5 sm:w-5" />}
                                     {landingPage.subtitle}
                                 </div>
                             )}
@@ -999,28 +999,41 @@ export default function LandingPage() {
                 {(landingPage.price_banner_original_label || landingPage.price_banner_original_price || landingPage.price_banner_current_label || landingPage.price_banner_current_price) && (
                     <>
                     <style>{`
-                        @keyframes strikeThrough {
-                            0% { width: 0; }
-                            100% { width: 100%; }
+                        @keyframes drawLine1 {
+                            0% { transform: translate(-50%, -50%) rotate(-45deg) scaleX(0); opacity: 0; }
+                            100% { transform: translate(-50%, -50%) rotate(-45deg) scaleX(1); opacity: 1; }
+                        }
+                        @keyframes drawLine2 {
+                            0% { transform: translate(-50%, -50%) rotate(45deg) scaleX(0); opacity: 0; }
+                            100% { transform: translate(-50%, -50%) rotate(45deg) scaleX(1); opacity: 1; }
                         }
                         .price-cross {
                             position: relative;
                             display: inline-block;
                         }
+                        .price-cross::before,
                         .price-cross::after {
                             content: '';
                             position: absolute;
-                            left: -4%;
                             top: 50%;
-                            width: 108%;
-                            height: 3px;
+                            left: 50%;
+                            width: 120%;
+                            height: 4px;
                             background: hsl(var(--destructive));
-                            transform: translateY(-50%) rotate(-3deg);
-                            animation: strikeThrough 0.8s ease-out 0.4s both;
+                            border-radius: 2px;
+                            opacity: 0;
                         }
-                        @keyframes underlineGrow {
-                            0% { width: 0; }
-                            100% { width: 100%; }
+                        .price-cross::before {
+                            transform: translate(-50%, -50%) rotate(-45deg) scaleX(0);
+                            animation: drawLine1 0.4s ease-out 0.4s forwards;
+                        }
+                        .price-cross::after {
+                            transform: translate(-50%, -50%) rotate(45deg) scaleX(0);
+                            animation: drawLine2 0.4s ease-out 0.7s forwards;
+                        }
+                        @keyframes drawUnderline {
+                            0% { clip-path: inset(0 100% 0 0); }
+                            100% { clip-path: inset(0 0% 0 0); }
                         }
                         .price-under {
                             position: relative;
@@ -1030,12 +1043,13 @@ export default function LandingPage() {
                             content: '';
                             position: absolute;
                             left: 0;
-                            bottom: -2px;
-                            width: 0;
-                            height: 3px;
+                            bottom: -4px;
+                            width: 100%;
+                            height: 4px;
                             background: hsl(var(--primary));
                             border-radius: 2px;
-                            animation: underlineGrow 0.6s ease-out 0.6s forwards;
+                            clip-path: inset(0 100% 0 0);
+                            animation: drawUnderline 0.6s ease-out 0.6s forwards;
                         }
                     `}</style>
                     <section className="bg-primary/5">
