@@ -197,6 +197,25 @@ export default function LandingPage() {
     const sizes = useMemo(() => [...new Set(variants.filter((v) => v.size).map((v) => v.size!))], [variants]);
     const colors = useMemo(() => [...new Set(variants.filter((v) => v.color).map((v) => v.color!))], [variants]);
 
+    // Auto-select first variant when variants exist and none selected
+    useEffect(() => {
+        if (variants.length > 0 && selectedVariantId === null) {
+            setSelectedVariantId(variants[0].id);
+        }
+    }, [variants, selectedVariantId]);
+
+    // Auto-select first variant for extra products
+    useEffect(() => {
+        extraProducts.forEach((ep) => {
+            if (ep.variants.length > 0 && !extraVariants[ep.id]) {
+                setExtraVariants((prev) => {
+                    if (prev[ep.id] !== undefined) return prev;
+                    return { ...prev, [ep.id]: ep.variants[0].id };
+                });
+            }
+        });
+    }, [extraProducts]);
+
     const shippingZones = useMemo(() => product.shipping_zones || [], [product.shipping_zones]);
 
     const selectedVariant = variants.find((v) => v.id === selectedVariantId) ?? null;
@@ -953,9 +972,9 @@ export default function LandingPage() {
                                     size="lg"
                                     type="button"
                                     onClick={scrollToCheckout}
-                                    className="px-10 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90"
+                                    className="px-12 py-7 text-lg font-extrabold shadow-xl shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95 animate-bounce"
                                 >
-                                    {getIconComponent(landingPage.mid_order_button_icon || 'shopping-cart', 'h-5 w-5 mr-2')}
+                                    {getIconComponent(landingPage.mid_order_button_icon || 'shopping-cart', 'h-6 w-6 mr-2')}
                                     {landingPage.mid_order_button_text || 'Order Now'}
                                 </Button>
                             </div>
@@ -1043,9 +1062,9 @@ export default function LandingPage() {
                             size="lg"
                             type="button"
                             onClick={scrollToCheckout}
-                            className="px-10 shadow-lg shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90"
+                            className="px-12 py-7 text-lg font-extrabold shadow-xl shadow-primary/30 bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 hover:scale-105 active:scale-95 animate-bounce"
                         >
-                            {getIconComponent(landingPage.mid_order_button_icon || 'shopping-cart', 'h-5 w-5 mr-2')}
+                            {getIconComponent(landingPage.mid_order_button_icon || 'shopping-cart', 'h-6 w-6 mr-2')}
                             {landingPage.mid_order_button_text || 'Order Now'}
                         </Button>
                     </div>
@@ -1449,7 +1468,7 @@ export default function LandingPage() {
                                                 <div className="mt-3 space-y-3 border-t border-border pt-3">
                                                     {sizes.length > 0 && (
                                                         <div>
-                                                            <span className="mb-1.5 block text-sm font-semibold text-foreground">{product.size_label || 'Size'}</span>
+                                                            <span className="mb-1.5 block text-base font-semibold text-red-600">{product.size_label || 'Size'}</span>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {sizes.map((size) => {
                                                                     const mv = variants.filter((v) => v.size === size);
@@ -1473,7 +1492,7 @@ export default function LandingPage() {
                                                     )}
                                                     {colors.length > 0 && (
                                                         <div>
-                                                            <span className="mb-1.5 block text-sm font-semibold text-foreground">{product.color_label || 'Color'}</span>
+                                                            <span className="mb-1.5 block text-base font-semibold text-red-600">{product.color_label || 'Color'}</span>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {colors.map((color) => {
                                                                     const mv = variants.filter((v) => v.color === color);
