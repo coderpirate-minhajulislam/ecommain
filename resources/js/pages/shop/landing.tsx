@@ -852,7 +852,29 @@ export default function LandingPage() {
             }));
         }
 
-        post(`/lp/${landingPage.slug}`, { forceFormData: true });
+        post(`/lp/${landingPage.slug}`, {
+            forceFormData: true,
+            onError: (errors) => {
+                // Scroll to the first error field
+                const errorFields = ['first_name', 'phone', 'email', 'district', 'address', 'blocked'];
+                for (const field of errorFields) {
+                    if (errors[field]) {
+                        const el = document.getElementById(field === 'first_name' ? 'firstName' : field);
+                        if (el) {
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            el.focus();
+                            toast.error(errors[field]);
+                            return;
+                        }
+                    }
+                }
+                // Fallback: scroll to the blocked warning or form top
+                const formEl = document.getElementById('checkout');
+                if (formEl) {
+                    formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            },
+        });
     }
 
     const addToCartFiredRef = useRef(false);
