@@ -999,15 +999,40 @@ export default function LandingPage() {
                 {(landingPage.price_banner_original_label || landingPage.price_banner_original_price || landingPage.price_banner_current_label || landingPage.price_banner_current_price) && (
                     <>
                     <style>{`
-                        @keyframes pricePulse {
-                            0%, 100% { text-decoration-thickness: 2px; }
-                            50% { text-decoration-thickness: 4px; }
+                        @keyframes priceStrikeAnim {
+                            0% { width: 0; opacity: 0; }
+                            100% { width: 100%; opacity: 1; }
+                        }
+                        .price-strike-anim {
+                            position: relative;
+                            display: inline-block;
+                        }
+                        .price-strike-anim::after {
+                            content: '';
+                            position: absolute;
+                            left: 0;
+                            top: 50%;
+                            width: 100%;
+                            height: 3px;
+                            background: hsl(var(--destructive));
+                            transform: translateY(-50%) rotate(-3deg);
+                            animation: priceStrikeAnim 1.5s ease-out forwards;
+                        }
+                        @keyframes pricePulseGlow {
+                            0%, 100% { text-decoration-thickness: 2px; text-shadow: 0 0 0 transparent; }
+                            50% { text-decoration-thickness: 4px; text-shadow: 0 4px 12px hsl(var(--primary) / 0.3); }
                         }
                         .price-underline-anim {
                             text-decoration: underline;
                             text-decoration-color: hsl(var(--primary));
-                            text-underline-offset: 4px;
-                            animation: pricePulse 2s ease-in-out infinite;
+                            text-underline-offset: 6px;
+                            text-decoration-thickness: 2px;
+                            animation: pricePulseGlow 2s ease-in-out infinite;
+                            display: inline-block;
+                            transition: transform 0.3s ease;
+                        }
+                        .price-underline-anim:hover {
+                            transform: scale(1.05);
                         }
                     `}</style>
                     <section className="bg-primary/5">
@@ -1017,7 +1042,7 @@ export default function LandingPage() {
                                     <p className="mb-3 text-lg font-bold text-muted-foreground sm:text-xl">
                                         {landingPage.price_banner_original_label}{' '}
                                         <span className="relative inline-block ml-1">
-                                            <span className="line-through decoration-2 decoration-destructive text-destructive text-xl sm:text-2xl">{landingPage.price_banner_original_price} ৳</span>
+                                            <span className="price-strike-anim decoration-2 decoration-destructive text-destructive text-xl sm:text-2xl">{landingPage.price_banner_original_price} ৳</span>
                                         </span>
                                     </p>
                                 )}
@@ -1037,7 +1062,15 @@ export default function LandingPage() {
                 <section className="bg-card border-t border-border">
                     <div className="mx-auto max-w-3xl px-4 py-8 text-center sm:py-12">
                         {countdownRemaining && (
-                            <div className="mb-5 flex items-center justify-center gap-2 sm:gap-3">
+                            <div className="mb-5 flex flex-col items-center gap-3">
+                                <button
+                                    type="button"
+                                    onClick={scrollToCheckout}
+                                    className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-105 sm:px-4 sm:py-2.5 sm:text-sm"
+                                >
+                                    {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-4 w-4')}
+                                    {landingPage.badge_text || 'Limited Offer'}
+                                </button>
                                 <div className="flex items-center gap-1 sm:gap-1.5">
                                     {(['days', 'hours', 'minutes', 'seconds'] as const).map((unit, idx) => (
                                         <span key={unit} className="flex items-center">
@@ -1048,14 +1081,6 @@ export default function LandingPage() {
                                         </span>
                                     ))}
                                 </div>
-                                <button
-                                    type="button"
-                                    onClick={scrollToCheckout}
-                                    className="flex items-center gap-1.5 rounded-full bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-transform hover:scale-105 sm:px-4 sm:py-2.5 sm:text-sm"
-                                >
-                                    {landingPage.icon_name && getIconComponent(landingPage.icon_name, 'h-4 w-4')}
-                                    {landingPage.badge_text || 'Limited Offer'}
-                                </button>
                             </div>
                         )}
                         <Button
