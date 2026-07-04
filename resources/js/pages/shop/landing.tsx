@@ -1273,6 +1273,25 @@ export default function LandingPage() {
                                         </div>
                                     </div>
 
+                                    {/* Delivery Zone Selector */}
+                                        {filteredZones.length > 0 && (
+                                            <div className="rounded-xl border border-border bg-muted/50 p-3 sm:p-5">
+                                                <p className="mb-2 text-sm font-bold">{labels?.deliveryArea ?? 'Delivery Area'}</p>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {filteredZones.map((zone) => (
+                                                        <button
+                                                            key={zone}
+                                                            type="button"
+                                                            onClick={() => setDeliveryZone(zone)}
+                                                            className={`rounded-md border px-3 py-1.5 text-xs font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
+                                                        >
+                                                            {zone}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
                                     {/* Payment Method */}
                                     <div className="rounded-xl border border-border bg-muted/50 p-3 sm:p-5">
                                         <h3 className="mb-3 text-sm font-bold">{labels?.paymentMethod ?? 'Payment Method'}</h3>
@@ -1430,7 +1449,7 @@ export default function LandingPage() {
                                                 <div className="mt-3 space-y-3 border-t border-border pt-3">
                                                     {sizes.length > 0 && (
                                                         <div>
-                                                            <span className="mb-1.5 block text-xs font-medium text-muted-foreground">{product.size_label || 'Size'}</span>
+                                                            <span className="mb-1.5 block text-sm font-semibold text-foreground">{product.size_label || 'Size'}</span>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {sizes.map((size) => {
                                                                     const mv = variants.filter((v) => v.size === size);
@@ -1454,7 +1473,7 @@ export default function LandingPage() {
                                                     )}
                                                     {colors.length > 0 && (
                                                         <div>
-                                                            <span className="mb-1.5 block text-xs font-medium text-muted-foreground">{product.color_label || 'Color'}</span>
+                                                            <span className="mb-1.5 block text-sm font-semibold text-foreground">{product.color_label || 'Color'}</span>
                                                             <div className="flex flex-wrap gap-2">
                                                                 {colors.map((color) => {
                                                                     const mv = variants.filter((v) => v.color === color);
@@ -1550,7 +1569,7 @@ export default function LandingPage() {
                                                             <div className="mt-3 space-y-3 border-t border-border pt-3">
                                                                 {epSizes.length > 0 && (
                                                                     <div>
-                                                                        <span className="mb-1.5 block text-xs font-medium text-muted-foreground">{ep.size_label || 'Size'}</span>
+                                                                        <span className="mb-1.5 block text-sm font-semibold text-foreground">{ep.size_label || 'Size'}</span>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             {epSizes.map((size) => {
                                                                                 const mv = ep.variants.filter((v) => v.size === size);
@@ -1575,7 +1594,7 @@ export default function LandingPage() {
                                                                 )}
                                                                 {epColors.length > 0 && (
                                                                     <div>
-                                                                        <span className="mb-1.5 block text-xs font-medium text-muted-foreground">{ep.color_label || 'Color'}</span>
+                                                                        <span className="mb-1.5 block text-sm font-semibold text-foreground">{ep.color_label || 'Color'}</span>
                                                                         <div className="flex flex-wrap gap-2">
                                                                             {epColors.map((color) => {
                                                                                 const mv = ep.variants.filter((v) => v.color === color);
@@ -1671,25 +1690,6 @@ export default function LandingPage() {
                                                 </div>
                                             )
                                         )}
-
-                                        {/* Delivery Zone Selector */}
-                                            {filteredZones.length > 0 && (
-                                                <div className="mb-3">
-                                                    <p className="mb-2 text-xs font-medium text-muted-foreground">Delivery Area</p>
-                                                    <div className="flex flex-wrap gap-2">
-                                                        {filteredZones.map((zone) => (
-                                                            <button
-                                                                key={zone}
-                                                                type="button"
-                                                                onClick={() => setDeliveryZone(zone)}
-                                                                className={`rounded-md border px-2 py-1.5 text-xs font-medium transition-colors ${deliveryZone === zone ? 'border-primary bg-primary text-primary-foreground' : 'border-border text-muted-foreground hover:border-primary/50'}`}
-                                                            >
-                                                                {zone}
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                            )}
 
                                         <div className="space-y-2 text-sm">
                                             {hasMultipleProducts && selectedItems.filter((i) => i.selected).map((i) => {
