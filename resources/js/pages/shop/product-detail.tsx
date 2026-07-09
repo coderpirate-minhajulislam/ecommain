@@ -464,20 +464,6 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                     )}
                                     {imagePaths.length > 1 && (
                                         <>
-                                            <button
-                                                onClick={imgPrev}
-                                                className="absolute left-2 top-1/2 z-20 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition hover:bg-black/70 group-hover:opacity-100"
-                                                aria-label="Previous image"
-                                            >
-                                                <ChevronLeft className="h-4 w-4" />
-                                            </button>
-                                            <button
-                                                onClick={imgNext}
-                                                className="absolute right-2 top-1/2 z-20 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition hover:bg-black/70 group-hover:opacity-100"
-                                                aria-label="Next image"
-                                            >
-                                                <ChevronRight className="h-4 w-4" />
-                                            </button>
                                         </>
                                     )}
                                 </div>
@@ -518,20 +504,6 @@ const [showFullDescription, setShowFullDescription] = useState(false);
                                     )}
                                     {imagePaths.length > 1 && (
                                         <>
-                                            <button
-                                                onClick={imgPrev}
-                                                className="absolute left-2 top-1/2 z-20 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white"
-                                                aria-label="Previous image"
-                                            >
-                                                <ChevronLeft className="h-4 w-4" />
-                                            </button>
-                                            <button
-                                                onClick={imgNext}
-                                                className="absolute right-2 top-1/2 z-20 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white"
-                                                aria-label="Next image"
-                                            >
-                                                <ChevronRight className="h-4 w-4" />
-                                            </button>
                                             <div className="absolute bottom-2 left-0 right-0 z-20 flex justify-center gap-1.5">
                                                 {imagePaths.map((_, i) => (
                                                     <button
