@@ -211,7 +211,7 @@ class OrderController extends Controller
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
 
             'email' => 'nullable|email|max:255',
-            'district' => ['nullable', 'string', 'max:100'],
+            'district' => ['required', 'string', 'max:100'],
             'address' => 'required|string|max:500',
             'delivery_zone' => 'required|string|max:100',
             'payment_method' => ['required', 'string', 'exists:payment_methods,slug', function ($attribute, $value, $fail) {
@@ -496,7 +496,7 @@ class OrderController extends Controller
             'phone' => ['required', 'string', 'regex:/^01\d{9}$/'],
 
             'email' => 'nullable|email|max:255',
-            'district' => ['nullable', 'string', 'max:100'],
+            'district' => ['required', 'string', 'max:100'],
             'address' => 'required|string|max:500',
             'delivery_zone' => 'required|string|max:100',
             'payment_method' => ['required', 'string', 'exists:payment_methods,slug', function ($attribute, $value, $fail) {

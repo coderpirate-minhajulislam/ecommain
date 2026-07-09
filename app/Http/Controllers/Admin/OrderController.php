@@ -210,6 +210,7 @@ class OrderController extends Controller
             'products' => Product::with('variants', 'images')->where('in_stock', true)->orderBy('name')->get(),
             'emailEnabled' => (bool) Setting::get('checkout_email_enabled', false),
             'shippingZones' => Cache::remember('shop.shipping_zones', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->pluck('name')->toArray()),
+            'shippingZoneClasses' => Cache::remember('shop.shipping_zone_classes', 3600, fn () => ShippingZone::orderBy('sort_order')->orderBy('name')->get(['name', 'districts'])->toArray()),
             'freeShippingAmount' => (float) Setting::get('free_shipping_amount', 0),
             'freeShippingEnabled' => (bool) Setting::get('free_shipping_enabled', true),
         ]);
@@ -221,6 +222,7 @@ class OrderController extends Controller
             'first_name' => 'required|string|max:255',
             'phone' => 'required|string|max:50',
             'email' => 'nullable|email|max:255',
+            'district' => ['required', 'string', 'max:100'],
             'address' => 'required|string|max:500',
             'delivery_zone' => 'nullable|string|max:100',
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled,hold,pre-order',
@@ -328,6 +330,7 @@ class OrderController extends Controller
             'first_name' => $validated['first_name'],
             'phone' => $validated['phone'],
             'email' => $validated['email'] ?? null,
+            'district' => $validated['district'],
             'address' => $validated['address'],
             'delivery_zone' => $deliveryZone,
         ]);

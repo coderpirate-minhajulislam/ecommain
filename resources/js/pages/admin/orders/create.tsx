@@ -1,6 +1,8 @@
 import { Head, useForm } from '@inertiajs/react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { buildDistrictOptions, filterShippingZoneNamesForDistrict } from '@/lib/shipping-zone-class';
+import { bangladeshDistricts } from '@/data/bangladesh-districts';
 
 type ShippingZoneCharge = {
     zone: string;
@@ -43,6 +45,7 @@ type Props = {
     products: Product[];
     emailEnabled: boolean;
     shippingZones?: string[];
+    shippingZoneClasses?: { name: string; districts?: string[] | null }[];
     freeShippingAmount?: number;
     freeShippingEnabled?: boolean;
 };
@@ -89,6 +92,7 @@ export default function CreateOrder({
     products,
     emailEnabled,
     shippingZones = [],
+    shippingZoneClasses = [],
     freeShippingAmount = 0,
     freeShippingEnabled = true,
 }: Props) {
@@ -96,6 +100,7 @@ export default function CreateOrder({
         first_name: '',
         phone: '',
         email: '',
+        district: '',
         address: '',
         delivery_zone: shippingZones[0] ?? '',
         status: 'pending',
@@ -165,7 +170,29 @@ export default function CreateOrder({
         return Array.from(zoneSet);
     }, [data.items, products]);
 
-    const deliveryZoneOptions = availableZones.length > 0 ? availableZones : shippingZones;
+    const districtOptions = useMemo(() => {
+        return buildDistrictOptions(bangladeshDistricts, shippingZoneClasses);
+    }, [shippingZoneClasses]);
+
+    const filteredZones = useMemo(() => {
+        return filterShippingZoneNamesForDistrict(data.district, availableZones.length > 0 ? availableZones : shippingZones, shippingZoneClasses);
+    }, [data.district, availableZones, shippingZones, shippingZoneClasses]);
+
+    const deliveryZoneOptions = filteredZones.length > 0 ? filteredZones : (availableZones.length > 0 ? availableZones : shippingZones);
+
+    const [districtSearch, setDistrictSearch] = useState('');
+    const [districtOpen, setDistrictOpen] = useState(false);
+    const districtRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClick(e: MouseEvent) {
+            if (districtRef.current && !districtRef.current.contains(e.target as Node)) {
+                setDistrictOpen(false);
+            }
+        }
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, []);
 
     useEffect(() => {
         if (deliveryZoneOptions.length === 0) {
@@ -291,6 +318,40 @@ export default function CreateOrder({
                                             {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
                                         </div>
                                     )}
+                                    <div ref={districtRef}>
+                                        <label className="mb-1.5 block text-sm font-medium">District *</label>
+                                        <div className="relative">
+                                            <input
+                                                id="district"
+                                                type="text"
+                                                value={districtOpen ? districtSearch : data.district}
+                                                onChange={(e) => { setDistrictSearch(e.target.value); setDistrictOpen(true); }}
+                                                onFocus={() => { setDistrictOpen(true); setDistrictSearch(data.district); }}
+                                                placeholder="Search district..."
+                                                autoComplete="off"
+                                                className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                                            />
+                                            {districtOpen && (() => {
+                                                const filtered = districtOptions.filter((d) =>
+                                                    d.toLowerCase().includes(districtSearch.toLowerCase())
+                                                );
+                                                return filtered.length > 0 ? (
+                                                    <ul className="absolute z-50 mt-1 max-h-48 w-full overflow-auto rounded-md border bg-popover shadow-md">
+                                                        {filtered.map((d) => (
+                                                            <li
+                                                                key={d}
+                                                                onClick={() => { setData('district', d); setDistrictSearch(d); setDistrictOpen(false); }}
+                                                                className={`cursor-pointer px-3 py-2 text-sm hover:bg-accent ${data.district === d ? 'bg-accent font-medium' : ''}`}
+                                                            >
+                                                                {d}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ) : null;
+                                            })()}
+                                        </div>
+                                        {errors.district && <p className="mt-1 text-xs text-destructive">{errors.district}</p>}
+                                    </div>
                                     <div>
                                         <label className="mb-1.5 block text-sm font-medium">Address</label>
                                         <input

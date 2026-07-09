@@ -817,6 +817,17 @@ export default function LandingPage() {
             return;
         }
 
+        // Validate district is selected
+        if (!data.district.trim()) {
+            toast.error('Please select your district before placing the order.');
+            const districtEl = document.getElementById('district');
+            if (districtEl) {
+                districtEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                districtEl.focus();
+            }
+            return;
+        }
+
         // Ensure UTM parameters are read fresh from sessionStorage at submit time
         const freshUtmData: Record<string, string> = {};
         utmKeys.forEach((key) => {
