@@ -209,6 +209,7 @@ export function HeroBanner() {
             {banners.length > 1 && (
                 <>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={prev}
                         className="absolute left-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Previous banner"
@@ -216,6 +217,7 @@ export function HeroBanner() {
                         <ChevronLeft className="h-5 w-5" />
                     </button>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={next}
                         className="absolute right-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Next banner"
@@ -227,6 +229,7 @@ export function HeroBanner() {
                         {banners.map((_, i) => (
                             <button
                                 key={i}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={() => setCurrent(i)}
                                 className={`h-2 rounded-full transition-all ${
                                     i === current ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'
@@ -513,6 +516,7 @@ export function MidBanner() {
             {midBanners.length > 1 && (
                 <>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={prev}
                         className="absolute left-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Previous banner"
@@ -520,6 +524,7 @@ export function MidBanner() {
                         <ChevronLeft className="h-5 w-5" />
                     </button>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={next}
                         className="absolute right-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Next banner"
@@ -530,6 +535,7 @@ export function MidBanner() {
                         {midBanners.map((_, i) => (
                             <button
                                 key={i}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={() => setCurrent(i)}
                                 className={`h-2 rounded-full transition-all ${
                                     i === current ? 'w-6 bg-white' : 'w-2 bg-white/50 hover:bg-white/80'

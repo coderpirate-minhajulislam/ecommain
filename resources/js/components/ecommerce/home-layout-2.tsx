@@ -187,6 +187,7 @@ function SideSlider({ items }: { items: Banner[] }) {
             {items.length > 1 && (
                 <>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={prev}
                         className="absolute left-2 top-1/2 z-20 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Previous"
@@ -194,6 +195,7 @@ function SideSlider({ items }: { items: Banner[] }) {
                         <ChevronLeft className="h-4 w-4" />
                     </button>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={next}
                         className="absolute right-2 top-1/2 z-20 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Next"
@@ -204,6 +206,7 @@ function SideSlider({ items }: { items: Banner[] }) {
                         {items.map((_, i) => (
                             <button
                                 key={i}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={() => setCurrent(i)}
                                 className={`h-1.5 rounded-full transition-all ${i === current ? 'w-5 bg-white' : 'w-1.5 bg-white/50 hover:bg-white/80'}`}
                                 aria-label={`Go to slide ${i + 1}`}
@@ -612,7 +615,9 @@ function MidBannerV2() {
             className="group relative overflow-hidden rounded-2xl select-none cursor-grab active:cursor-grabbing"
             style={{ minHeight: '200px' }}
             onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
+            onTouchCancel={onTouchCancel}
             onMouseDown={onMouseDown}
             onMouseMove={onMouseMove}
             onMouseUp={onMouseUp}
@@ -658,6 +663,7 @@ function MidBannerV2() {
             {midBanners.length > 1 && (
                 <>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={prev}
                         className="absolute left-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Previous banner"
@@ -665,6 +671,7 @@ function MidBannerV2() {
                         <ChevronLeft className="h-5 w-5" />
                     </button>
                     <button
+                        onMouseDown={(e) => e.stopPropagation()}
                         onClick={next}
                         className="absolute right-3 top-1/2 z-20 -translate-y-1/2 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 transition hover:bg-black/70 group-hover:opacity-100"
                         aria-label="Next banner"
@@ -675,6 +682,7 @@ function MidBannerV2() {
                         {midBanners.map((_, i) => (
                             <button
                                 key={i}
+                                onMouseDown={(e) => e.stopPropagation()}
                                 onClick={() => setCurrent(i)}
                                 className={`h-2 rounded-full transition-all ${i === current ? 'w-6 bg-white' : 'w-2 bg-white/50'}`}
                                 aria-label={`Go to slide ${i + 1}`}
